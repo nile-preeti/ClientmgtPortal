@@ -160,7 +160,7 @@ class UserController extends Controller
         $year = request('year', date('Y'));
         $statusFilter = $request->query('status'); // Store status filter separately
         $user = User::where('id', $id)->first();
-       
+
         // Fetch attendance records
         $attendanceRecords = Attendance::where('user_id', $id)
             ->whereMonth('date', $month)
@@ -181,20 +181,21 @@ class UserController extends Controller
 
         for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
             $formattedDate = $date->format('Y-m-d');
-            
+
             if (isset($attendanceRecords[$formattedDate])) {
-                
+
                 $record = $attendanceRecords[$formattedDate];
 
                 $checkInTime = !empty($record->check_in_time) ? strtotime($record->check_in_time) : null;
                 $checkOutTime = !empty($record->check_out_time) ? strtotime($record->check_out_time) : null;
-                
+                $netWorkedHours = 0;
+                $breaks = [];
                 if (is_null($checkInTime) || is_null($checkOutTime)) {
                     $recordStatus = 'Absent'; // No check-in or check-out means Absent
                 } else {
                     // Calculate total worked time (before break deduction)
                     $workedHours = ($checkOutTime - $checkInTime) / 3600; // Convert to hours
-                
+
                     // Fetch total break time for the user on the given date
                     $totalBreakSeconds = \App\Models\AttendanceBreak::where('user_id', $record->user_id)
                         ->where('date', $record->date)
@@ -204,11 +205,17 @@ class UserController extends Controller
                         ->sum(function ($break) {
                             return strtotime($break->end_break) - strtotime($break->start_break);
                         });
-                
+                    // Fetch total break time for the user on the given date
+                    $breaks = \App\Models\AttendanceBreak::where('user_id', $record->user_id)
+                        ->where('date', $record->date)
+                        ->whereNotNull('start_break')
+                        ->whereNotNull('end_break')->orderBy("id",'asc')
+                        ->get();
+
                     // Convert break time to hours and subtract from worked hours
                     $totalBreakHours = $totalBreakSeconds / 3600;
                     $netWorkedHours = $workedHours - $totalBreakHours;
-                
+
                     // Determine attendance status after break deduction
                     if ($netWorkedHours < 4.5) {
                         $recordStatus = 'Absent';
@@ -225,7 +232,9 @@ class UserController extends Controller
                     'check_in_full_address' => $record->check_in_full_address,
                     'check_out_time' => $record->check_out_time,
                     'check_out_full_address' => $record->check_out_full_address,
-                    'status' => $recordStatus
+                    'status' => $recordStatus,
+                    'working_hours' => number_format($netWorkedHours, 1),
+                    'breaks' => $breaks
                 ];
             } else {
                 if (in_array($formattedDate, $holidays)) {
@@ -244,7 +253,9 @@ class UserController extends Controller
                     'check_in_full_address' => null,
                     'check_out_time' => null,
                     'check_out_full_address' => null,
-                    'status' => $recordStatus
+                    'status' => $recordStatus,
+                    'working_hours' => 0,
+                    'breaks' => []
                 ];
             }
         }

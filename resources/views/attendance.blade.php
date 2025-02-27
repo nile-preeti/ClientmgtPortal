@@ -68,7 +68,7 @@
 
         <div class="hrmodule-punching-section">
             <div class="container">
-            
+
                 <div class="hrmodule-punching-item">
                     <div id="map"></div>
                     <div class="controls">
@@ -332,10 +332,12 @@
             // Fetch Address from Coordinates
             async function getAddressFromCoordinates(lat, lng) {
                 const response = await fetch(
-                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}`
+                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?types=address&access_token=${MAPBOX_TOKEN}`
                 );
                 const data = await response.json();
-                return data.features[0]?.place_name || "Unknown address";
+
+                // Check if an address is found
+                return data.features.length > 0 ? data.features[0].place_name : "Unknown address";
             }
 
             // Display Records

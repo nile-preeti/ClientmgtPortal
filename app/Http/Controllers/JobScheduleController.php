@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\JobSchedule;
+use App\Models\Service;
+use App\Models\State;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -42,7 +44,9 @@ class JobScheduleController extends Controller
         $title = "Schedule Job";
         $users = User::where("role_id", 2)->get();
         $customers = Customer::all();
-        return view("pages.job_schedules.create", compact('title', 'users', 'customers'));
+        $states=State::where("country_id",233)->get();
+        $services=Service::all();
+        return view("pages.job_schedules.create", compact('title','services','states', 'users', 'customers'));
     }
     public function edit(Request $request, $id)
     {
@@ -54,8 +58,9 @@ class JobScheduleController extends Controller
         }
         $users = User::where("role_id", 2)->get();
         $customers = Customer::all();
-
-        return view("pages.job_schedules.create", compact('job_schedule', 'users', 'customers', 'title'));
+        $states=State::where("country_id",233)->get();
+        $services=Service::all();
+        return view("pages.job_schedules.create", compact('job_schedule','states','services', 'users', 'customers', 'title'));
     }
     public function store(Request $request)
     {

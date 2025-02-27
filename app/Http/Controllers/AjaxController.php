@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\AttendanceBreak;
+use App\Models\Customer;
 use App\Models\EventName;
 use App\Models\EventType;
 use App\Models\Holiday;
@@ -423,5 +424,19 @@ class AjaxController extends Controller
             'last_page' => $employees->lastPage(),
             'total' => $employees->total(),
         ]);
+    }
+
+    public function getCustomer()
+    {
+        if (request()->has("id")) {
+            $customer = Customer::find(request("id"));
+            if ($customer) {
+                return response()->json($customer);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Custome does not exists']);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Please provide id']);
+        }
     }
 }

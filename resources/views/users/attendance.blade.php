@@ -340,6 +340,10 @@
 
 
                 checkinBtn.addEventListener("click", async () => {
+                    const address = await getAddressFromCoordinates(lat, lng);
+
+                    console.log(address);
+
                     if (checkinBtn.getAttribute("data-id") == "check_in") {
                         const address = await getAddressFromCoordinates(lat, lng);
 
@@ -465,14 +469,32 @@
             }
 
             // Fetch Address from Coordinates
-            async function getAddressFromCoordinates(lat, lng) {
+            // async function getAddressFromCoordinates(lat, lng) {
+            //     const response = await fetch(
+            //         `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}`
+            //     );
+            //     const data = await response.json();
+            //     return data.features[0]?.place_name || "Unknown address";
+            // }
+
+            async function getAddressFromCoordinates(lat, lng, defaultAddress = "Default Location") {
                 const response = await fetch(
-                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}`
+                    `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?types=address&access_token=${MAPBOX_TOKEN}`
                 );
                 const data = await response.json();
-                return data.features[0]?.place_name || "Unknown address";
-            }
+              
 
+                if (!data.features.length) {
+                    return defaultAddress; // Return default if no results at all
+                }
+         
+                // Look for a rooftop-accurate address
+                const preciseAddress = data.features.find(feature => feature.properties?.accuracy ===
+                    "rooftop");
+                    const preciseStreetAddress = data.features.find(feature => feature.properties?.accuracy ===
+                    "street");
+                return preciseAddress ? preciseAddress.place_name : preciseStreetAddress.place_name;
+            }
 
 
 
@@ -523,7 +545,7 @@
                             //                 // $("#table_container").removeClass("d-none");
                             //                 $("#table_body").html($("#table_body").html() +
                             //                     `<tr><td>Break Started</td>
-                            //       <td>${break.break_start}</td></tr>`
+                        //       <td>${break.break_start}</td></tr>`
                             //                 );
                             //                 checkinBtn.setAttribute("data-id", "end_break");
                             //                 checkinBtn.textContent = ` End Break`;
@@ -535,7 +557,7 @@
                             //                 // $("#table_container").removeClass("d-none");
                             //                 $("#table_body").html($("#table_body").html() +
                             //                     `<tr><td>Break Finished</td>
-                            //       <td>${break.break_end}</td></tr>`
+                        //       <td>${break.break_end}</td></tr>`
                             //                 );
                             //                 checkinBtn.setAttribute("data-id", "start_break");
                             //                 checkinBtn.textContent = ` Start Break`;

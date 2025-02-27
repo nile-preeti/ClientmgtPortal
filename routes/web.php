@@ -87,7 +87,7 @@ Route::prefix('user')->as("user.")->group(function () {
 
 
 Route::get("get-service", [AjaxController::class, 'getService'])->name("get_service");
-
+Route::get("get-customer", [AjaxController::class, 'getCustomer'])->name("get_customer");
 
 
 // Ajax Routes for image upload
