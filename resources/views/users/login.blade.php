@@ -44,15 +44,15 @@
                         <div class="sign-in-from">
                            
                             <h1 class="mb-0 dark-signin">Employee Login</h1>
-                            <p>Enter your email address and password to access user panel.</p>
+                            <p></p>
                             <form class="mt-4" id="signin_form" enctype="multipart/form-data" action="{{route('user.login_post')}}" method="POST">
                                 @csrf
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">Emp Id</label>
+                                    <label for="exampleInputEmail1">Employee Id</label>
                                     <input type="text" name="emp_id" class="form-control mb-0" id="exampleInputEmail1" placeholder="Enter emp id">
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputPassword1">Enter Your Password</label>
+                                    <label for="exampleInputPassword1">Password</label>
                                     <input type="password"  name="password" class="form-control mb-0" id="exampleInputPassword1" placeholder="Password">
                                 </div>
                                 <div class="d-inline-block w-100">
@@ -113,6 +113,17 @@
                         maxlength: 191,
 
                     },
+                },
+                messages: {
+                    emp_id: {
+                        required: "Required",
+                        maxlength: "Max 4 digits allowed.",
+                        digits: "Only numbers allowed."
+                    },
+                    password: {
+                        required: "Required",
+                        maxlength: "Max 191 characters allowed."
+                    }
                 },
                 errorElement: "span",
                 errorPlacement: function(error, element) {

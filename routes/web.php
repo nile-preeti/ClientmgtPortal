@@ -80,8 +80,9 @@ Route::prefix('user')->as("user.")->group(function () {
         Route::get("holidays", [UserController::class, 'holidays'])->name("holidays");
         Route::get("directory", [UserController::class, 'directory'])->name("directory");
         Route::get("employee/directory", [UserController::class, 'directory_directory'])->name("employee.directory");
-        Route::get("all-emp-directory", [AjaxController::class, 'Employeedirectory'])->name("employee.directory");
-// reports
+        Route::get("all-emp-directory", [AjaxController::class, 'Employeedirectory'])->name("employee.directories");
+
+        Route::post('/change-password', [UserController::class, 'changePassword'])->name('change.password');
 
 
         Route::get("logout", [UserController::class, 'logout'])->name("logout");

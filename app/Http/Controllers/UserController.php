@@ -67,7 +67,7 @@ class UserController extends Controller
 
         $user = new User();
         $user->role_id = 2;
-        $user->name = $request->name;
+        $user->name = ucwords(strtolower($request->name));
         $user->email = $request->email;
         $user->image = $request->image;
 
@@ -102,7 +102,7 @@ class UserController extends Controller
         ]);
 
         $user =  User::find($id);
-        $user->name = $request->name;
+        $user->name = ucwords(strtolower($request->name));
         $user->email = $request->email;
         $user->image = $request->image;
         $user->phone = $request->phone;
@@ -411,5 +411,19 @@ class UserController extends Controller
     public function directory(Request $request)
     {
         return view("users.directory");
+    }
+
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'new_password' => 'required|min:6|confirmed'
+        ]);
+
+        $user = auth()->user();
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Password updated successfully!']);
     }
 }
