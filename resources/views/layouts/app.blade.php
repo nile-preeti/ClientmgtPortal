@@ -95,7 +95,7 @@
                         <li>
                             <a class="iq-waves-effect" style="cursor: pointer"
                             onclick="askLogout()" href="#" ><i
-                            class="ri-login-box-line ml-2"></i> <span>Sign out</span> </a>
+                            class="ri-login-box-line "></i> <span>Sign out</span> </a>
                         </li>
 
                       
@@ -169,14 +169,14 @@
                         <li>
                             <a href="#"
                                 class="search-toggle iq-waves-effect d-flex align-items-center bg-primary rounded">
-                                <img src="{{ asset('assets/images/user/1.jpg') }}" class="img-fluid rounded mr-3"
+                                <img src="{{ asset('avatar.png') }}" class="img-fluid rounded mr-3"
                                     alt="user">
                                 <div class="caption">
                                     <h6 class="mb-0 line-height text-white">{{ auth()->guard("admin")->user()->name }}</h6>
                                     <!-- <span class="font-size-12 text-white">Available</span> -->
                                 </div>
                             </a>
-                            <div class="iq-sub-dropdown iq-user-dropdown">
+                            {{-- <div class="iq-sub-dropdown iq-user-dropdown">
                                 <div class="iq-card shadow-none m-0">
                                     <div class="iq-card-body p-0 ">
                                         <div class="bg-primary p-3">
@@ -217,7 +217,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
                         </li>
                     </ul>
                 </nav>
@@ -293,7 +293,6 @@
             Swal.fire({
                 title: '',
                 text: title,
-                iconHtml: '<img src="{{ asset('assets/images/question.png') }}" height="25px">',
                 customClass: {
                     icon: 'no-border'
                 },

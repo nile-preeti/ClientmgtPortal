@@ -94,7 +94,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <form class="position-relative mr-1">
                                     <div class="form-group mb-0">
-                                        <a class="btnChangePassword" href="#"><i
+                                        <a class="btnChangePassword" href="{{route("reports")}}?export=true"><i
                                                 class="ri-download-line"></i>
                                             &nbsp; Download Logs</a>
                                     </div>

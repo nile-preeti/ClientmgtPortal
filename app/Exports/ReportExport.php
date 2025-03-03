@@ -33,10 +33,10 @@ class ReportExport implements FromCollection, WithHeadings
 
             return [
                 "ID" => $item->id,
-                "Name" => $item->first_name . ' ' . $item->last_name ?? 'N/A',
+                "Name" => $item->name  ?? 'N/A',
                 "Email" => $item->email ?? 'N/A',
-                "Phone" => $item->mobile_phone ?? 'N/A',
-                "Status" => $item->status ?? 'N/A',
+                "Phone" => $item->phone ?? 'N/A',
+                "Status" => $item->status ?"Active": 'Inactive',
                 "Working Hours" => $item->working_hours ?? 'N/A',
 
 

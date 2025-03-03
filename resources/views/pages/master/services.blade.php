@@ -53,7 +53,7 @@
                                     </div>
                                 </div>
                                 <div class="table-responsive">
-                                    <table id="user-list-table" class="table table-striped table-borderless mt-0" role="grid"
+                                    <table id="user-list-table" class="table table-striped table-hover table-borderless mt-0" role="grid"
                                         aria-describedby="user-list-page-info">
                                         <thead>
                                             <tr>

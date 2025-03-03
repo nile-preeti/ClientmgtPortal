@@ -154,7 +154,7 @@
                                 </div>
 
                                 <table id="user-list-table"
-                                    class="table-responsive table table-striped table-borderless mt-4">
+                                    class="table-responsive table table-striped table-hover table-borderless mt-4">
                                     <thead>
                                         <tr>
                                             <th>Date</th>

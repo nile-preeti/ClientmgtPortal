@@ -163,14 +163,27 @@ class AdminController extends Controller
         $users = User::when(request()->filled("search"), function ($query) {
             $keyword = trim(request("search"));
             return $query->where("name", "LIKE", "%$keyword%")->orWhere("designation", "LIKE", "%$keyword%")->orWhere("email", "LIKE", "%$keyword%")->orWhere("phone", "LIKE", "%$keyword%");
+        })->when(request()->filled("month"), function ($query) {
+
+            return $query->whereMonth("created_at", request("month"));
         })
+            ->when(request()->filled("year"), function ($query) {
+
+                return $query->whereYear("created_at", request("year"));
+            })
             ->where("role_id", 2)
             ->when(request()->filled("status"), function ($query) {
                 return $query->where("status", request("status"));
             });
 
         if (request()->has("export")) {
+
             $users =  $users->get();
+            foreach ($users as $user) {
+                $month = request("month", date("m"));
+                $year = request("year", date("Y"));
+                $user->working_hours = $this->getTotalWorkingHours($user->id, $month, $year);
+            }
             return Excel::download(new ReportExport($users),  'employees_' . date("d-m-Y", time()) . '.xlsx');
         }
         $users =      $users->orderBy("id", "desc")->paginate(config("contant.paginatePerPage"));

@@ -56,7 +56,7 @@
                                                 src="{{ asset('reset.png') }}" height="20" alt=""></span>
                                     </div>
                                 </div>
-                                <table id="user-list-table" class="table table-striped table-borderless mt-4" role="grid"
+                                <table id="user-list-table" class="table table-striped table-hover table-borderless mt-4" role="grid"
                                     aria-describedby="user-list-page-info">
                                     <thead>
                                         <tr>

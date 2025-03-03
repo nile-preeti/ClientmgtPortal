@@ -1,5 +1,10 @@
 @extends('layouts.app')
 @section('content')
+    <style>
+        .search-filter-info .form-group select.form-control {
+            padding: 10px 15px 14px 15px !important;
+        }
+    </style>
     <!-- Page Content  -->
     <div id="content-page" class="content-page">
         <div class="container-fluid">
@@ -7,55 +12,89 @@
                 <div class="col-sm-12">
                     <div class="iq-card">
                         <!-- <div class="iq-card-header d-flex justify-content-between">
-                                                                                                                              <div class="iq-header-title">
-                                                                                                                                 <h4 class="card-title">User List</h4>
-                                                                                                                              </div>
-                                                                                                                           </div> -->
+                                                                                                                                          <div class="iq-header-title">
+                                                                                                                                             <h4 class="card-title">User List</h4>
+                                                                                                                                          </div>
+                                                                                                                                       </div> -->
                         <div class="iq-card-body">
                             <div class="search-filter-info">
                                 <div class="row justify-content-between">
-                                    <div class="col-sm-12 col-md-5">
+                                    <div class="col-sm-12 col-md-3">
 
                                         <div class="users-filter-search">
                                             <div id="user_list_datatable_info" class="dataTables_filter filter-search-info">
                                                 <form class="position-relative">
                                                     <div class="form-group mb-0">
                                                         <input type="search" class="form-control" name="search"
-                                                        placeholder="Search..." aria-controls="user-list-table"
-                                                        value="{{ $search }}">
+                                                            placeholder="Search..." aria-controls="user-list-table"
+                                                            value="{{ $search }}">
                                                     </div>
                                                 </form>
                                             </div>
-                                            <div class="btn-reload"  onclick="window.location.href = window.location.origin + window.location.pathname;">
+                                            <div class="btn-reload"
+                                                onclick="window.location.href = window.location.origin + window.location.pathname;">
                                                 <img src="{{ asset('reset.png') }}" height="20" alt="">
                                             </div>
                                         </div>
                                     </div>
-                                   
-                                    <div class="col-sm-12 col-md-5">
-                                        <div class="form-group">
-                                            <select class="form-control" id="selectcountry"
-                                                onchange="changeStatus(this.value)">
-                                                <option value="">--Filter By Status--</option>
-                                                <option value="1" @if (request()->has('status') && request('status') == 1) selected @endif>
-                                                    Active </option>
-
-                                                <option value="0" @if (request()->has('status') && request('status') == 0) selected @endif>
-                                                    Inactive </option>
-
-                                            </select>
-                                        </div>
+                                    @php
+                                    $currentYear = request('year', date('Y')); // Default to current year if not passed
+                                    $currentMonth = request('month', date('m')); // Default to current month if not passed
+                                @endphp
+                                
+                                <div class="col-sm-12 col-md-2">
+                                    <div class="form-group">
+                                        {{-- <label for="selectStatus">Filter By Status</label> --}}
+                                        <select class="form-control" id="selectStatus" onchange="updateFilters()">
+                                            <option value="">--Filter By Status--</option>
+                                            <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Active</option>
+                                            <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactive</option>
+                                        </select>
                                     </div>
+                                </div>
+                                
+                                <!-- Month Filter -->
+                                <div class="col-sm-12 col-md-2">
+                                    <div class="form-group">
+                                        {{-- <label for="selectMonth">Filter By Month</label> --}}
+                                        <select class="form-control" id="selectMonth" onchange="updateFilters()">
+                                            <option value="">--Filter By Month--</option>
+                                            @for ($m = 1; $m <= 12; $m++)
+                                                <option value="{{ $m }}" {{ $currentMonth == $m ? 'selected' : '' }}>
+                                                    {{ date('F', mktime(0, 0, 0, $m, 1)) }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <!-- Year Filter -->
+                                <div class="col-sm-12 col-md-2">
+                                    <div class="form-group">
+                                        {{-- <label for="selectYear">Filter By Year</label> --}}
+                                        <select class="form-control" id="selectYear" onchange="updateFilters()">
+                                            <option value="">--Filter By Year--</option>
+                                            @for ($y = date('Y'); $y >= date('Y') - 5; $y--)
+                                                <option value="{{ $y }}" {{ $currentYear == $y ? 'selected' : '' }}>
+                                                    {{ $y }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                </div>
+                                
                                     <div class="col-sm-12 col-md-2">
                                         <div class="form-group">
-                                          <a href="{{route("reports")}}?export=true" class="btn btn-primary">Export</a>
+                                            <a class="btnChangePassword" href="{{ route('reports') }}?export=true"><i
+                                                    class="ri-download-line"></i>
+                                                &nbsp; Download Report</a>
                                         </div>
                                     </div>
-                                     
+
                                 </div>
                                 <div class="table-responsive">
-                                    <table id="user-list-table" class="table table-striped table-borderless mt-0" role="grid"
-                                        aria-describedby="user-list-page-info">
+                                    <table id="user-list-table" class="table table-striped table-hover table-borderless mt-0"
+                                        role="grid" aria-describedby="user-list-page-info">
                                         <thead>
                                             <tr>
                                                 <th> Name</th>
@@ -63,7 +102,7 @@
                                                 {{-- <th>Designation</th> --}}
                                                 <th>Phone No.</th>
                                                 <th>Status</th>
-                                               
+
                                                 <th>Working Hours</th>
 
                                                 {{-- <th>Action</th> --}}
@@ -72,7 +111,8 @@
                                         <tbody>
                                             @forelse ($users as $item)
                                                 <tr>
-                                                    <td class="d-flex align-items-center"><img class="avatar-40 rounded mr-2"
+                                                    <td class="d-flex align-items-center"><img
+                                                            class="avatar-40 rounded mr-2"
                                                             src="{{ $item->image ? asset("uploads/images/$item->image") : asset('avatar.png') }}"
                                                             alt="profile"> {{ $item->name }}</td>
 
@@ -83,7 +123,7 @@
                                                             class="badge dark-icon-light iq-bg-primary">{{ $item->status ? 'Active' : 'Inactive' }}</span>
                                                     </td>
 
-                                                    <td>{{$item->working_hours}}</td>
+                                                    <td>{{ $item->working_hours }}</td>
                                                     <td class="d-none">
                                                         <div class="flex align-items-center list-user-action">
                                                             {{-- <a  data-toggle="modal"
@@ -97,7 +137,7 @@
                                                                 onclick="showData(this)" data-target="#EditModel"
                                                                 style="cursor: pointer"><i class="ri-pencil-fill"></i></a> --}}
 
-                                                                {{-- edit button --}}
+                                                            {{-- edit button --}}
                                                             <a href="{{ route('users.edit', $item->id) }}"
                                                                 class="btnedit"><i class="ri-pencil-fill"></i></a>
                                                             {{-- delete  button --}}
@@ -189,9 +229,6 @@
             </div>
         </div>
     </div> <!-- Large Approved modal -->
-
-   
-
 @endsection
 @push('js')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/jquery.inputmask.bundle.min.js"></script>
@@ -501,17 +538,49 @@
 
         }
 
-        function changeStatus(val) {
-            var currentUrl = new URL(window.location.href);
-            // Add or update the 'run_id' parameter
-            currentUrl.searchParams.set('status', val);
-            if (val == "") {
-                currentUrl.searchParams.delete('status');
+        // function changeStatus(val) {
+        //     var currentUrl = new URL(window.location.href);
+        //     // Add or update the 'run_id' parameter
+        //     currentUrl.searchParams.set('status', val);
+        //     if (val == "") {
+        //         currentUrl.searchParams.delete('status');
 
+        //     }
+        //     // Reload the page with the new URL
+        //     window.location.href = currentUrl.toString();
+
+        // }
+
+        function updateFilters() {
+            let url = new URL(window.location.href);
+            let params = new URLSearchParams(url.search);
+
+            // Get selected filter values
+            let status = document.getElementById("selectStatus").value;
+            let month = document.getElementById("selectMonth").value;
+            let year = document.getElementById("selectYear").value;
+
+            // Update query parameters
+            if (status) {
+                params.set("status", status);
+            } else {
+                params.delete("status");
             }
-            // Reload the page with the new URL
-            window.location.href = currentUrl.toString();
 
+            if (month) {
+                params.set("month", month);
+            } else {
+                params.delete("month");
+            }
+
+            if (year) {
+                params.set("year", year);
+            } else {
+                params.delete("year");
+            }
+
+            // Reload page with updated URL
+            window.location.href = url.pathname + "?" + params.toString();
         }
     </script>
     <script type="text/javascript">
