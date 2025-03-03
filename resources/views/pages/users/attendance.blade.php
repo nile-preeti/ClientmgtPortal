@@ -15,6 +15,46 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="iq-card">
+                        <div class="user-table-item">
+                            <div class="row g-1 align-items-center">
+                                <div class="col-md-3">
+                                    <div class="user-profile-item mb-2">
+                                        <div class="user-profile-media">
+                                            <img src="https://mkradlandscapeandlawncare.com/assets/images/avatar.png">
+                                        </div>
+                                        <div class="user-profile-text">
+                                            <h2>{{ $user->name }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="User-contact-info mb-2">
+                                        <div class="User-contact-info-icon">
+                                            <i class="ri-mail-line"></i>
+                                        </div> 
+                                        <div class="User-contact-info-content">
+                                            <h2>Email Address</h2>
+                                            <p><a href="mailto:{{ $user->email }}">{{ $user->email }}</a></p>
+                                        </div>    
+                                    </div>
+                                </div>
+            
+                                <div class="col-md-3">
+                                    <div class="User-contact-info">
+                                        <div class="User-contact-info-icon">
+                                            <i class="ri-phone-line"></i>
+                                        </div> 
+                                        <div class="User-contact-info-content">
+                                            <h2>Phone</h2>
+                                            <p>{{ $user->phone }}</p>
+                                        </div>    
+                                    </div>
+                                </div>
+            
+                               
+                               
+                            </div>
+                        </div>
                         <!-- <div class="iq-card-header d-flex justify-content-between">
                                       <div class="iq-header-title">
                                          <h4 class="card-title">User List</h4>
@@ -149,7 +189,7 @@
                                                 <td>
                                                     <button class="btn btn-primary"
                                                         onclick='showBreaks(@json($item['breaks']))'>View
-                                                        Breaks</button>
+                                                        </button>
                                                 </td>
                                             </tr>
                                         @empty
@@ -247,9 +287,8 @@
             if (breaks.length == 0) {
                 $("#breaks_table").html(`<tr> <td>No Breaks</td> <td>${item.start_break}</td></tr>`);
             }
-            breaks.map(item => {
-                html += `<tr> <td>Break Started</td> <td>${item.start_break}</td></tr>`;
-                html += `<tr> <td>Break Finished</td><td>${item.end_break}</td></tr>`;
+            breaks.map((item,i) => {
+                html += `<tr> <td> ${i+1}.<td> Started - Finished</td> <td>${item.start_break} - ${item.end_break} </td></tr>`;
 
 
 

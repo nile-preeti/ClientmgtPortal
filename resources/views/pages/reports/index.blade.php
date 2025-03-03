@@ -46,12 +46,12 @@
                                             </select>
                                         </div>
                                     </div>
-
-                                     <div class="col-sm-12 col-md-2">
+                                    <div class="col-sm-12 col-md-2">
                                         <div class="form-group">
-                                            <a class="addbtn" href="{{ route('users.create') }}">Add</a>
+                                          <a href="{{route("reports")}}?export=true" class="btn btn-primary">Export</a>
                                         </div>
                                     </div>
+                                     
                                 </div>
                                 <div class="table-responsive">
                                     <table id="user-list-table" class="table table-striped table-borderless mt-0" role="grid"
@@ -63,7 +63,10 @@
                                                 {{-- <th>Designation</th> --}}
                                                 <th>Phone No.</th>
                                                 <th>Status</th>
-                                                <th>Action</th>
+                                               
+                                                <th>Working Hours</th>
+
+                                                {{-- <th>Action</th> --}}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -80,7 +83,8 @@
                                                             class="badge dark-icon-light iq-bg-primary">{{ $item->status ? 'Active' : 'Inactive' }}</span>
                                                     </td>
 
-                                                    <td>
+                                                    <td>{{$item->working_hours}}</td>
+                                                    <td class="d-none">
                                                         <div class="flex align-items-center list-user-action">
                                                             {{-- <a  data-toggle="modal"
                                                                 data-name="{{ $item->name ?? '' }}"
@@ -186,144 +190,8 @@
         </div>
     </div> <!-- Large Approved modal -->
 
-    <div class="modal fade CreateModel" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <form action="{{ route('users.store') }}" method="post" id="create_form"
-                    enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title">Create User</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-form-item">
-                            <div class="form-group">
-                                <label for="name">Name*</label>
-                                <input type="text" name="name" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">Email*</label>
-                                <input type="email" name="email" class="form-control" required>
-                            </div>
+   
 
-                            <div class="form-group">
-                                <label for="name">Designation*</label>
-                                <input type="text" name="designation" class="form-control" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="name">Phone Number*</label>
-                                <input type="number" placeholder="(678) 878-9909"
-                                    data-inputmask="'mask': '(999) 999-9999'" required name="phone"
-                                    class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">Password*</label>
-                                <input type="text" name="password" class="form-control" required>
-                            </div>
-
-                            {{-- <div class="form-group">
-                                <label for="name">Image</label>
-                            </div> --}}
-                            <input type="hidden" name="image" id="create_image" class="form-control">
-                            <div class="form-group">
-                                <div class="dropzone" id="myDropzone"></div>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">Status</label>
-                                <select class="form-control" name="status">
-                                    <option value="1">Active </option>
-                                    <option value="0">Inactive </option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <!-- <button type="button" class="btn btn-success">Approve</button> -->
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade EditModel" tabindex="-1" role="dialog" aria-hidden="true" id="EditModel">
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <form action="{{ route('users.store') }}" method="post" id="edit_form" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit User</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-
-                        <div class="container-fluid">
-                            <div class="form-group">
-                                <label for="name">Name*</label>
-                                <input type="text" name="name" id="name" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">Email*</label>
-                                <input type="email" name="email" id="email" class="form-control" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="name">Designation*</label>
-                                <input type="text" name="designation" id="designation" class="form-control" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="name">Phone No.*</label>
-                                <input type="number" name="phone" placeholder="(678) 878-9909"
-                                    data-inputmask="'mask': '(999) 999-9999'" id="phone" class="form-control"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <div>
-                                    <button type="button" class="btn btn-primary my-1"
-                                        onclick="$('#password').toggle()">Reset
-                                        Password</button>
-                                </div>
-                                <div>
-                                    <input type="text" name="password" class="form-control" required id="password"
-                                        style="display: none">
-
-                                </div>
-                            </div>
-                            <input type="hidden" name="image" id="edit_image" class="form-control">
-
-                            <div class="form-group">
-                                <div class="dropzone" id="editDropzone"></div>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">Status</label>
-                                <select class="form-control" name="status" id="status">
-
-                                    <option value="1">Active </option>
-                                    <option value="0">Inactive </option>
-
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <!-- <button type="button" class="btn btn-success">Approve</button> -->
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 @endsection
 @push('js')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/jquery.inputmask.bundle.min.js"></script>

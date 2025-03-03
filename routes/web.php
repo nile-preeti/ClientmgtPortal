@@ -47,6 +47,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::prefix("master")->as("master.")->group(function () {
         Route::resource("services", ServiceController::class);
     });
+    Route::get("reports", [AdminController::class, 'reports'])->name("reports");
 
 
     Route::get("users/attendance/{id}", [UserController::class, 'userAttendance'])->name("userAttendance");
@@ -80,6 +81,8 @@ Route::prefix('user')->as("user.")->group(function () {
         Route::get("directory", [UserController::class, 'directory'])->name("directory");
         Route::get("employee/directory", [UserController::class, 'directory_directory'])->name("employee.directory");
         Route::get("all-emp-directory", [AjaxController::class, 'Employeedirectory'])->name("employee.directory");
+// reports
+
 
         Route::get("logout", [UserController::class, 'logout'])->name("logout");
     });

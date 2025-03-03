@@ -87,6 +87,18 @@
                             <a href="{{ route('master.services.index') }}" class="iq-waves-effect">
                                 <i class="ri-calendar-event-line"></i><span>Services</span></a>
                         </li>
+                        <li>
+                            <a href="{{ route('reports') }}" class="iq-waves-effect">
+                                <i class="ri-calendar-event-line"></i><span>Reports</span></a>
+                        </li>
+                        
+                        <li>
+                            <a class="iq-waves-effect" style="cursor: pointer"
+                            onclick="askLogout()" href="#" ><i
+                            class="ri-login-box-line ml-2"></i> <span>Sign out</span> </a>
+                        </li>
+
+                      
                         {{-- <li class="nav-item  active ">
 
                             <a class="nav-link" href="javascript:void(0)" data-toggle="collapse"

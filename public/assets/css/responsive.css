@@ -304,7 +304,7 @@ NOTE: This file contains the styling for responsive Template.
 
 	.iq-sidebar-logo { width: auto; }
 
-	.iq-top-navbar .iq-navbar-custom .iq-menu-bt { display: inline-block; position: absolute; right: 440px; opacity: 1; color: #475cc7; background: var(--iq-bg-light-color); }
+	.iq-top-navbar .iq-navbar-custom .iq-menu-bt { display: inline-block; position: absolute; right: 150px; opacity: 1; color: #475cc7; background: var(--iq-bg-light-color); }
 
 	body.sidebar-main .iq-top-navbar .iq-sidebar-logo a span { opacity: 1; display: inline-block; }
 

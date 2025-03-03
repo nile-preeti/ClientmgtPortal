@@ -2213,4 +2213,49 @@ a.btnview {width: 36px;height: 36px;color: #3d3e3e;white-space: nowrap;backgroun
 .client-form-item .search-form-group input.form-control{padding: 13px 15px 13px 40px;}
 .client-form-item .form-group .form-control:focus{ border:1px solid #0069ac; }
 .client-form-item .search-form-group span.search-icon {position: absolute; top: 50%; left: 10px; pointer-events: none; transform: translateY(-50%) scaleX(-1); color: #6362e7; font-size: 18px; }
-.client-form-item .btnremove {color: #fff; white-space: nowrap; background: #cf3428; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+.client-form-item .btnremove {color: #fff; white-space: nowrap; background: #c9271b; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+button.btnReset {color: #fff; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+.btnSubmit {color: #fff; white-space: nowrap; background:#0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+a.btnSubmit {color: #fff; white-space: nowrap; background:#0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+
+
+.modal-form-item .form-group label {margin: 0; padding: 0; }
+.modal-form-item .search-form-group {position: relative; }
+.modal-form-item .form-group input.form-control {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding: 13px 15px 13px 15px; border:1px solid var(--iq-dark-border); width: 100%; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);}
+.modal-form-item .form-group select.form-control {position: relative; appearance:auto;color: var(--gray);border-radius: 5px;font-weight: 400;font-size: 13px;box-sizing: border-box;padding:14px 15px 14px 15px;border:1px solid var(--iq-dark-border);width: 100%;background: #FFF;box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);}
+.modal-form-item .form-group textarea.form-control {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding: 13px 15px 13px 15px; border:1px solid var(--iq-dark-border); width: 100%; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);}
+.modal-form-item .search-form-group input.form-control{padding: 13px 15px 13px 40px;}
+.modal-form-item .form-group .form-control:focus{ border:1px solid #0069ac; }
+.modal-form-item .search-form-group span.search-icon {position: absolute; top: 50%; left: 10px; pointer-events: none; transform: translateY(-50%) scaleX(-1); color: #6362e7; font-size: 18px; }
+.modal-action .btnSubmit {color: #fff; white-space: nowrap; background:#0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+.modal-action .btnClose {color: #fff; white-space: nowrap; background: #c9271b; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+
+
+
+.user-table-item{box-shadow: 0 0 #0000,0 0 #0000, 0px 12px 28px 0px rgba(36,7,70,.06); margin-bottom: 10px; background: var(--white); padding: 10px; border-radius: 10px; position: relative;}
+.user-profile-text {flex: 1; }
+
+.user-profile-item {padding: 0 0 0rem 0; display: flex; align-items: center; }
+.user-profile-media {width: 60px; height: 60px; position: relative; overflow: hidden; border-radius: 50%; margin: 0 10px 0 0; border: 1px solid #eaedf7; }
+.user-profile-media img {object-fit: cover; width: 100%; height: 100%; }
+.user-profile-text h2 {font-size: 16px; font-weight: 600; margin: 0 0 5px 0; padding: 0; color: var(--black); }
+.user-contact-info {position: relative; width: 100%; border-radius: 0; padding:  0; display: flex; gap: 5px; margin-bottom: 0rem; }
+.user-contact-info-icon {width: 32px; height: 32px; line-height: 32px; }
+.user-contact-info-icon img {height: 32px; }
+.user-contact-info-content h2 {    font-size: 12px; font-weight: 700; margin: 0 0 5px 0; padding: 0; color:var(--black); }
+.user-contact-info-content p {font-size: 14px; font-weight: normal; margin: 0; text-align: justify; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; color: var(--gray); }
+
+.email-text{font-size: 13px; font-weight: 400; margin: 0 0 5px 0; padding: 0; color: var(--gray); }
+
+.User-contact-info {position: relative; width: 100%; border-radius: 0; padding:  0; display: flex;  margin-bottom: 0rem; }
+.User-contact-info-icon {width: 40px; height: 40px; margin-right: 10px; line-height: 40px; font-size: 28px; color: #0069ac; }
+
+.User-contact-info-icon img {height: 32px; }
+.User-contact-info-content h2 {    font-size: 12px; font-weight: 700; margin: 0 0 5px 0; padding: 0; color: #4f5168; }
+
+.User-contact-info-content p {font-size: 12px; margin: 0; color: #0069ac; line-height: normal; font-weight: normal; }
+
+.user-profile-action{display: flex; align-items: center; gap: 10px;}
+
+.Scheduled-card {box-shadow: 0 0 #0000, 0 0 #0000, 0px 12px 28px 0px rgba(36, 7, 70, .06); margin-bottom: 10px; background: var(--white); padding: 10px; border-radius: 10px; position: relative; }
+.Scheduled-card h5 {    font-size:18px; font-weight: 700; margin: 0 0 0px 0; padding: 0; color: #4f5168; }

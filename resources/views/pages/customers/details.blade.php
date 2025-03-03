@@ -20,11 +20,11 @@
                         <div class="User-contact-info mb-2">
                             <div class="User-contact-info-icon">
                                 <i class="ri-mail-line"></i>
-                            </div> 
+                            </div>
                             <div class="User-contact-info-content">
                                 <h2>Email Address</h2>
                                 <p><a href="mailto:{{ $customer->email }}">{{ $customer->email }}</a></p>
-                            </div>    
+                            </div>
                         </div>
                     </div>
 
@@ -32,11 +32,11 @@
                         <div class="User-contact-info">
                             <div class="User-contact-info-icon">
                                 <i class="ri-phone-line"></i>
-                            </div> 
+                            </div>
                             <div class="User-contact-info-content">
                                 <h2>Phone</h2>
                                 <p>{{ $customer->phone }}</p>
-                            </div>    
+                            </div>
                         </div>
                     </div>
 
@@ -44,18 +44,18 @@
                         <div class="User-contact-info">
                             <div class="User-contact-info-icon">
                                 <i class="ri-map-pin-line"></i>
-                            </div> 
+                            </div>
                             <div class="User-contact-info-content">
                                 <h2>Full Address</h2>
                                 <p>{{ $customer->full_address }}</p>
-                            </div>    
+                            </div>
                         </div>
                     </div>
-                   
+
                 </div>
             </div>
 
-          
+
             <div class="Scheduled-card mt-2">
                 <h5 class="mt-2">Scheduled Jobs</h5>
                 <div class="table-responsive">
@@ -67,8 +67,10 @@
                                 <th>Service</th>
 
 
-                                <th>From </th>
-                                <th>To </th>
+                                <th>Start Date </th>
+                                <th>End Date </th>
+                                <th>From Time </th>
+                                <th>To Time </th>
                                 <th>Status</th>
                                 <th>Action &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
                             </tr>
@@ -82,11 +84,15 @@
                                     <td>
                                         {{ $item->service->name ?? 'N/A' }}
                                     </td>
-
-
-                                    <td>{{ date('h:i A', strtotime($item->start_time)) . ' ' . date('Y-m-d', strtotime($item->start_date)) }}
+                                    <td>{{ date('Y-m-d', strtotime($item->start_date)) }}
                                     </td>
-                                    <td>{{ date('h:i A', strtotime($item->end_time)) . ' ' . date('Y-m-d', strtotime($item->end_date)) }}
+                                    <td>{{ date('Y-m-d', strtotime($item->end_date)) }}
+                                    </td>
+
+
+                                    <td>{{ date('h:i A', strtotime($item->start_time)) }}
+                                    </td>
+                                    <td>{{ date('h:i A', strtotime($item->end_time)) }}
                                     </td>
 
 

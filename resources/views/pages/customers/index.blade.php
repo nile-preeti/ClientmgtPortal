@@ -20,7 +20,7 @@
                                                 <form class="position-relative">
                                                     <div class="form-group mb-0">
                                                         <input type="search" class="form-control" name="search"
-                                                        placeholder="Search by  name..." aria-controls="user-list-table"
+                                                        placeholder="Search" aria-controls="user-list-table"
                                                         value="{{ $search }}">
                                                     </div>
                                                 </form>
@@ -58,7 +58,7 @@
                                         <thead>
                                             <tr>
                                                 <th> Name</th>
-                                                <th>email</th>
+                                                <th>Email</th>
                                                 <th>Phone No.</th>
                                                 <th>Address</th>
                                                 <th>Status</th>

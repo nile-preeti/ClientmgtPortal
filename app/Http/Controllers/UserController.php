@@ -156,6 +156,7 @@ class UserController extends Controller
     // user end routes
     public function userAttendance(Request $request, $id)
     {
+        
         $month = request('month', date('m'));
         $year = request('year', date('Y'));
         $statusFilter = $request->query('status'); // Store status filter separately
@@ -165,6 +166,9 @@ class UserController extends Controller
         $attendanceRecords = Attendance::where('user_id', $id)
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
+            ->when($request->filled("date"), function ($query) {
+                return $query->whereDate("date", request('date'));
+            })
             ->when($statusFilter, function ($query) use ($statusFilter) {
                 return $query->where('status', $statusFilter);
             })
@@ -178,7 +182,10 @@ class UserController extends Controller
         $startDate = Carbon::createFromDate($year, $month, 1);
         $endDate = $startDate->copy()->endOfMonth();
         $currentDate = Carbon::now()->format('Y-m-d');
-
+        if ($request->has('date')) {
+            $startDate = Carbon::parse(request('date'));
+            $endDate =  Carbon::parse(request('date'));
+        }
         for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
             $formattedDate = $date->format('Y-m-d');
 
@@ -209,7 +216,7 @@ class UserController extends Controller
                     $breaks = \App\Models\AttendanceBreak::where('user_id', $record->user_id)
                         ->where('date', $record->date)
                         ->whereNotNull('start_break')
-                        ->whereNotNull('end_break')->orderBy("id",'asc')
+                        ->whereNotNull('end_break')->orderBy("id", 'asc')
                         ->get();
 
                     // Convert break time to hours and subtract from worked hours
