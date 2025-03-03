@@ -105,7 +105,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h2 class="text-dark mb-4 mt-4 pb-0"> Welcome {{ auth()->user()->name }}</h2>
+                            <h2 class="text-dark mb-4 mt-4 pb-0 text-capitalize"> Welcome {{ auth()->user()->name }}</h2>
                             <!-- <a href="#" class="btn btn-primary" onclick="logout()">Logout</a> -->
                         </div>
                     </div>
