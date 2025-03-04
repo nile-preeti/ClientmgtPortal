@@ -79,12 +79,13 @@ Route::prefix('user')->as("user.")->group(function () {
         Route::get("attendance_records", [UserController::class, 'attendance_records'])->name("attendance_records");
         Route::get("holidays", [UserController::class, 'holidays'])->name("holidays");
         Route::get("directory", [UserController::class, 'directory'])->name("directory");
-        Route::get("employee/directory", [UserController::class, 'directory_directory'])->name("employee.directory");
-        Route::get("all-emp-directory", [AjaxController::class, 'Employeedirectory'])->name("employee.directories");
+        Route::get("all-emp-directory", [AjaxController::class, 'Employeedirectory'])->name("employee.directory");
+        
+        Route::get("services", [UserController::class, 'Services'])->name("services");
+        Route::get("all-services", [AjaxController::class, 'userServices'])->name("employee.services");
+// reports
 
         Route::post('/change-password', [UserController::class, 'changePassword'])->name('change.password');
-
-
         Route::get("logout", [UserController::class, 'logout'])->name("logout");
     });
 });

@@ -426,4 +426,11 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Password updated successfully!']);
     }
+
+
+    public function Services(Request $request)
+    {
+        return view("users.directory");
+    }
+
 }

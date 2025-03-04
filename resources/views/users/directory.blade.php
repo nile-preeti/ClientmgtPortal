@@ -152,7 +152,22 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h2 class="py-4 text-dark mb-2 mt-2"><a href="javascript:history.back()"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Employee Directory</h2>
+                    <h2 class="py-4 text-dark mb-2 mt-2"><a href="javascript:history.back()"><img src="https://nileprojects.in/client-portal/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Services</h2>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <form class="mr-3 position-relative">
+                        <div class="form-group mb-0">
+                            <input type="search" class="form-control" name="search"
+                                placeholder="Search" aria-controls="user-list-table" value="">
+                        </div>
+                    </form>
+                </div>
+                <div class="col-sm-3 col-md-3">
+                    <div class="form-group">
+                        <form id="filterForm">
+                            <input type="date" name="date" class="form-control" id="datePicker">
+                        </form>
+                    </div>
                 </div>
                 <div class="">
                     <div id="recordsList" style=";list-style: none;">
@@ -174,14 +189,26 @@
     </div>
     <script>
         let currentPage = 1;
-let lastPage = 1;
+        let lastPage = 1;
+        let searchQuery = '';
+        let selectedDate = '';
 
-// Function to display employee directory
-function displayEmployees(employees) {
+        // Function to display employee directory
+        function displayEmployees(services) {
+            console.log(services);
     const recordsList = document.querySelector("#recordsList");
     recordsList.innerHTML = ""; // Clear previous records
 
-    employees.forEach((employee) => {
+    if (services.length === 0) {
+          // Show "No Records Found" when there is no data
+          recordsList.innerHTML = `
+            <li class="text-center mt-4">
+                <h5 class="text-danger">No Records Found</h5>
+            </li>`;
+        return; // Do nothing if no records exist
+    }
+
+    services.forEach((service) => {
         const listItem = document.createElement("li");
         listItem.classList.add("mt-4");
 
@@ -189,23 +216,25 @@ function displayEmployees(employees) {
         <div class="col-md-12">
             <div class="card">
                 <div class="d-flex justify-content-between date-time-sec">
-                    <h6>
-                        Name: ${employee.name} 
-                    </h6>
+                    <h6>Service Name: ${service.service ? service.service.name : 'N/A'}</h6>
                 </div>
                 <div class="card-body py-2 px-2">
                     <div class="attendance-record-data">
                         <div class="d-md-flex justify-content-md-between">
                             <div>
-                                <h6> Employee ID: <span>${employee.emp_id}</span></h6>
-                                <h6> Email:  <span>${employee.email}</span></h6>
+                                <h6>Customer Name: <span>${service.customer ? service.customer.name : 'N/A'}</span></h6>
+                                <h6>Description: <span>${service.customer ? service.description : 'N/A'}</span></h6>
+                                 <h6>Start Date: <span>${service.start_date || 'N/A'}</span></h6>
                             </div>
                             <div>
                                 <div class="d-md-flex justify-content-md-end">
-                                    <h6> Designation: <span>${employee.designation || 'N/A'}</span></h6>
+                                    <h6>End Date: <span>${service.end_date || 'N/A'}</span></h6>
                                 </div>
                                 <div class="d-md-flex justify-content-md-end">
-                                    <h6> Phone: <span>${employee.phone || 'N/A'}</span></h6>
+                                     <h6>Start Time: <span>${service.start_time || 'N/A'}</span></h6>
+                                </div>
+                                <div class="d-md-flex justify-content-md-end">
+                                     <h6>End Time: <span>${service.end_time || 'N/A'}</span></h6>
                                 </div>
                             </div>
                         </div>
@@ -218,42 +247,47 @@ function displayEmployees(employees) {
     });
 }
 
-// Function to update pagination controls
-function updatePaginationControls() {
-    const paginationControls = document.getElementById("pagination-controls");
-    const pageInfo = document.getElementById("page-info");
-    const prevButton = document.getElementById("prev-page");
-    const nextButton = document.getElementById("next-page");
-
-    pageInfo.textContent = `Page ${currentPage} of ${lastPage}`;
-
-    prevButton.disabled = currentPage <= 1;
-    nextButton.disabled = currentPage >= lastPage;
-
-    if (lastPage <= 1) {
-        paginationControls.style.cssText = "display: none !important;"; // Force hide
-    } else {
-        paginationControls.style.cssText = "display: flex !important;"; // Force show
-    }
-}
 
 
-// Function to change the page
-function changePage(direction) {
+        // Function to update pagination controls
+        function updatePaginationControls() {
+            const paginationControls = document.getElementById("pagination-controls");
+            const pageInfo = document.getElementById("page-info");
+            const prevButton = document.getElementById("prev-page");
+            const nextButton = document.getElementById("next-page");
+
+            pageInfo.textContent = `Page ${currentPage} of ${lastPage}`;
+
+            prevButton.disabled = currentPage <= 1;
+            nextButton.disabled = currentPage >= lastPage;
+
+            if (lastPage <= 1) {
+                paginationControls.style.cssText = "display: none !important;"; // Force hide
+            } else {
+                paginationControls.style.cssText = "display: flex !important;"; // Force show
+            }
+        }
+
+        // Function to change the page
+        function changePage(direction) {
     if (direction === 'prev' && currentPage > 1) {
         currentPage--;
     } else if (direction === 'next' && currentPage < lastPage) {
         currentPage++;
     }
 
-    fetchEmployees(currentPage);
+    fetchEmployees(currentPage, searchQuery, selectedDate);
 }
 
-// Function to fetch employees
-function fetchEmployees(page = 1) {
-    $.get("{{ route('user.employee.directory') }}", { page: page }, function(data) {
+        // Function to fetch employees with search
+        function fetchEmployees(page = 1, search = '', date = '') {
+    $.get("{{ route('user.employee.services') }}", {
+        page: page,
+        search: search,
+        date: date
+    }, function(data) {
         if (data.success) {
-            displayEmployees(data.employees);
+            displayEmployees(data.job_schedules);
             currentPage = data.current_page;
             lastPage = data.last_page;
             updatePaginationControls();
@@ -261,11 +295,23 @@ function fetchEmployees(page = 1) {
     });
 }
 
-// Load employees when the page is ready
-document.addEventListener("DOMContentLoaded", function () {
-    fetchEmployees();
+        // Search input event listener
+        document.querySelector("input[name='search']").addEventListener("input", function() {
+            searchQuery = this.value;
+            fetchEmployees(1, searchQuery);
+        });
+
+        document.getElementById("datePicker").addEventListener("change", function() {
+    selectedDate = this.value;
+    fetchEmployees(1, searchQuery, selectedDate);
 });
 
+        // Load employees when the page is ready
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.querySelector("input[name='search']");
+            searchQuery = searchInput.value; // Get existing search query if any
+            fetchEmployees(1, searchQuery);
+        });
     </script>
 
     <script>
@@ -301,7 +347,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const selectedMonth = document.getElementById("monthFilter").value;
 
             fetch(`/fetch-attendance?id=${userId}&month=${selectedMonth}&page=${page}`)
-                .then(response => respo,nse.json())
+                .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         displayRecords(data.records);
@@ -333,12 +379,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     // localStorage.removeItem('user')
                     $.get("{{ route('user.logout') }}", function(data) {
                         if (data.success) {
-                            Swal.fire("Success", "Logged out successfully", 'success').then((result) => {
+                            Swal.fire({
+                                title: "",
+                                text: "Logged out successfully", // Show only the text
+                                iconHtml: "", // Removes the default success icon
+                                showConfirmButton: true,
+                                confirmButtonText: "OK"
+                            }).then((result) => {
                                 if (result.value) {
-
                                     location.replace("{{ route('user.login') }}");
-
-
                                 }
                             });
                         }

@@ -316,7 +316,7 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-6 col-md-6 col-lg-4 mb-3">
+                    <div class="col-sm-6 col-md-6 col-lg-4 mb-3 d-none">
                         <div class="mark-attendance-sec">
                         <a href="{{ route('user.holidays')}}">
                             <div class="bg-gradient-success card card-img-holder">
@@ -391,15 +391,15 @@
 
                     <div class="col-sm-6 col-md-6 col-lg-4">
                         <div class="mark-attendance-sec">
-                          <a href="{{route('user.directory')}}">
+                          <a href="{{route('user.services')}}">
                             <div class="bg-gradient-warning-1 card card-img-holder">
                                 <div class="card-body p-3">
                                   <img src="../public/assets/images/circle.svg" class="card-img-absolute" alt="circle-image">
                                   <div class="row">
                                     <div class="col-8">
                                       <div class="numbers">
-                                        <p class="text-light text-sm text-uppercase fw-medium">Directory</p>
-                                        <h3 class="text-light font-weight-bolder pb-0 ">0 </h3>
+                                        <p class="text-light text-sm text-uppercase fw-medium">Services</p>
+                                        <h3 class="text-light font-weight-bolder pb-0 ">&nbsp;</h3>
                                       </div>
                                     </div>
                                     <div class="col-4 text-end align-items-center d-flex justify-content-end">
