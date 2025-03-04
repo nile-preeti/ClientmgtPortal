@@ -12,6 +12,7 @@ use App\Models\Service;
 use App\Models\User;
 use App\Models\UserChatCount;
 use App\Models\UserService;
+use App\Models\JobSchedule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -439,4 +440,58 @@ class AjaxController extends Controller
             return response()->json(['success' => false, 'message' => 'Please provide id']);
         }
     }
+
+
+
+    public function userServices(Request $request)
+{
+    $perPage = 10; // Number of records per page
+    $page = $request->input('page', 1);
+    $authUserId = Auth::id(); // Get the logged-in user ID
+    $search = $request->input('search');
+    $selectedDate = $request->input('date'); // Get selected date
+
+    // Fetch job schedules where user_id matches the logged-in user
+    $query = JobSchedule::where('user_id', $authUserId)
+        ->with(['service:id,name', 'customer:id,name']) // Load service and customer details
+        ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date');
+
+    // Apply search filter
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->orWhere('description', 'LIKE', "%{$search}%")
+              ->orWhereHas('service', function ($q) use ($search) {
+                  $q->where('name', 'LIKE', "%{$search}%");
+              })
+              ->orWhereHas('customer', function ($q) use ($search) {
+                  $q->where('name', 'LIKE', "%{$search}%");
+              });
+        });
+    }
+
+    // Apply date filter if a date is selected
+    if (!empty($selectedDate)) {
+        $query->where(function ($q) use ($selectedDate) {
+            $q->whereDate('start_date', $selectedDate)
+              ->orWhereDate('end_date', $selectedDate);
+        });
+    }
+
+    // Paginate results
+    $jobSchedules = $query->paginate($perPage, ['*'], 'page', $page);
+
+    return response()->json([
+        'success' => true,
+        'job_schedules' => $jobSchedules->items(),
+        'current_page' => $jobSchedules->currentPage(),
+        'last_page' => $jobSchedules->lastPage(),
+        'total' => $jobSchedules->total(),
+    ]);
+}
+
+
+
+    
+
+
 }

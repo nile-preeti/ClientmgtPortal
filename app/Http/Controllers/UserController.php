@@ -442,4 +442,11 @@ class UserController extends Controller
         $user = User::find($id);
         return view("pages.users.job_schedule", compact("job_schedules", 'user'));
     }
+
+
+    public function Services(Request $request)
+    {
+        return view("users.directory");
+    }
+
 }
