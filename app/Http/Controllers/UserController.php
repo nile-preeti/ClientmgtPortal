@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Holiday;
-use App\Models\JobSchedule;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\UserService;
+use App\Models\JobSchedule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -158,7 +158,7 @@ class UserController extends Controller
     // user end routes
     public function userAttendance(Request $request, $id)
     {
-
+        
         $month = request('month', date('m'));
         $year = request('year', date('Y'));
         $statusFilter = $request->query('status'); // Store status filter separately
@@ -194,11 +194,14 @@ class UserController extends Controller
             if (isset($attendanceRecords[$formattedDate])) {
 
                 $record = $attendanceRecords[$formattedDate];
+                //dd($record);
 
                 $checkInTime = !empty($record->check_in_time) ? strtotime($record->check_in_time) : null;
                 $checkOutTime = !empty($record->check_out_time) ? strtotime($record->check_out_time) : null;
                 $netWorkedHours = 0;
-                $breaks = [];
+                $breaks = \App\Models\AttendanceBreak::where('user_id', 9)
+                    ->where('attendance_id', 19)
+                        ->get();
                 if (is_null($checkInTime) || is_null($checkOutTime)) {
                     $recordStatus = 'Absent'; // No check-in or check-out means Absent
                 } else {
@@ -207,7 +210,7 @@ class UserController extends Controller
 
                     // Fetch total break time for the user on the given date
                     $totalBreakSeconds = \App\Models\AttendanceBreak::where('user_id', $record->user_id)
-                        ->where('date', $record->date)
+                        ->where('attendance_id', $record->id)
                         ->whereNotNull('start_break')
                         ->whereNotNull('end_break')
                         ->get()
@@ -215,11 +218,10 @@ class UserController extends Controller
                             return strtotime($break->end_break) - strtotime($break->start_break);
                         });
                     // Fetch total break time for the user on the given date
-                    $breaks = \App\Models\AttendanceBreak::where('user_id', $record->user_id)
-                        ->where('date', $record->date)
-                        ->whereNotNull('start_break')
-                        ->whereNotNull('end_break')->orderBy("id", 'asc')
-                        ->get();
+
+                    // $breaks = \App\Models\AttendanceBreak::where('user_id', 9)
+                    // ->where('attendance_id', 19)
+                    //     ->get();
 
                     // Convert break time to hours and subtract from worked hours
                     $totalBreakHours = $totalBreakSeconds / 3600;
@@ -424,10 +426,16 @@ class UserController extends Controller
 
         $user = auth()->user();
         $user->password = Hash::make($request->new_password);
-        // $user->save();
+        $user->save();
 
         return response()->json(['message' => 'Password updated successfully!']);
     }
+
+    public function Services(Request $request)
+    {
+        return view("users.directory");
+    }
+
     public function job_schedule($id)
     {
         $job_schedules = JobSchedule::where("user_id", $id)->get();
@@ -442,11 +450,4 @@ class UserController extends Controller
         $user = User::find($id);
         return view("pages.users.job_schedule", compact("job_schedules", 'user'));
     }
-
-
-    public function Services(Request $request)
-    {
-        return view("users.directory");
-    }
-
 }

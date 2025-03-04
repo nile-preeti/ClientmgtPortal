@@ -41,7 +41,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post("change_password_post", [AdminController::class, 'change_password_post'])->name("change_password_post");
 
 
-    Route::resource("users", UserController::class);
+    Route::resource("userss", UserController::class);
     Route::resource("payouts", PayoutController::class);
     Route::resource("job_schedules", JobScheduleController::class);
     Route::get("users/job_schedule/{id}", [UserController::class, 'job_schedule'])->name("user.job_schedule");

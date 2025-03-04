@@ -27,7 +27,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <div class="User-contact-info mb-2">
                                         <div class="User-contact-info-icon">
                                             <i class="ri-mail-line"></i>
@@ -260,7 +260,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Breaks table</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Breaks Table</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -281,6 +281,7 @@
     </div>
     <script>
         function showBreaks(breaks) {
+            console.log(breaks);
             $("#exampleModal").modal("show");
             var html = '';
             console.log(breaks);

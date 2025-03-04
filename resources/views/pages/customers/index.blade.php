@@ -17,12 +17,15 @@
                                     <div class="col-sm-12 col-md-5">
                                         <div class="users-filter-search">
                                             <div id="user_list_datatable_info" class="dataTables_filter filter-search-info">
-                                                <form class="position-relative">
-                                                    <div class="form-group mb-0">
+                                                <form class="position-relative d-flex" style="gap: 5px">
+                                                    <div class="form-group mb-0" style="width: 100%">
                                                         <input type="search" class="form-control" name="search"
                                                             placeholder="Search" aria-controls="user-list-table"
                                                             value="{{ $search }}">
                                                     </div>
+                                                    <button type="submit" class="" style="border: none; background: none; cursor: pointer;">
+                                                                <i class="fa fa-search" style="color:#3d3e3e;font-size:20px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);padding: 10px 0px;text-align: center;border-radius: 5px;width: 45px;height:45px;"></i>
+                                                            </button>
                                                 </form>
                                             </div>
                                             <div class="btn-reload"

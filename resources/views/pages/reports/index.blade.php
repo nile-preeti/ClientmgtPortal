@@ -15,16 +15,19 @@
                         <div class="iq-card-body">
                             <div class="search-filter-info">
                                 <div class="row justify-content-between">
-                                    <div class="col-sm-12 col-md-3">
+                                    <div class="col-sm-12 col-md-4">
 
                                         <div class="users-filter-search">
                                             <div id="user_list_datatable_info" class="dataTables_filter filter-search-info">
-                                                <form class="position-relative">
-                                                    <div class="form-group mb-0">
+                                                <form class="position-relative d-flex" style="gap: 5px">
+                                                    <div class="form-group mb-0" style="width: 100%">
                                                         <input type="search" class="form-control" name="search"
                                                             placeholder="Search..." aria-controls="user-list-table"
                                                             value="{{ $search }}">
                                                     </div>
+                                                    <button type="submit" class="" style="border: none; background: none; cursor: pointer;">
+                                                                <i class="fa fa-search" style="color:#3d3e3e;font-size:20px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);padding: 10px 0px;text-align: center;border-radius: 5px;width: 45px;height:45px;"></i>
+                                                            </button>
                                                 </form>
                                             </div>
                                             <div class="btn-reload"
@@ -79,11 +82,11 @@
                                     </div>
                                 </div>
                                 
-                                    <div class="col-sm-12 col-md-2">
+                                    <div class="col-sm-12 col-md-1">
                                         <div class="form-group">
                                             <a class="btnChangePassword" href="{{ route('reports') }}?export=true"><i
                                                     class="ri-download-line"></i>
-                                                &nbsp; Download Report</a>
+                                                &nbsp;</a>
                                         </div>
                                     </div>
 
@@ -129,17 +132,17 @@
                                                                 data-designation="{{ $item->designation }}"
                                                                 data-phone="{{ $item->phone }}"
                                                                 data-image="{{ $item->image ? asset("uploads/images/$item->image") : null }}"
-                                                                data-url="{{ route('users.update', $item->id) }}"
+                                                                data-url="{{ route('userss.update', $item->id) }}"
                                                                 onclick="showData(this)" data-target="#EditModel"
                                                                 style="cursor: pointer"><i class="ri-pencil-fill"></i></a> --}}
 
                                                             {{-- edit button --}}
-                                                            <a href="{{ route('users.edit', $item->id) }}"
+                                                            <a href="{{ route('userss.edit', $item->id) }}"
                                                                 class="btnedit"><i class="ri-pencil-fill"></i></a>
                                                             {{-- delete  button --}}
                                                             <a class="btndelete" data-id="{{ $item->id }}"
                                                                 style="cursor: pointer"
-                                                                data-url="{{ route('users.destroy', $item->id) }}"
+                                                                data-url="{{ route('userss.destroy', $item->id) }}"
                                                                 onclick="deletePublic(this)"><i
                                                                     class="ri-delete-bin-7-line"></i></a>
                                                             <a class="btnview" data-id="{{ $item->id }}"

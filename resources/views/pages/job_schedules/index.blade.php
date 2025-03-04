@@ -1,4 +1,11 @@
 @extends('layouts.app')
+@push('css')
+<style>
+    .table-borderless td {
+        font-weight:normal;
+    }
+</style>
+@endpush
 @section('content')
     <!-- Page Content  -->
     <div id="content-page" class="content-page">
@@ -18,12 +25,15 @@
 
                                         <div class="users-filter-search">
                                             <div id="user_list_datatable_info" class="dataTables_filter filter-search-info">
-                                                <form class="position-relative">
-                                                    <div class="form-group mb-0">
+                                                <form class="position-relative d-flex" style="gap: 5px">
+                                                    <div class="form-group mb-0" style="width: 100%">
                                                         <input type="search" class="form-control" name="search"
                                                         placeholder="Search..." aria-controls="user-list-table"
                                                         value="{{ $search }}">
                                                     </div>
+                                                    <button type="submit" class="" style="border: none; background: none; cursor: pointer;">
+                                                                <i class="fa fa-search" style="color:#3d3e3e;font-size:20px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);padding: 10px 0px;text-align: center;border-radius: 5px;width: 45px;height:45px;"></i>
+                                                            </button>
                                                 </form>
                                             </div>
                                             <div class="btn-reload" onclick="window.location.href = window.location.origin + window.location.pathname;">
@@ -55,19 +65,19 @@
                                 </div>
                                 <div class="table-responsive">
                                     <table id="user-list-table" class="table table-striped table-hover table-borderless mt-0" role="grid"
-                                        aria-describedby="user-list-page-info">
+                                        aria-describedby="user-list-page-info" >
                                         <thead>
                                             <tr>
                                                 <th>Employee</th>
                                                 <th>Service</th>
                                                 <th>Customer</th>
 
-                                                <th>From </th>
-                                                <th>To </th>
+                                                <th>From</th>
+                                                <th>To</th>
                                                 <th>Status</th>
                                                 <th>Action &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
                                             </tr>
-                                        </thead>*
+                                        </thead>
                                         <tbody>
                                             @forelse ($job_schedules as $item)
                                                 <tr>
@@ -81,8 +91,8 @@
                                                         {{$item->customer->name}}
                                                     </td>
 
-                                                    <td>{{ date("h:i A",strtotime($item->start_time))." ". date("Y-m-d",strtotime($item->start_date)) }}</td>
-                                                    <td>{{ date("h:i A",strtotime($item->end_time)) ." ".date("Y-m-d",strtotime($item->end_date)) }}</td>
+                                                    <td>{{ date("Y-m-d", strtotime($item->start_date)) . " / " . date("h:i A", strtotime($item->start_time)) }}</td>
+                                                    <td>{{ date("Y-m-d", strtotime($item->end_date)) . " / " . date("h:i A", strtotime($item->end_time)) }}</td>
 
                                                
                                                     <td><span

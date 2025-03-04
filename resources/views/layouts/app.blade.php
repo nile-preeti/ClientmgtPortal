@@ -70,8 +70,8 @@
 
 
 
-                        <li @if (Route::is('users.index')) class="active" @endif>
-                            <a href="{{ route('users.index') }}" class="iq-waves-effect">
+                        <li @if (Route::is('userss.index')) class="active" @endif>
+                            <a href="{{ route('userss.index') }}" class="iq-waves-effect">
                                 <i class="ri-user-settings-line"></i><span>Employee Management</span></a>
                         </li>
 
