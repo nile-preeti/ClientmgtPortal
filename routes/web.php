@@ -7,6 +7,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\JobScheduleController;
+use App\Http\Controllers\PayoutController;
 use App\Http\Controllers\ServiceController;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Artisan;
@@ -39,8 +40,11 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get("change_password", [AdminController::class, 'change_password'])->name("change_password");
     Route::post("change_password_post", [AdminController::class, 'change_password_post'])->name("change_password_post");
 
+
     Route::resource("users", UserController::class);
+    Route::resource("payouts", PayoutController::class);
     Route::resource("job_schedules", JobScheduleController::class);
+    Route::get("users/job_schedule/{id}", [UserController::class, 'job_schedule'])->name("user.job_schedule");
 
     Route::resource("customers", CustomerController::class);
 
@@ -48,6 +52,8 @@ Route::group(['middleware' => 'admin'], function () {
         Route::resource("services", ServiceController::class);
     });
     Route::get("reports", [AdminController::class, 'reports'])->name("reports");
+    Route::get("settings", [AdminController::class, 'settings'])->name("settings");
+    Route::post("settings", [AdminController::class, 'settings_store'])->name("settings.store");
 
 
     Route::get("users/attendance/{id}", [UserController::class, 'userAttendance'])->name("userAttendance");

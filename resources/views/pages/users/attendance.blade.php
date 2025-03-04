@@ -164,7 +164,7 @@
                                             <th>Check Out Location</th>
                                             <th>Working Hours</th>
                                             <th>Status</th>
-                                            <th>breaks</th>
+                                            <th>Breaks</th>
 
                                         </tr>
                                     </thead>

@@ -1,10 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <style>
-        .search-filter-info .form-group select.form-control {
-            padding: 10px 15px 14px 15px !important;
-        }
-    </style>
+
     <!-- Page Content  -->
     <div id="content-page" class="content-page">
         <div class="container-fluid">

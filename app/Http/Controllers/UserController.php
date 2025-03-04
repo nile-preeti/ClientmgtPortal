@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Holiday;
+use App\Models\JobSchedule;
 use App\Models\Service;
 use App\Models\User;
 use App\Models\UserService;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\View\ViewServiceProvider;
 
 class UserController extends Controller
 {
@@ -156,7 +158,7 @@ class UserController extends Controller
     // user end routes
     public function userAttendance(Request $request, $id)
     {
-        
+
         $month = request('month', date('m'));
         $year = request('year', date('Y'));
         $statusFilter = $request->query('status'); // Store status filter separately
@@ -422,8 +424,22 @@ class UserController extends Controller
 
         $user = auth()->user();
         $user->password = Hash::make($request->new_password);
-        $user->save();
+        // $user->save();
 
         return response()->json(['message' => 'Password updated successfully!']);
+    }
+    public function job_schedule($id)
+    {
+        $job_schedules = JobSchedule::where("user_id", $id)->get();
+        foreach ($job_schedules as $key => $value) {
+            $charge = UserService::where("user_id", $value->user_id)->where("service_id", $value->service_id)->first();
+            if ($charge) {
+                $value->charge =  $charge->price_per_hour;
+            } else {
+                $value->charge = 0;
+            }
+        }
+        $user = User::find($id);
+        return view("pages.users.job_schedule", compact("job_schedules", 'user'));
     }
 }

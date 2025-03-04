@@ -1,3 +1,5 @@
+
+
 @extends('layouts.app')
 @section('content')
     <!-- Page Content  -->
@@ -22,7 +24,7 @@
                                                     <div class="form-group mb-0">
                                                         <input type="search" class="form-control" name="search"
                                                             placeholder="Search..." aria-controls="user-list-table"
-                                                            value="{{ $search }}">
+                                                            value="{{ request()->has("search")?request("search"):"" }}">
                                                     </div>
                                                 </form>
                                             </div>
@@ -33,7 +35,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-sm-12 col-md-5">
+                                    {{-- <div class="col-sm-12 col-md-5">
                                         <div class="form-group">
                                             <select class="form-control" id="selectcountry"
                                                 onchange="changeStatus(this.value)">
@@ -46,13 +48,8 @@
 
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
-                                    <div class="col-sm-12 col-md-2">
-                                        <div class="form-group">
-                                            <a class="addbtn" href="{{ route('users.create') }}">Add</a>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="table-responsive">
                                     <table id="user-list-table"
@@ -64,7 +61,7 @@
                                                 <th>Email</th>
                                                 {{-- <th>Designation</th> --}}
                                                 <th>Phone No.</th>
-                                                <th>Status</th>
+                                                <th>Payout Status</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -97,22 +94,10 @@
                                                                 style="cursor: pointer"><i class="ri-pencil-fill"></i></a> --}}
 
                                                             {{-- edit button --}}
-                                                            <a href="{{ route('users.edit', $item->id) }}"
-                                                                class="btnedit"><i class="ri-pencil-fill"></i></a>
+                                                            {{-- <a href="{{ route('users.edit', $item->id) }}"
+                                                                class="btnedit"><i class="ri-eye-fill"></i></a> --}}
                                                             {{-- delete  button --}}
-                                                            <a class="btndelete" data-id="{{ $item->id }}"
-                                                                style="cursor: pointer"
-                                                                data-url="{{ route('users.destroy', $item->id) }}"
-                                                                onclick="deletePublic(this)"><i
-                                                                    class="ri-delete-bin-7-line"></i></a>
-                                                            <a class="btnview" data-id="{{ $item->id }}"
-                                                                style="cursor: pointer"
-                                                                href="{{ route('user.job_schedule', $item->id) }}"><i
-                                                                    class="ri-briefcase-line"></i></a>
-                                                            <a class="btnview" data-id="{{ $item->id }}"
-                                                                style="cursor: pointer"
-                                                                href="{{ route('userAttendance', $item->id) }}"><i
-                                                                    class="ri-calendar-event-fill"></i></a>
+                                                           
 
 
                                                         </div>

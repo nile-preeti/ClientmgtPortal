@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
@@ -134,6 +135,7 @@ class AdminController extends Controller
         return view("pages.users.index", compact("title", 'users'));
     }
 
+
     public function users_details($id)
     {
         $title = "User Management";
@@ -163,14 +165,7 @@ class AdminController extends Controller
         $users = User::when(request()->filled("search"), function ($query) {
             $keyword = trim(request("search"));
             return $query->where("name", "LIKE", "%$keyword%")->orWhere("designation", "LIKE", "%$keyword%")->orWhere("email", "LIKE", "%$keyword%")->orWhere("phone", "LIKE", "%$keyword%");
-        })->when(request()->filled("month"), function ($query) {
-
-            return $query->whereMonth("created_at", request("month"));
         })
-            ->when(request()->filled("year"), function ($query) {
-
-                return $query->whereYear("created_at", request("year"));
-            })
             ->where("role_id", 2)
             ->when(request()->filled("status"), function ($query) {
                 return $query->where("status", request("status"));
@@ -245,4 +240,43 @@ class AdminController extends Controller
 
         return number_format($totalWorkingHours, 1); // Return formatted total hours
     }
+    public function settings()
+    {
+        return view("pages.settings");
+    }
+
+    public function settings_store(Request $request)
+    {
+        $validate = Validator::make($request->all(), [
+            'key' => 'required',
+            'value' => 'required',
+
+        ]);
+        if ($validate->fails()) {
+
+            return response()->json(['success' => false, ',message' => $validate->errors()->first()]);
+        }
+
+        $constantsFile = config_path('constant.php');
+
+        // Get the current contents of the constants file
+        $constants = include($constantsFile);
+
+        // Update the specified key with the new value
+        $constants[$request->key] = $request->value;
+
+        // Export the updated constants array to PHP code
+        $constantsContent = '<?php return ' . var_export($constants, true) . ';';
+
+        // Write the updated constants back to the file
+        file_put_contents($constantsFile, $constantsContent);
+
+
+
+
+        return response()->json(['success' => true, ',message' => 'Settings updated successfully']);
+    }
+
+    public function payouts(Request $request) {}
+    public function payout_details(Request $request, $id) {}
 }

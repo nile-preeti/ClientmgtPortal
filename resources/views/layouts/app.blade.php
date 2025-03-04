@@ -24,7 +24,11 @@
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+    <style>
+        .search-filter-info .form-group select.form-control {
+            padding: 10px 15px 14px 15px !important;
+        }
+    </style>
     
  
 </head>
@@ -88,10 +92,18 @@
                                 <i class="ri-calendar-event-line"></i><span>Services</span></a>
                         </li>
                         <li>
+                            <a href="{{ route('payouts.index') }}" class="iq-waves-effect">
+                                <i class="ri-calendar-event-line"></i><span>Payouts</span></a>
+                        </li>
+                        <li>
                             <a href="{{ route('reports') }}" class="iq-waves-effect">
                                 <i class="ri-calendar-event-line"></i><span>Reports</span></a>
                         </li>
-                        
+                        <li>
+                            <a href="{{ route('settings') }}" class="iq-waves-effect">
+                                <i class="ri-home-gear-fill"></i><span>Settings</span></a>
+                        </li>
+
                         <li>
                             <a class="iq-waves-effect" style="cursor: pointer"
                             onclick="askLogout()" href="#" ><i
