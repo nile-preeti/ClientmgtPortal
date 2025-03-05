@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('jquery.js') }}"></script>
     <script src="{{ asset('plugins/bootstrap/js/bootstrap.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/css/typography.css') }}" />
     <link rel="stylesheet" href="{{ asset('plugins/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('style.css') }}">
     <link rel="stylesheet" href="{{ asset('users/attendance_records.css') }}">
@@ -119,6 +120,30 @@
 
             .swal2-popup.swal2-modal.swal2-show{padding: 40px;}
 
+
+            .attendance-records-head .form-control {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding:12px 15px 12px 15px; border: 1px solid var(--border); width: 100%; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); appearance: auto; }
+
+            .attendance-records-head .btn-search {background: #064086; white-space: nowrap; width: 100%; padding: 10px 20px; display: inline-block; font-size: 13px; color: var(--white); border-radius: 5px; font-weight: 600; text-align: center; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); border: none; }
+
+
+            .services-page-section{padding: 1rem 0; position: relative; }
+            .recordsList{list-style: none; padding: 0; margin: 0;}
+
+            .attendance-records-head {display: flex ; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+            .attendance-records-head h2 {font-size: 20px; font-weight: 600; margin: 0; padding: 0; color: var(--black); }
+            .cp-card {box-shadow: 0 0 #0000, 0 0 #0000, 0px 12px 28px 0px rgba(36, 7, 70, .06); background: var(--white); border-radius: 10px; position: relative; }
+
+            .cp-card-head {display: flex ; align-items: center; padding: 10px; border-bottom:2px solid #f5f5fd; }
+            .cp-date {font-size: 13px; font-weight: bold; margin: 0 0 0px 0; color: #064086; padding: 0; }
+            .cp-card-body{padding: 10px;}
+            .cp-point-box {display: flex ; gap: 10px; align-items: center; margin-bottom: 10px; }
+            .cp-point-icon{background: #fafafa; padding: 10px; border-radius:5px; }
+
+            .cp-point-text h4 {font-size: 13px; font-weight: bold; margin: 0 0 5px 0; color: #064086; padding: 0; } 
+            .cp-point-text p {    font-size: 13px; font-weight: 400; margin: 0 0 0px 0; color:#000; padding: 0; line-height: 22px; }
+            .cp-action-btn a {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding: 8px; border: 1px solid var(--border); background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); margin-left: 10px; display: inline-block; }
+
+
     </style>
 </head>
 
@@ -148,30 +173,36 @@
             </div>
         </div>
     </header>
-    <div>
+    <div class="services-page-section">
         <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2 class="py-4 text-dark mb-2 mt-2"><a href="javascript:history.back()"><img src="https://nileprojects.in/client-portal/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Services</h2>
-                </div>
-                <div class="col-md-6 mb-2">
-                    <form class="mr-3 position-relative">
-                        <div class="form-group mb-0">
-                            <input type="search" class="form-control" name="search"
-                                placeholder="Search" aria-controls="user-list-table" value="">
+            <div class="attendance-records-head">
+                <h2>
+                    <a href="javascript:history.back()"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Services
+                </h2>
+                <div class="Search-filter">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <form class="">
+                                    <input type="search" class="form-control" name="search"
+                                            placeholder="Search" aria-controls="user-list-table" value="">
+                                </form>
+                            </div>
                         </div>
-                    </form>
-                </div>
-                <div class="col-sm-3 col-md-3">
-                    <div class="form-group">
-                        <form id="filterForm">
-                            <input type="date" name="date" class="form-control" id="datePicker">
-                        </form>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                               <form id="filterForm">
+                                <input type="date" name="date" class="form-control" id="datePicker">
+                            </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="">
-                    <div id="recordsList" style=";list-style: none;">
-                        <!-- Dynamic content will be added here by the JavaScript -->
+            </div>
+            <div class="attendance-records-body">
+                <div class="attendance-records-content">
+                    <div id="recordsList"  class="recordsList">
                     </div>
 
                     <div id="pagination-controls" class="d-flex justify-content-end">
@@ -180,11 +211,9 @@
                         <button id="next-page" onclick="changePage('next')">Next</button>
                     </div>
                 </div>
-                <div class="col-md-12 attendance-record-data-tbl">
-
+                <div class="attendance-record-data-tbl">
                 </div>
             </div>
-
         </div>
     </div>
     <script>
@@ -202,7 +231,7 @@
     if (services.length === 0) {
           // Show "No Records Found" when there is no data
           recordsList.innerHTML = `
-            <li class="text-center mt-4">
+            <li class="text-center mt-2">
                 <h5 class="text-danger">No Records Found</h5>
             </li>`;
         return; // Do nothing if no records exist
@@ -210,34 +239,92 @@
 
     services.forEach((service) => {
         const listItem = document.createElement("li");
-        listItem.classList.add("mt-4");
+        listItem.classList.add("mt-2");
 
         listItem.innerHTML = `
         <div class="col-md-12">
-            <div class="card">
-                <div class="d-flex justify-content-between date-time-sec">
-                    <h6>Service Name: ${service.service ? service.service.name : 'N/A'}</h6>
-                </div>
-                <div class="card-body py-2 px-2">
-                    <div class="attendance-record-data">
-                        <div class="d-md-flex justify-content-md-between">
-                            <div>
-                                <h6>Customer Name: <span>${service.customer ? service.customer.name : 'N/A'}</span></h6>
-                                <h6>Description: <span>${service.customer ? service.description : 'N/A'}</span></h6>
-                                 <h6>Start Date: <span>${service.start_date || 'N/A'}</span></h6>
-                            </div>
-                            <div>
-                                <div class="d-md-flex justify-content-md-end">
-                                    <h6>End Date: <span>${service.end_date || 'N/A'}</span></h6>
+            <div class="cp-card">
+                <div class="cp-card-head">
+                    <div class="cp-date">Service Name:<span> ${service.service ? service.service.name : 'N/A'}</span>
+                    <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
+                        ${service.status == 1 ? 'Active' : 'Inactive'}
+                    </span>
+                    </div>
+                </div> 
+                <div class="cp-card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
                                 </div>
-                                <div class="d-md-flex justify-content-md-end">
-                                     <h6>Start Time: <span>${service.start_time || 'N/A'}</span></h6>
-                                </div>
-                                <div class="d-md-flex justify-content-md-end">
-                                     <h6>End Time: <span>${service.end_time || 'N/A'}</span></h6>
+                                <div class="cp-point-text">
+                                    <h4>Customer Name:</h4>
+                                    <p>${service.customer ? service.customer.name : 'N/A'}</p>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>Start Date:</h4>
+                                    <p>${service.start_date || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>End Date:</h4>
+                                    <p>${service.end_date || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>Start Time:</h4>
+                                    <p>${service.start_time || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>End Time:</h4>
+                                    <p>${service.end_time || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>Description:</h4>
+                                    <p>${service.customer ? service.description : 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>

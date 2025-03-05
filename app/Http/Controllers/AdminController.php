@@ -242,7 +242,8 @@ class AdminController extends Controller
     }
     public function settings()
     {
-        return view("pages.settings");
+        $title = 'Settings';
+        return view("pages.settings", compact('title'));
     }
 
     public function settings_store(Request $request)

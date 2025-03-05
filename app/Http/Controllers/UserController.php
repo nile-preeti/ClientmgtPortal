@@ -46,6 +46,7 @@ class UserController extends Controller
     public function edit(Request $request, $id)
     {
         $title = "Edit Employee";
+        $back_url = route('userss.index');
 
         $user = User::find($id);
         if (!$user) {
@@ -53,7 +54,7 @@ class UserController extends Controller
         }
         $services = Service::all();
 
-        return view("pages.users.create", compact('user', 'services', 'title'));
+        return view("pages.users.create", compact('user', 'services', 'title','back_url'));
     }
     public function store(Request $request)
     {
@@ -174,10 +175,13 @@ class UserController extends Controller
             ->when($statusFilter, function ($query) use ($statusFilter) {
                 return $query->where('status', $statusFilter);
             })
+            ->with('attendanceBreaks')
             ->get()
             ->keyBy('date'); // Store by date for quick lookup
 
+            // dd($attendanceRecords);
         $title = "Employee Attendance Records";
+        $back_url = route('userss.index');
         $holidays = Holiday::whereMonth('date', $month)->whereYear('date', $year)->pluck('date')->toArray();
 
         $allDays = [];
@@ -194,14 +198,14 @@ class UserController extends Controller
             if (isset($attendanceRecords[$formattedDate])) {
 
                 $record = $attendanceRecords[$formattedDate];
-                //dd($record);
+                // dd($record);
 
                 $checkInTime = !empty($record->check_in_time) ? strtotime($record->check_in_time) : null;
                 $checkOutTime = !empty($record->check_out_time) ? strtotime($record->check_out_time) : null;
                 $netWorkedHours = 0;
-                $breaks = \App\Models\AttendanceBreak::where('user_id', 9)
-                    ->where('attendance_id', 19)
-                        ->get();
+                // $breaks = \App\Models\AttendanceBreak::where('user_id', 9)
+                //     ->where('attendance_id', 19)
+                //         ->get();
                 if (is_null($checkInTime) || is_null($checkOutTime)) {
                     $recordStatus = 'Absent'; // No check-in or check-out means Absent
                 } else {
@@ -245,7 +249,7 @@ class UserController extends Controller
                     'check_out_full_address' => $record->check_out_full_address,
                     'status' => $recordStatus,
                     'working_hours' => number_format($netWorkedHours, 1),
-                    'breaks' => $breaks
+                    'breaks' => $record->attendanceBreaks->isNotEmpty() ? $record->attendanceBreaks : [],
                 ];
             } else {
                 if (in_array($formattedDate, $holidays)) {
@@ -288,6 +292,7 @@ class UserController extends Controller
             $currentPage,
             ['path' => request()->url(), 'query' => request()->query()]
         );
+       // dd($allDaysPaginated);
 
         // Calculate attendance summary
         $totalWorkingDays = collect($allDays)->filter(function ($day) {
@@ -309,6 +314,7 @@ class UserController extends Controller
             "totalAbsent",
             "title",
             'user',
+            'back_url',
         ));
     }
     public function attendance()
@@ -438,6 +444,8 @@ class UserController extends Controller
 
     public function job_schedule($id)
     {
+        $title ="Jobs Scheduled";
+        $back_url = route('userss.index');
         $job_schedules = JobSchedule::where("user_id", $id)->get();
         foreach ($job_schedules as $key => $value) {
             $charge = UserService::where("user_id", $value->user_id)->where("service_id", $value->service_id)->first();
@@ -448,6 +456,6 @@ class UserController extends Controller
             }
         }
         $user = User::find($id);
-        return view("pages.users.job_schedule", compact("job_schedules", 'user'));
+        return view("pages.users.job_schedule", compact("job_schedules", 'user','title','back_url'));
     }
 }

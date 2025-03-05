@@ -91,7 +91,8 @@ class CustomerController extends Controller
         $customer = Customer::find($id);
         $job_schedules = JobSchedule::where("customer_id", $id)->get();
         $title = "Customer Details";
-        return view("pages.customers.details", compact("customer", 'job_schedules', 'title'));
+        $back_url = route('customers.index');
+        return view("pages.customers.details", compact("customer", 'job_schedules', 'title','back_url'));
     }
     public function  destroy($id)
     {

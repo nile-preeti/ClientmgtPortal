@@ -154,14 +154,27 @@
             .swal2-popup.swal2-modal.swal2-show{padding: 40px;}
             .btn.btn-search{background: #064086; padding: 12px 20px; font-size: 14px; color: #fff; border-radius: 50px;}
 
-            .form-control{
-                height: 45px;
-                background: #fff;
-                border: 1px solid var(--bs-border-color);
-                font-size: 14px;
-                color: var(--iq-body-text);
-                border-radius: 8px;
-            }
+            .attendance-records-head .form-control {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding:12px 15px 12px 15px; border: 1px solid var(--border); width: 100%; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); appearance: auto; }
+
+            .attendance-records-head .btn-search {background: #064086; white-space: nowrap; width: 100%; padding: 10px 20px; display: inline-block; font-size: 13px; color: var(--white); border-radius: 5px; font-weight: 600; text-align: center; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); border: none; }
+
+
+            .attendance-records-section {padding: 1rem 0; position: relative; }
+            .recordsList{list-style: none; padding: 0; margin: 0;}
+
+            .attendance-records-head {display: flex ; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+            .attendance-records-head h2 {font-size: 20px; font-weight: 600; margin: 0; padding: 0; color: var(--black); }
+            .cp-card {box-shadow: 0 0 #0000, 0 0 #0000, 0px 12px 28px 0px rgba(36, 7, 70, .06); background: var(--white); border-radius: 10px; position: relative; }
+
+            .cp-card-head {display: flex ; align-items: center; padding: 10px; border-bottom:2px solid #f5f5fd; }
+            .cp-date {font-size: 13px; font-weight: bold; margin: 0 0 0px 0; color: #064086; padding: 0; }
+            .cp-card-body{padding: 10px;}
+            .cp-point-box {display: flex ; gap: 10px; align-items: center; margin-bottom: 10px; }
+            .cp-point-icon{background: #fafafa; padding: 10px; border-radius:5px; }
+
+            .cp-point-text h4 {font-size: 13px; font-weight: bold; margin: 0 0 5px 0; color: #064086; padding: 0; } 
+            .cp-point-text p {    font-size: 13px; font-weight: 400; margin: 0 0 0px 0; color:#000; padding: 0; line-height: 22px; }
+            .cp-action-btn a {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding: 3px; border: 1px solid var(--border); background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); margin-left: 10px; display: inline-block; }
 
 
     </style>
@@ -190,44 +203,53 @@
             </div>
         </div>
     </header>
-    <div>
+    <div class="attendance-records-section">
         <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2 class="py-4 text-dark mb-2 mt-2"><a href="javascript:history.back()"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Attendance Record</h2>
-                </div>
-                <div class="row mb-4">
-                    <!-- Month & Year Filter -->
-                    <div class="col-md-4">
-                        <label for="month">Select Month:</label>
-                        <select id="month" class="form-control">
-                            <option value="01">January</option>
-                            <option value="02">February</option>
-                            <option value="03">March</option>
-                            <option value="04">April</option>
-                            <option value="05">May</option>
-                            <option value="06">June</option>
-                            <option value="07">July</option>
-                            <option value="08">August</option>
-                            <option value="09">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
-                        </select>
-                    </div>
+            <div class="attendance-records-head">
+                <h2>
+                    <a href="javascript:history.back()"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Attendance Record
+                </h2>
+                <div class="Search-filter">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <!-- <label for="month">Select Month:</label> -->
+                                <select id="month" class="form-control">
+                                    <option value="01">Select Month</option>
+                                    <option value="01">January</option>
+                                    <option value="02">February</option>
+                                    <option value="03">March</option>
+                                    <option value="04">April</option>
+                                    <option value="05">May</option>
+                                    <option value="06">June</option>
+                                    <option value="07">July</option>
+                                    <option value="08">August</option>
+                                    <option value="09">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+                        </div>
 
-                    <div class="col-md-4">
-                        <label for="year">Select Year:</label>
-                        <input type="number" id="year" class="form-control" min="2000" max="2050">
-                    </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <!-- <label for="year">Select Year:</label> -->
+                                <input type="number" id="year" class="form-control" min="2000" max="2050" placeholder="Select Year">
+                            </div>
+                        </div>
 
-                    <div class="col-md-4">
-                        <button class="btn btn-search mt-4" onclick="fetchAttendance(1)">Search</button>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <button class="btn-search" onclick="fetchAttendance(1)">Search</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="">
-                    <div id="recordsList" style="list-style: none;">
-                        <!-- Dynamic content will be added here by the JavaScript -->
+            </div>
+            <div class="attendance-records-body">
+                <div class="attendance-records-content">
+                    <div id="recordsList" class="recordsList">
                     </div>
 
                     <div id="pagination-controls" class="d-flex justify-content-end mb-4">
@@ -323,7 +345,7 @@ function displayRecords(records) {
 
     records.forEach((record) => {
         const listItem = document.createElement("li");
-        listItem.classList.add("mt-4");
+        listItem.classList.add("mt-2");
 
         const formatTime = (time) => {
             return time && time !== "N/A" ? new Date(`1970-01-01T${time}`).toLocaleTimeString([], {
@@ -362,26 +384,88 @@ if (record.status.key === "absent") {
 
         listItem.innerHTML = `
         <div class="col-md-12">
-            <div class="card">
-                <div class="d-flex justify-content-between date-time-sec">
-                    <h6>
-                        Date: ${new Date(record.date).toLocaleDateString('en-GB')} 
-                        <span class="badge ${bgColor}">${statusLabel}</span>
-                    </h6>
-                </div>
-                <div class="card-body py-2 px-2">
-                    <div class="attendance-record-data">
-                        <div class="d-md-flex justify-content-md-between">
-                            <div>
-                                <h6> Check-in Time: <span>${formatTime(record.status.check_in_time)}</span></h6>
-                                <h6> Check-in Address: <span>${formatAddress(record.status.check_in_address)}</span></h6>
-                            </div>
-                            <div>
-                                <div class="d-md-flex justify-content-md-end">
-                                    <h6> Check-out Time: <span>${formatTime(record.status.check_out_time)}</span></h6>
+
+            <div class="cp-card">
+                <div class="cp-card-head">
+                    <div class="cp-date">Date:<span> ${new Date(record.date).toLocaleDateString('en-GB')}</span></div>
+                    <div class="cp-status"><span class="badge ${bgColor}">${statusLabel}</span></div>
+                    <div class="cp-action-btn">
+                       <a href=""><img src="https://nileprojects.in/client-portal/public/assets/images/eye.svg"> </a>
+                    </div>
+                </div> 
+                <div class="cp-card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
                                 </div>
-                                <div class="d-md-flex justify-content-md-end">
-                                    <h6> Check-out Address: <span>${formatAddress(record.status.check_out_address)}</span></h6>
+                                <div class="cp-point-text">
+                                    <h4>Check-in Time:</h4>
+                                    <p>${formatTime(record.status.check_in_time)}</p>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>Check-out Time:</h4>
+                                    <p>${formatTime(record.status.check_out_time)}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>Working Hours</h4>
+                                    <p>${formatAddress(record.status.check_out_address)}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>Breaking  Hours:</h4>
+                                    <p>${formatAddress(record.status.check_out_address)}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/location.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>Check-in Address:</h4>
+                                    <p>${formatAddress(record.status.check_in_address)}</p>
+                                </div>
+                            </div>
+                        </div>
+ 
+                        <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/location.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>Check-out Address:</h4>
+                                    <p>${formatAddress(record.status.check_out_address)}</p>
                                 </div>
                             </div>
                         </div>

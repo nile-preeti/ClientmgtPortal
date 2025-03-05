@@ -7,7 +7,6 @@
 
             <div class="iq-card">
                 <div class="card-header">
-                    <h2>Settings </h2>
 
                 </div>
                 <div class="card-body">

@@ -187,9 +187,11 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-primary"
-                                                        onclick='showBreaks(@json($item['breaks']))'>View
-                                                        </button>
+                                                    @if (!empty($item['breaks']) && count($item['breaks']) > 0)
+                                                        <button class="btn btn-primary" onclick='showBreaks(@json($item['breaks']))'>View</button>
+                                                    @else
+                                                        N/A
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @empty
@@ -260,7 +262,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Breaks Table</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Breaks Details</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

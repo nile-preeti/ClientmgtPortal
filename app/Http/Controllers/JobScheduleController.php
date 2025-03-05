@@ -30,7 +30,7 @@ class JobScheduleController extends Controller
 
             ->orderBy("id", "desc")->paginate(config("contant.paginatePerPage"));
 
-        $title = "Job scheduling";
+        $title = "Job Scheduling";
 
 
         return view("pages.job_schedules.index", compact("title", 'job_schedules', 'search',));
@@ -42,15 +42,17 @@ class JobScheduleController extends Controller
     public function create(Request $request)
     {
         $title = "Schedule Job";
+        $back_url = route('job_schedules.index');
         $users = User::where("role_id", 2)->get();
         $customers = Customer::all();
         $states=State::where("country_id",233)->get();
         $services=Service::all();
-        return view("pages.job_schedules.create", compact('title','services','states', 'users', 'customers'));
+        return view("pages.job_schedules.create", compact('title','services','states', 'users', 'customers','back_url'));
     }
     public function edit(Request $request, $id)
     {
         $title = "Edit Job Schedule";
+        $back_url = route('job_schedules.index');
 
         $job_schedule = JobSchedule::find($id);
         if (!$job_schedule) {
@@ -60,7 +62,7 @@ class JobScheduleController extends Controller
         $customers = Customer::all();
         $states=State::where("country_id",233)->get();
         $services=Service::all();
-        return view("pages.job_schedules.create", compact('job_schedule','states','services', 'users', 'customers', 'title'));
+        return view("pages.job_schedules.create", compact('job_schedule','states','services', 'users', 'customers', 'title','back_url'));
     }
     public function store(Request $request)
     {

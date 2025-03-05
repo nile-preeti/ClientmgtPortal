@@ -116,6 +116,44 @@
 
             .res-fields-1 label{color: #595959;}
             .res-fields-1 p{font-weight: 500; color: #000;}
+.profile-page-section{padding: 1rem 0; position: relative;}
+
+.profile-head{display: flex;align-items: center; justify-content: space-between; margin-bottom: 1rem;}
+.profile-head h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    color: var(--black);
+}
+
+.user-table-item{box-shadow: 0 0 #0000,0 0 #0000, 0px 12px 28px 0px rgba(36,7,70,.06); margin-bottom: 10px; background: var(--white); padding: 10px; border-radius: 10px; position: relative;}
+
+.user-profile-item {padding: 0 0 0rem 0; display: flex; align-items: center; }
+.user-profile-media {width: 60px; height: 60px; position: relative; overflow: hidden; border-radius: 50%; margin: 0 10px 0 0; border: 1px solid #eaedf7; }
+.user-profile-media img {object-fit: cover; width: 100%; height: 100%; }
+.user-profile-text h2 {font-size: 16px; font-weight: 600; margin: 0 0 5px 0; padding: 0; color: var(--black); }
+.user-contact-info {position: relative; width: 100%; border-radius: 0; padding:  0; display: flex; gap: 5px; margin-bottom: 0rem; }
+.user-contact-info-icon {width: 32px; height: 32px; line-height: 32px; }
+.user-contact-info-icon img {height: 32px; }
+.user-contact-info-content h2 {    font-size: 12px; font-weight: 700; margin: 0 0 5px 0; padding: 0; color:var(--black); }
+.user-contact-info-content p {font-size: 14px; font-weight: normal; margin: 0; text-align: justify; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; color: var(--gray); }
+
+.email-text{font-size: 13px; font-weight: 400; margin: 0 0 5px 0; padding: 0; color: var(--gray); }
+
+.User-contact-info {position: relative; width: 100%; border-radius: 0; padding:  0; display: flex;  margin-bottom: 0rem; }
+.User-contact-info-icon {width: 40px; height: 40px; margin-right: 10px; line-height: 40px; }
+.User-contact-info-icon img {height: 32px; }
+.User-contact-info-content h2 {    font-size: 12px; font-weight: 700; margin: 0 0 5px 0; padding: 0; color: #4f5168; }
+
+.User-contact-info-content p {font-size: 12px; margin: 0; color: #8C9AA1; line-height: normal; font-weight: normal; }
+
+.user-profile-action{display: flex; align-items: center; gap: 10px;}
+
+.cat-text {background: var(--body); padding: 3px 20px; display: inline-block; font-size: 13px; width: 100%; color: var(--purple); border-radius: 5px; font-weight: bold; text-align: center; }
+
+
+
 
         </style>
 
@@ -147,56 +185,76 @@
           </div>
         </div>
     </header>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-10">
-                <h2 class=" text-dark mb-2 mt-2"><a href="{{route('user.dashboard')}}"> <img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a> Profile</h2>
-            </div>
-            <div class="col-md-2 mb-2 mt-2 text-right">
-              <button class="btnChangePassword btn-signin" data-toggle="modal" data-target="#changePasswordModal">
-                Change Password
-              </button>
-            </div>
-
-            <form >
-                <div class="card profile-form">
+    <div class="profile-page-section">
+        <div class="container">
+            <div class="profile-head">
+                <h2>
+                    <a href="{{route('user.dashboard')}}"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Profile
+                </h2>
+                <div class="Search-filter">
                     <div class="row">
-                        <div class="col-md-4 col-sm-12 col-lg-3 d-flex align-items-center justify-content-center" style="background: #f8f8ff;">
-                            <img src="{{ auth()->user()->image ? asset('uploads/images/' . auth()->user()->image) : 'https://nileprojects.in/client-portal/public/assets/images/image.png' }}"  class="user-profile">
-                        </div>
-                        <div class="col-md-8 col-sm-12 col-lg-9">
-                            <div class="row px-4">
-                                <div class="col-lg-4 col-md-6 col-sm-12 mt-4">
-                                    <div class="res-fields">
-                                        <label for="inputEmail4" class="form-label">Name</label>
-                                        <p class="text-capitalize">{{ auth()->user()->name }}</p>
-                                    </div>
-                                </div>
-                                  <div class="col-lg-4 col-md-6 col-sm-12 mt-4">
-                                    <div class="res-fields">
-                                        <label for="inputAddress" class="form-label">Phone Number</label>
-                                        <p>{{ auth()->user()->phone ? '+91' . auth()->user()->phone : 'N/A' }}</p>
-                                    </div>
-                                  </div>
-                                  
-                                  <div class="col-lg-4 col-md-6 col-sm-12 mt-4">
-                                    <div class="res-fields">
-                                        <label for="inputAddress2" class="form-label">Employee ID</label>
-                                        <p>{{ auth()->user()->emp_id }}</p>
-                                    </div>
-                                  </div>
-                                  <div class="col-lg-4 col-md-6 col-sm-12 mt-4">
-                                    <div class="res-fields-1">
-                                        <label for="inputAddress2" class="form-label">Email</label>
-                                        <p>{{ auth()->user()->email }}</p>
-                                    </div>
-                                  </div>
-                                  <div class="col-lg-12 col-md-12 col-sm-12 mt-4 mb-4 d-none">
-                                    <button type="submit" class="btn btn-submit px-5">Submit</button>
-                                  </div>  
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <button class="btnChangePassword btn-signin" data-toggle="modal" data-target="#changePasswordModal"> Change Password </button>
                             </div>
                         </div>
-                  </div>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-records-body">
+            <form >
+                <div class="profile-form">
+                    <div class="profile-section">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="user-table-item">
+                                    <div class="row g-1 align-items-center">
+                                        <div class="col-md-4">
+                                            <div class="user-profile-item mb-2">
+                                                <div class="user-profile-media">
+                                                    <img src="{{ auth()->user()->image ? asset('uploads/images/' . auth()->user()->image) : 'https://nileprojects.in/client-portal/public/assets/images/image.png' }}"  class="user-profile">
+                                                </div>
+                                                <div class="user-profile-text">
+                                                    <h2>{{ auth()->user()->name }}</h2>
+                                                    <div class="cat-text">Employee ID: {{ auth()->user()->emp_id }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="User-contact-info mb-2">
+                                                <div class="User-contact-info-icon">
+                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/sms.svg">
+                                                </div> 
+                                                <div class="User-contact-info-content">
+                                                    <h2>Email Address</h2>
+                                                    <p>{{ auth()->user()->email }}</p>
+                                                </div>    
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="User-contact-info">
+                                                <div class="User-contact-info-icon">
+                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/call.svg">
+                                                </div> 
+                                                <div class="User-contact-info-content">
+                                                    <h2>Phone</h2>
+                                                    <p>{{ auth()->user()->phone ?? 'N/A' }}</p>
+                                                </div>    
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2  d-none">
+                                           <div class="user-profile-action ">
+                                                <button type="submit" class="btn btn-submit px-5">Submit</button>    
+                                           </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- <div class="row">
                       <div class="col-lg-6 col-md-6 col-sm-12 mt-4">
                         <label for="inputEmail4" class="form-label">Name</label>

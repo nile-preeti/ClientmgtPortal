@@ -15,4 +15,10 @@ class Attendance extends Model
         'check_out_full_address', 'check_out_latitude', 'check_out_longitude', 'check_out_time',
         'status'
     ];
+
+
+    public function attendanceBreaks()
+    {
+        return $this->hasMany(AttendanceBreak::class, 'attendance_id');
+    }
 }

@@ -1,5 +1,41 @@
 @extends('layouts.app')
 @section('content')
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.2.0/mapbox-gl-geocoder.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+@push('css')
+<style>
+        /* Adjust Geocoder input width */
+        .mapboxgl-ctrl-geocoder {
+            width: 100% !important;
+            max-width: 400px !important; /* Adjust width as needed */
+        }
+        .mapboxgl-ctrl-geocoder{
+            position: relative !important;
+            color: var(--gray) !important;
+            border-radius: 5px !important;
+            font-weight: 400 !important;
+            font-size: 13px !important;
+            box-sizing: border-box !important;
+            padding: 5px 0px !important;
+            border: 1px solid var(--iq-dark-border) !important;
+            width: 100% !important;
+            background: #FFF !important;
+            box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05) !important;
+            min-width: 100% !important;
+        }
+        .mapboxgl-ctrl-geocoder--input {
+        height: 36px;
+        padding: 0px 15px !important;
+    }
+    .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon-search {
+        display: none !important;
+    }
+    </style>
+@endpush
+
+
     <!-- Page Content  -->
     <div id="content-page" class="content-page">
         <div class="container-fluid">
@@ -196,74 +232,70 @@
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-body">
-                    <form action="{{ route('customers.store') }}" method="post" id="create_form"
-                        enctype="multipart/form-data">
-                        @csrf
+                <form action="{{ route('customers.store') }}" method="post" id="create_form" enctype="multipart/form-data">
+    @csrf
 
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
 
-                        <div class="modal-form-item">
-                            <h5 class="modal-title">Add Customer</h5>
-                            <div class="form-group">
-                                <label for="name">Name*</label>
-                                <input type="text" name="name" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">Email*</label>
-                                <input type="email" name="email" class="form-control" required>
-                            </div>
+    <div class="modal-form-item">
+        <h5 class="modal-title">Add Customer</h5>
 
+        <div class="form-group">
+            <label for="name">Name*</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
 
-                            <div class="form-group">
-                                <label for="name">Phone Number*</label>
-                                <input type="text" name="phone" placeholder="(678) 878-9909"
-                                    data-inputmask="'mask': '(999) 999-9999'" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">Full Address*</label>
-                                <input type="text" name="full_address" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">City*</label>
-                                <input type="text" name="city" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="name">State</label>
-                                <select class="form-control" name="state_id">
-                                    @foreach ($states as $item)
-                                        <option value="{{ $item->id }}">{{ $item->name }} </option>
-                                    @endforeach
+        <div class="form-group">
+            <label for="email">Email*</label>
+            <input type="email" name="email" class="form-control" required>
+        </div>
 
+        <div class="form-group">
+            <label for="phone">Phone Number*</label>
+            <input type="text" name="phone" placeholder="(678) 878-9909" data-inputmask="'mask': '(999) 999-9999'" class="form-control" required>
+        </div>
 
-                                </select>
-                            </div>
+        <div class="form-group">
+            <label for="full_address">Full Address*</label>
+            <div id="geocoder-container"></div>
+            <input type="hidden" id="full_address" name="full_address" required>
+        </div>
 
-                            <div class="form-group">
-                                <label for="name">Zip Code *</label>
-                                <input type="number" name="zipcode" min="0" class="form-control" required>
-                            </div>
-                            {{-- <input type="hidden" name="image" id="create_image" class="form-control">
-                        <div class="form-group">
-                            <div class="dropzone" id="myDropzone"></div>
-                        </div> --}}
-                            <div class="form-group">
-                                <label for="name">Status</label>
-                                <select class="form-control" name="status">
-                                    <option value="1">Active </option>
-                                    <option value="0">Inactive </option>
-                                </select>
-                            </div>
-                        </div>
+        <div class="form-group">
+            <label for="city">City*</label>
+            <input type="text" id="city" name="city" class="form-control" required>
+        </div>
 
-                        <div class="modal-action">
-                            <button type="submit" class="btnSubmit">Submit</button>
+        <div class="form-group">
+            <label for="state_id">State</label>
+            <select class="form-control" name="state_id" id="state">
+                @foreach ($states as $item)
+                    <option value="{{ $item->id }}">{{ $item->name }} </option>
+                @endforeach
+            </select>
+        </div>
 
-                            <button type="button" class="btnClose" data-dismiss="modal">Close</button>
-                            <!-- <button type="button" class="btn btn-success">Approve</button> -->
-                        </div>
-                    </form>
+        <div class="form-group">
+            <label for="zipcode">Zip Code *</label>
+            <input type="number" name="zipcode" min="0" class="form-control" required id="zipcode">
+        </div>
+
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select class="form-control" name="status">
+                <option value="1">Active </option>
+                <option value="0">Inactive </option>
+            </select>
+        </div>
+    </div>
+
+    <div class="modal-action">
+        <button type="submit" class="btnSubmit">Submit</button>
+        <button type="button" class="btnClose" data-dismiss="modal">Close</button>
+    </div>
+</form>
                 </div>
             </div>
         </div>
@@ -305,7 +337,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="name">City*</label>
-                                <input type="text" name="city" id="city" class="form-control" required>
+                                <input type="text" name="city"  class="form-control" required>
                             </div>
                             <div class="form-group">
                                 <label for="name">State</label>
@@ -347,7 +379,56 @@
         </div>
     @endsection
     @push('js')
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/jquery.inputmask.bundle.min.js"></script>
+        <script>
+            mapboxgl.accessToken = "pk.eyJ1IjoidXNlcnMxIiwiYSI6ImNsdGgxdnpsajAwYWcya25yamlvMHBkcGEifQ.qUy8qSuM_7LYMSgWQk215w";
+
+            const geocoder = new MapboxGeocoder({
+                accessToken: mapboxgl.accessToken,
+                types: 'address',
+                placeholder: 'Start typing address...',
+                countries: 'us',
+                mapboxgl: undefined,
+                marker: false
+            });
+
+            document.getElementById('geocoder-container').appendChild(geocoder.onAdd());
+
+            geocoder.on('result', function (e) {
+                let place = e.result;
+                let city = "";
+                let state = "";
+                let zip = "";
+
+                // Store full address
+                document.getElementById('full_address').value = place.place_name;
+
+                place.context.forEach((component) => {
+                    if (component.id.includes("place")) {
+                        city = component.text;
+                    }
+                    if (component.id.includes("region")) {
+                        state = component.text;
+                    }
+                    if (component.id.includes("postcode")) {
+                        zip = component.text;
+                    }
+                });
+
+                document.getElementById('city').value = city;
+
+                let stateDropdown = document.getElementById('state');
+                for (let i = 0; i < stateDropdown.options.length; i++) {
+                    if (stateDropdown.options[i].text.trim().toLowerCase() === state.toLowerCase()) {
+                        stateDropdown.options[i].selected = true;
+                        break;
+                    }
+                }
+
+                document.getElementById('zipcode').value = zip;
+            });
+        </script>
 
         <script>
             $(":input").inputmask();

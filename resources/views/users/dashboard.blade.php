@@ -398,7 +398,7 @@
                                   <div class="row">
                                     <div class="col-8">
                                       <div class="numbers">
-                                        <p class="text-light text-sm text-uppercase fw-medium">Services</p>
+                                        <p class="text-light text-sm text-uppercase fw-medium">Jobs</p>
                                         <h3 class="text-light font-weight-bolder pb-0 ">&nbsp;</h3>
                                       </div>
                                     </div>
