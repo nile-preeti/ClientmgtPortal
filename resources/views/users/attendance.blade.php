@@ -102,6 +102,14 @@
         .swal2-popup.swal2-modal.swal2-show {
             padding: 40px;
         }
+
+        .crm-card-table .record-entry, .record-item{display: flex; justify-content: space-between; border-bottom: 1px solid #d0e1f5; padding: 10px;}
+        .crm-card-table .record-entry .record-label, .record-item{color: #000; font-weight: 500;}
+        .crm-card-table .record-entry .record-value, .record-item{color: #000}
+        .crm-card-table .record-entry:last-child{ border-bottom: none;}
+        .record-item{border-bottom: 1px solid #d0e1f5;}
+        .record-item:last-child{border-bottom: none;}
+        #recordsContainer{background: #f0f7ff; border-radius: 10px; border: 1px solid #d0e1f5;}
     </style>
 </head>
 
@@ -172,28 +180,30 @@
                     <div id="map"></div>
                     <div class="controls">
                         <div class="hrmodule-punching-controls-box">
-                            {{-- <div class="punching-controls-icon">
+                            <div class="punching-controls-icon">
                                 <img src="{{ asset('watch-icon.svg') }}">
-                        </div> --}}
-                            <div style="display: flex;justify-content:center;">
-                                <!-- <div class="text-center"><a href="javascript:history.back()">
+                            </div> 
+                            <!-- <div style="display: flex;justify-content:center;">
+                                <div class="text-center"><a href="javascript:history.back()">
                                     <img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"></a>
-                            </div> -->
                             </div>
-                            <div class="mb-3" style="display: flex;justify-content:center;">
-                                <!-- <div class="d-flex align-items-center">
+                            </div> -->
+                             <!--<div class="mb-3" style="display: flex;justify-content:center;">
+                                <div class="d-flex align-items-center">
                                 <div class="me-2"><a href="javascript:history.back()">
                                     <img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"></a>
                                 </div>
-                            </div> -->
-                                <img src="https://nileprojects.in/hrmodule/public/assets/images/ic-clock.png"
-                                    class="" height="130px"></a>
                             </div>
+                                 {{--<img src="https://nileprojects.in/hrmodule/public/assets/images/ic-clock.png"
+                                    class="" height="130px"></a>--}}
+                            </div> -->
                             <div class="text-center"{{ date('M d , Y') }}></div>
+
                             <div class="punching-time">
                                 <span id="hours">00</span>:<span id="minutes">00</span>:<span
                                     id="seconds">00</span>
                             </div>
+
                             <div class="hrmodule-punching-item-action">
                                 <div class="punching-btn">
                                     <button id="checkinBtn" data-id="check_in" class="checkinBtn">Check-in</button>
@@ -204,27 +214,34 @@
                                     {{-- <div class="info" id="checkoutInfo"></div> --}}
                                 </div>
                             </div>
-                            <hr>
                             {{-- <div class="hrmodule-punching-item-action ">
                                 <div class="punching-btn">
-                                    <button id="startBreakBtn" data-id="" class="checkinBtn">Start Break</button>
+                                    <button id="startBreakBtn" data-id="" class="StartBreakBtn">Start Break</button>
                                     <div class="info" id="startBreakInfo"></div>
                                 </div>
                                 <div class="punching-btn">
-                                    <button id="endBreakBtn"   class="checkoutBtn" disabled>End Break</button>
+                                    <button id="endBreakBtn"   class="EndBreakBtn" disabled>End Break</button>
                                     <div class="info" id="endBreakInfo"></div>
                                 </div>
-                            </div> --}}
+                            </div> --}} 
                         </div>
-                        <div class="hrmodule-table-card d-none" id="table_container">
-                            {{-- <button class="btn-bl mb-2" id="fetchRecordsBtn">Fetch Records</button> --}}
-                            <div class="crm-card-table table-responsive">
-                                <table id="recordsTable" class="table">
 
-                                    <tbody id="table_body"></tbody>
-                                </table>
+
+                        <div class="hrmodule-record-list">
+                            <div class="hrmodule-record-item">
+                                <div class="hrmodule-record-item-text"></div>
+                                <div class="hrmodule-record-item-value"></div>
                             </div>
                         </div>
+
+
+
+                        <div class="hrmodule-table-card d-none" id="table_container">
+                            <div class="crm-card-table">
+                                <div id="recordsContainer"></div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -331,142 +348,117 @@
 
             // Initialize Buttons
             function initializeButtons(lat, lng) {
-                const checkinBtn = document.getElementById("checkinBtn");
-                const checkoutBtn = document.getElementById("checkoutBtn");
-                const fetchRecordsBtn = document.getElementById("fetchRecordsBtn");
-                const checkinInfo = document.getElementById("checkinInfo");
-                const checkoutInfo = document.getElementById("checkoutInfo");
+    const checkinBtn = document.getElementById("checkinBtn");
+    const checkoutBtn = document.getElementById("checkoutBtn");
+    const recordsContainer = document.getElementById("recordsContainer");
 
+    checkinBtn.addEventListener("click", async () => {
+        const address = await getAddressFromCoordinates(lat, lng);
 
+        if (checkinBtn.getAttribute("data-id") == "check_in") {
+            const result = await saveDataToPHP("{{ route('user.attendance.store') }}", {
+                _token: csrfToken,
+                user_id: user.id,
+                check_in_full_address: address,
+                check_in_latitude: lat,
+                check_in_longitude: lng,
+            });
 
-                checkinBtn.addEventListener("click", async () => {
-                    const address = await getAddressFromCoordinates(lat, lng);
+            if (result.status === "success") {
+                checkinBtn.textContent = `Start Break`;
+                checkoutBtn.disabled = false;
+                Swal.fire("Success", result.message, "success");
 
-                    console.log(address);
+                $("#table_container").removeClass("d-none");
+                recordsContainer.innerHTML += `
+                    <div class="record-item">
+                        <span>Check In:</span> <span>${result.data.check_in_time}</span>
+                    </div>`;
+                checkinBtn.setAttribute("data-id", "start_break");
 
-                    if (checkinBtn.getAttribute("data-id") == "check_in") {
-                        const address = await getAddressFromCoordinates(lat, lng);
-
-                        // Send Check-in data to the backend
-                        const result = await saveDataToPHP("{{ route('user.attendance.store') }}", {
-                            _token: csrfToken, // Include CSRF token
-                            user_id: user.id,
-                            check_in_full_address: address,
-                            check_in_latitude: lat,
-                            check_in_longitude: lng,
-                        });
-
-                        if (result.status === "success") {
-                            checkinBtn.textContent = ` Start Break`;
-
-                            checkoutBtn.disabled = false;
-                            Swal.fire("Success", result.message, "success");
-
-                            $("#table_container").removeClass("d-none");
-                            $("#table_body").html($("#table_body").html() +
-                                `<tr><td>Check In</td>
-                                  <td>${result.data.check_in_time}</td></tr>`
-                            );
-                            checkinBtn.setAttribute("data-id", "start_break");
-
-                            return;
-
-                        } else {
-                            // alert(result.message);
-                            Swal.fire("Error", result.message, "error");
-                        }
-                    }
-                    if (checkinBtn.getAttribute("data-id") == "start_break") {
-                        const address = await getAddressFromCoordinates(lat, lng);
-
-                        // Send Check-out data to the backend
-                        const result = await saveDataToPHP("{{ route('user.attendance.break') }}", {
-                            _token: csrfToken, // Include CSRF token
-                            user_id: user.id,
-                            type: "start"
-
-                        });
-
-
-                        if (result.success) {
-                            checkinBtn.textContent = ` End Break`;
-
-                            checkoutBtn.disabled = false;
-                            Swal.fire("Success", result.message, "success");
-
-                            $("#table_body").html($("#table_body").html() +
-                                `<tr><td> Break Started</td>
-                                  <td>${result.start_break}</td></tr>`
-                            );
-                            checkinBtn.setAttribute("data-id", "end_break");
-
-                            return;
-                        } else {
-                            // alert(result.message);
-                            Swal.fire("Error", result.message, "error");
-                        }
-                    }
-                    if (checkinBtn.getAttribute("data-id") == "end_break") {
-                        const address = await getAddressFromCoordinates(lat, lng);
-
-                        // Send Check-out data to the backend
-                        const result = await saveDataToPHP("{{ route('user.attendance.break') }}", {
-                            _token: csrfToken, // Include CSRF token
-                            user_id: user.id,
-                            // type: "end"
-
-                        });
-
-
-                        if (result.success) {
-                            checkinBtn.textContent = `Start Break`;
-
-                            checkoutBtn.disabled = false;
-                            Swal.fire("Success", result.message, "success");
-
-                            $("#table_body").html($("#table_body").html() +
-                                `<tr><td> Break Finished</td>
-                                  <td>${result.end_break}</td></tr>`
-                            );
-                            checkinBtn.setAttribute("data-id", "start_break");
-
-                            return;
-
-                        } else {
-                            // alert(result.message);
-                            Swal.fire("Error", result.message, "error");
-                        }
-                    }
-                });
-
-                checkoutBtn.addEventListener("click", async () => {
-                    const address = await getAddressFromCoordinates(lat, lng);
-
-                    // Send Check-out data to the backend
-                    const result = await saveDataToPHP("{{ route('user.attendance.update') }}", {
-                        _token: csrfToken, // Include CSRF token
-                        user_id: user.id,
-                        check_out_full_address: address,
-                        check_out_latitude: lat,
-                        check_out_longitude: lng,
-                    });
-
-                    if (result.status === "success") {
-                        // checkoutInfo.textContent = ` ${result.data.check_out_time}`;
-                        checkinBtn.disabled = true;
-                        $("#table_body").html($("#table_body").html() +
-                            `<tr><td>Checkout </td>
-                                  <td>${result.data.check_out_time}</td></tr>`
-                        );
-                        Swal.fire("Success", result.message, "success");
-                    } else {
-                        Swal.fire("Error", result.message, "error");
-                    }
-                });
-
-
-
+                return;
+            } else {
+                Swal.fire("Error", result.message, "error");
             }
+        }
+
+        if (checkinBtn.getAttribute("data-id") == "start_break") {
+            const result = await saveDataToPHP("{{ route('user.attendance.break') }}", {
+                _token: csrfToken,
+                user_id: user.id,
+                type: "start"
+            });
+
+            if (result.success) {
+                checkinBtn.textContent = `End Break`;
+                checkoutBtn.disabled = false;
+                Swal.fire("Success", result.message, "success");
+
+                recordsContainer.innerHTML += `
+                    <div class="record-item" data-break-id="${result.break_id}">
+                        <span>Break Start - End:</span> 
+                        <span>${result.start_break} - <span id="end_${result.break_id}">-</span></span>
+                    </div>`;
+
+                checkinBtn.setAttribute("data-id", "end_break");
+                checkinBtn.setAttribute("data-break-id", result.break_id); // Store break ID for updating
+
+                return;
+            } else {
+                Swal.fire("Error", result.message, "error");
+            }
+        }
+
+        if (checkinBtn.getAttribute("data-id") == "end_break") {
+            const breakId = checkinBtn.getAttribute("data-break-id"); // Retrieve break ID
+
+            const result = await saveDataToPHP("{{ route('user.attendance.break') }}", {
+                _token: csrfToken,
+                user_id: user.id,
+                type: "end"
+            });
+
+            if (result.success) {
+                checkinBtn.textContent = `Start Break`;
+                checkoutBtn.disabled = false;
+                Swal.fire("Success", result.message, "success");
+
+                // Update the same break entry instead of adding a new one
+                document.getElementById(`end_${breakId}`).textContent = result.end_break;
+
+                checkinBtn.setAttribute("data-id", "start_break");
+
+                return;
+            } else {
+                Swal.fire("Error", result.message, "error");
+            }
+        }
+    });
+
+    checkoutBtn.addEventListener("click", async () => {
+        const address = await getAddressFromCoordinates(lat, lng);
+
+        const result = await saveDataToPHP("{{ route('user.attendance.update') }}", {
+            _token: csrfToken,
+            user_id: user.id,
+            check_out_full_address: address,
+            check_out_latitude: lat,
+            check_out_longitude: lng,
+        });
+
+        if (result.status === "success") {
+            checkinBtn.disabled = true;
+            recordsContainer.innerHTML += `
+                <div class="record-item">
+                    <span>Checkout:</span> <span>${result.data.check_out_time}</span>
+                </div>`;
+            Swal.fire("Success", result.message, "success");
+        } else {
+            Swal.fire("Error", result.message, "error");
+        }
+    });
+}
+
 
             // Fetch Address from Coordinates
             // async function getAddressFromCoordinates(lat, lng) {
@@ -510,116 +502,61 @@
             }
 
             function fetchRecords() {
-                $.get("{{ route('user.attendance.fetch.today') }}" + "?id=" + user.id, function(data) {
-                    if (data.success) {
+    $.get("{{ route('user.attendance.fetch.today') }}" + "?id=" + user.id, function (data) {
+        if (data.success) {
+            if (data.today) {
+                const checkinBtn = document.getElementById("checkinBtn");
 
-                        if (data.today) {
+                if (data.today.check_in_time) {
+                    $("#checkoutBtn").attr("disabled", false);
+                    $("#table_container").removeClass("d-none");
 
-                            if (data.today.check_in_time) {
-                                const checkinBtn = document.getElementById("checkinBtn");
+                    $("#recordsContainer").append(`
+                        <div class="record-entry">
+                            <span class="record-label">Check In:</span>
+                            <span class="record-value">${data.today.check_in_time}</span>
+                        </div>
+                    `);
 
-                                $("#checkoutBtn").attr("disabled", false);
+                    checkinBtn.setAttribute("data-id", "start_break");
+                    checkinBtn.textContent = `Start Break`;
+                }
 
+                if (data.breaks) {
+                    data.breaks.forEach((breakItem) => {
+                        let breakStart = breakItem.break_start ? breakItem.break_start : "-";
+                        let breakEnd = breakItem.break_end ? breakItem.break_end : "-";
 
-                                $("#table_container").removeClass("d-none");
-                                $("#table_body").html($("#table_body").html() +
-                                    `<tr><td>Check In</td>
-                                  <td>${data.today.check_in_time}</td></tr>`
-                                );
-                                checkinBtn.setAttribute("data-id", "start_break");
+                        $("#recordsContainer").append(`
+                            <div class="record-entry">
+                                <span class="record-label">Break Start - End:</span>
+                                <span class="record-value">${breakStart} - ${breakEnd}</span>
+                            </div>
+                        `);
 
-                                checkinBtn.textContent = `Start Break`;
-
-                                // Convert the start time string to a timestamp and start the timer
-
-
-
-                            }
-                            // if (data.breaks) {
-                            //     data.breaks.map(
-                            //         (
-                            //             break) => {
-
-                            //             if (
-                            //                 break.break_start) {
-                            //                 // $("#table_container").removeClass("d-none");
-                            //                 $("#table_body").html($("#table_body").html() +
-                            //                     `<tr><td>Break Started</td>
-                        //       <td>${break.break_start}</td></tr>`
-                            //                 );
-                            //                 checkinBtn.setAttribute("data-id", "end_break");
-                            //                 checkinBtn.textContent = ` End Break`;
-
-
-                            //             }
-                            //             if (
-                            //                 break.break_end) {
-                            //                 // $("#table_container").removeClass("d-none");
-                            //                 $("#table_body").html($("#table_body").html() +
-                            //                     `<tr><td>Break Finished</td>
-                        //       <td>${break.break_end}</td></tr>`
-                            //                 );
-                            //                 checkinBtn.setAttribute("data-id", "start_break");
-                            //                 checkinBtn.textContent = ` Start Break`;
-
-
-                            //             }
-                            //         })
-
-
-                            // }
-
-                            if (data.breaks) {
-                                // let tableContent = $("#table_body").html(); // Store existing content
-
-                                data.breaks.forEach((breakItem) => {
-                                    if (
-                                        breakItem.break_start) {
-                                        // $("#table_container").removeClass("d-none");
-                                        $("#table_body").html($("#table_body").html() +
-                                            `<tr><td>Break Started</td>
-                                  <td>${breakItem.break_start}</td></tr>`
-                                        );
-                                        checkinBtn.setAttribute("data-id", "end_break");
-                                        checkinBtn.textContent = ` End Break`;
-
-
-                                    }
-                                    if (
-                                        breakItem.break_end) {
-                                        // $("#table_container").removeClass("d-none");
-                                        $("#table_body").html($("#table_body").html() +
-                                            `<tr><td>Break Finished</td>
-                                  <td>${breakItem.break_end}</td></tr>`
-                                        );
-                                        checkinBtn.setAttribute("data-id", "start_break");
-                                        checkinBtn.textContent = ` Start Break`;
-
-
-                                    }
-                                });
-
-                                // $("#table_body").html(tableContent); // Update table body once after loop
-                            }
-                            if (data.today.check_out_time != "N/A") {
-
-
-                                const checkoutInfo = document.getElementById("checkoutInfo");
-                                // $("#checkoutBtn").attr("disabled", true);
-                                $("#checkinBtn").attr("disabled", true);
-                                // $("#table_container").removeClass("d-none");
-                                $("#table_body").html($("#table_body").html() +
-                                    `<tr><td>Checkout </td>
-                                  <td>${data.today.check_out_time}</td></tr>`
-                                );
-
-                                // checkoutInfo.textContent = ` ${data.today.check_out_time}`;
-
-                            }
+                        if (!breakItem.break_end) {
+                            checkinBtn.setAttribute("data-id", "end_break");
+                            checkinBtn.textContent = `End Break`;
+                        } else {
+                            checkinBtn.setAttribute("data-id", "start_break");
+                            checkinBtn.textContent = `Start Break`;
                         }
-                    }
-                });
+                    });
+                }
+
+                if (data.today.check_out_time != "N/A") {
+                    $("#checkinBtn").attr("disabled", true);
+                    $("#recordsContainer").append(`
+                        <div class="record-entry">
+                            <span class="record-label">Checkout:</span>
+                            <span class="record-value">${data.today.check_out_time}</span>
+                        </div>
+                    `);
+                }
             }
+        }
+    });
+}
 
 
 

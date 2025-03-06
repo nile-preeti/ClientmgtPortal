@@ -83,6 +83,7 @@ Route::prefix('user')->as("user.")->group(function () {
         
         //user.attendance.fetch.today
         Route::get("attendance_records", [UserController::class, 'attendance_records'])->name("attendance_records");
+        Route::post('/fetch-break-details', [AjaxController::class, 'fetchBreakDetails'])->name('fetch.break.details');
         Route::get("holidays", [UserController::class, 'holidays'])->name("holidays");
         Route::get("directory", [UserController::class, 'directory'])->name("directory");
         Route::get("all-emp-directory", [AjaxController::class, 'Employeedirectory'])->name("employee.directory");

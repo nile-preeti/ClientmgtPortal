@@ -272,6 +272,7 @@ class AjaxController extends Controller
                     ->whereYear("date", $selectedYear)
                     ->whereMonth("date", $selectedMonth)
                     ->orderBy("date", "asc")
+                    ->with('attendanceBreaks')
                     ->get()
                     ->keyBy('date');
 
@@ -281,53 +282,83 @@ class AjaxController extends Controller
                     $date = $selectedYear . '-' . str_pad($selectedMonth, 2, '0', STR_PAD_LEFT) . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
                     $dayOfWeek = date('N', strtotime($date));
 
-                    // Default Status
-                    $status = ["key" => "absent", "label" => "Absent"];
+                    // Default status
+                    $status = [
+                        "key" => "absent",
+                        "label" => "Absent",
+                        "working_hours" => "N/A",
+                        "break_time" => "00:00",
+                        "check_in_time" => "N/A",
+                        "check_out_time" => "N/A",
+                        "check_in_address" => "N/A",
+                        "check_out_address" => "N/A"
+                    ];
 
                     if (in_array($date, $holidays)) {
-                        $status = ["key" => "holiday", "label" => "Holiday"];
+                        $status = ["key" => "holiday", "label" => "Holiday", "working_hours" => "N/A", "break_time" => "00:00"];
                     } elseif ($date > $today) {
-                        $status = ["key" => "na", "label" => "N/A"];
+                        $status = ["key" => "na", "label" => "N/A", "working_hours" => "N/A", "break_time" => "00:00"];
                     } elseif ($dayOfWeek == 6 || $dayOfWeek == 7) {
-                        $status = ["key" => "weekly_off", "label" => "Weekly Off"];
+                        $status = ["key" => "weekly_off", "label" => "Weekly Off", "working_hours" => "N/A", "break_time" => "00:00"];
                     } elseif (isset($attendances[$date])) {
                         $attendance = $attendances[$date];
 
                         if (empty($attendance->check_in_time)) {
-                            $status = ["key" => "absent", "label" => "Absent"];
+                            $status = ["key" => "absent", "label" => "Absent", "working_hours" => "N/A", "break_time" => "00:00"];
                         } else {
-                            $checkInTime = strtotime($attendance->check_in_time);
-                            $checkOutTime = $attendance->check_out_time ? strtotime($attendance->check_out_time) : null;
+                            $workedHours = "N/A";
+                            $checkInTime = $attendance->check_in_time ? Carbon::parse($attendance->check_in_time) : null;
+                            $checkOutTime = $attendance->check_out_time ? Carbon::parse($attendance->check_out_time) : null;
+
+                            if ($checkInTime && $checkOutTime) {
+                                $workedHours = $checkInTime->diff($checkOutTime)->format('%h hours %i minutes');
+                            }
 
                             if ($date == $today) {
                                 $status = ["key" => "present", "label" => "Present"];
                             } elseif ($date < $today && is_null($checkOutTime)) {
                                 $status = ["key" => "absent", "label" => "Absent"];
-                            } elseif (!is_null($checkOutTime)) {
-                                $workedHours = ($checkOutTime - $checkInTime) / 3600; // Convert seconds to hours
-
-                                if ($workedHours < 4.5) {
+                            } elseif ($checkInTime && $checkOutTime) {
+                                $totalHours = $checkInTime->diffInHours($checkOutTime);
+                                if ($totalHours < 4.5) {
                                     $status = ["key" => "absent", "label" => "Absent"];
-                                } elseif ($workedHours >= 4.5 && $workedHours < 9) {
+                                } elseif ($totalHours >= 4.5 && $totalHours < 9) {
                                     $status = ["key" => "half_day", "label" => "Half Day"];
                                 } else {
                                     $status = ["key" => "present", "label" => "Present"];
                                 }
-                            } else {
-                                $status = ["key" => "absent", "label" => "Absent"];
                             }
+
+                            // Assign check-in, check-out, address, and working hours
+                            $status["check_in_time"] = $checkInTime ? $checkInTime->format("H:i") : "N/A";
+                            $status["check_out_time"] = $checkOutTime ? $checkOutTime->format("H:i") : "N/A";
+                            $status["check_in_address"] = !empty($attendance->check_in_full_address) ? $attendance->check_in_full_address : "N/A";
+                            $status["check_out_address"] = !empty($attendance->check_out_full_address) ? $attendance->check_out_full_address : "N/A";
+                            $status["working_hours"] = $workedHours;
+
+                            // Calculate total break time
+                            $totalBreakSeconds = 0;
+                            if ($attendance->attendanceBreaks) {
+                                foreach ($attendance->attendanceBreaks as $break) {
+                                    if ($break->start_break && $break->end_break) {
+                                        $startBreak = Carbon::parse($break->start_break);
+                                        $endBreak = Carbon::parse($break->end_break);
+                                        $totalBreakSeconds += $startBreak->diffInSeconds($endBreak);
+                                    }
+                                }
+                            }
+
+                            // Convert seconds to HH:MM format
+                            $breakHours = gmdate("H:i", $totalBreakSeconds);
+
+                            // Assign break time to status
+                            $status["break_time"] = $totalBreakSeconds > 0 ? $breakHours : "00:00";
                         }
-
-                        $status["check_in_time"] = $attendance->check_in_time ? date("H:i", strtotime($attendance->check_in_time)) : "N/A";
-                        $status["check_out_time"] = $attendance->check_out_time ? date("H:i", strtotime($attendance->check_out_time)) : "N/A";
-                        $status["check_in_address"] = !empty($attendance->check_in_full_address) ? $attendance->check_in_full_address : "N/A";
-                        $status["check_out_address"] = !empty($attendance->check_out_full_address) ? $attendance->check_out_full_address : "N/A";
                     }
-
                     $records[] = [
                         "date" => $date,
                         "status" => $status,
-                        'id' => $id,
+                        'id' => isset($attendances[$date]) ? $attendances[$date]->id : null,
                     ];
                 }
 
@@ -354,6 +385,9 @@ class AjaxController extends Controller
 
         return response()->json(['success' => false, 'message' => 'User does not exist']);
     }
+
+    
+
 
 
 
@@ -490,6 +524,23 @@ class AjaxController extends Controller
 }
 
 
+public function fetchBreakDetails(Request $request)
+{
+    $attendance = Attendance::with('attendanceBreaks')->find($request->id);
+
+    if (!$attendance) {
+        return response()->json(["success" => false, "message" => "Attendance not found"]);
+    }
+
+    $breaks = $attendance->attendanceBreaks->map(function ($break) {
+        return [
+            "start_break" => $break->start_break ? Carbon::parse($break->start_break)->format('H:i') : "N/A",
+            "end_break" => $break->end_break ? Carbon::parse($break->end_break)->format('H:i') : "N/A"
+        ];
+    });
+
+    return response()->json(["success" => true, "breaks" => $breaks]);
+}
 
     
 

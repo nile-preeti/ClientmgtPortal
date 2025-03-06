@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Check-in/Check-out with Map</title>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
@@ -13,6 +14,7 @@
     <link rel="stylesheet" href="{{ asset('plugins/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('style.css') }}">
     <link rel="stylesheet" href="{{ asset('users/attendance_records.css') }}">
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <style>
@@ -174,7 +176,8 @@
 
             .cp-point-text h4 {font-size: 13px; font-weight: bold; margin: 0 0 5px 0; color: #064086; padding: 0; } 
             .cp-point-text p {    font-size: 13px; font-weight: 400; margin: 0 0 0px 0; color:#000; padding: 0; line-height: 22px; }
-            .cp-action-btn a {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding: 3px; border: 1px solid var(--border); background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); margin-left: 10px; display: inline-block; }
+            .cp-action-btn a {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding: 0px 4px; border: 1px solid var(--border); background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); margin-left: 10px; display: inline-block; }
+            .cp-action-btn img{height: 20px;}
 
 
     </style>
@@ -185,7 +188,8 @@
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
 
-                <a href="#"> <img src="https://nileprojects.in/hrmodule/public/assets/images/nile-logo.jpg" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
+                <a href="#"> <img src="{{ asset('hrmodule.png') }}" class="logo card-img-absolute"
+                alt="circle-image" height="50px"></a>
 
                 <div class="dropdown text-end">
                     <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -390,7 +394,9 @@ if (record.status.key === "absent") {
                     <div class="cp-date">Date:<span> ${new Date(record.date).toLocaleDateString('en-GB')}</span></div>
                     <div class="cp-status"><span class="badge ${bgColor}">${statusLabel}</span></div>
                     <div class="cp-action-btn">
-                       <a href=""><img src="https://nileprojects.in/client-portal/public/assets/images/eye.svg"> </a>
+                       <a href="javascript:void(0);" class="view-break-details" data-id="${record.id}" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    <img src="https://nileprojects.in/client-portal/public/assets/images/eye.svg"> 
+</a>
                     </div>
                 </div> 
                 <div class="cp-card-body">
@@ -429,7 +435,8 @@ if (record.status.key === "absent") {
                                 </div>
                                 <div class="cp-point-text">
                                     <h4>Working Hours</h4>
-                                    <p>${formatAddress(record.status.check_out_address)}</p>
+                                     <p>${record.status.working_hours}</p>
+
                                 </div>
                             </div>
                         </div>
@@ -441,7 +448,8 @@ if (record.status.key === "absent") {
                                 </div>
                                 <div class="cp-point-text">
                                     <h4>Breaking  Hours:</h4>
-                                    <p>${formatAddress(record.status.check_out_address)}</p>
+                                    <p>${record.status.break_time}</p>
+
                                 </div>
                             </div>
                         </div>
@@ -662,7 +670,52 @@ Swal.fire({
         let currentYear = new Date().getFullYear();
         document.getElementById("year").value = currentYear;
     });
+
+    $(document).on("click", ".view-break-details", function () {
+    let attendanceId = $(this).data("id");
+
+    $.ajax({
+        url: "{{ route('user.fetch.break.details') }}", // Update the route accordingly
+        type: "POST",
+        data: {
+            id: attendanceId,
+            _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
+        },
+        success: function (response) {
+            if (response.success) {
+                let breakDetails = response.breaks.map(breakItem => `
+                    <p><strong>Break Start - End:</strong> ${breakItem.start_break} - ${breakItem.end_break}</p>
+                `).join("");
+
+                $("#exampleModal .modal-body").html(breakDetails);
+            } else {
+                $("#exampleModal .modal-body").html("<p>No break records found.</p>");
+            }
+        },
+        error: function () {
+            $("#exampleModal .modal-body").html("<p>Error fetching data.</p>");
+        }
+    });
+});
 </script>
+
+<!-- Modal -->
+   <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Break Details</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer d-none">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 
