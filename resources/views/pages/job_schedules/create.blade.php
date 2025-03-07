@@ -138,7 +138,7 @@
                                             <label for="name">Start Date*</label>
                                             <input type="date" placeholder="(678) 878-9909"
                                                 @if (isset($job_schedule)) value="{{ $job_schedule->start_date }}" @endif
-                                                required name="start_date" class="form-control" required>
+                                                required name="start_date" class="form-control" required    min="{{ isset($job_schedule) ? $job_schedule->start_date : date('Y-m-d') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -146,7 +146,7 @@
                                             <label for="name">End Date*</label>
                                             <input type="date" placeholder="(678) 878-9909"
                                                 @if (isset($job_schedule)) value="{{ $job_schedule->end_date }}" @endif
-                                                required name="end_date" class="form-control" required>
+                                                required name="end_date" class="form-control" required    min="{{ isset($job_schedule) ? $job_schedule->end_date : date('Y-m-d') }}">
                                         </div>
                                     </div>
 
@@ -156,7 +156,7 @@
                                             <label for="name">Start Time*</label>
                                             <input type="time" placeholder="(678) 878-9909"
                                                 @if (isset($job_schedule)) value="{{ $job_schedule->start_time }}" @endif
-                                                required name="start_time" class="form-control" required>
+                                                required name="start_time" class="form-control" required  min="{{ isset($job_schedule) ? $job_schedule->start_time : date('H:i') }}" id="start_time">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -164,7 +164,7 @@
                                             <label for="time">End Time*</label>
                                             <input type="time" placeholder="(678) 878-9909"
                                                 @if (isset($job_schedule)) value="{{ $job_schedule->end_time }}" @endif
-                                                required name="end_time" class="form-control" required>
+                                                required name="end_time" class="form-control" required  min="{{ isset($job_schedule) ? $job_schedule->end_time : date('H:i') }}"  id="end_time">
                                         </div>
                                     </div>
 
@@ -497,4 +497,10 @@
             })
         });
     </script>
+    <script>
+    document.getElementById('start_time').addEventListener('change', function() {
+        let startTime = this.value;
+        document.getElementById('end_time').min = startTime;
+    });
+</script>
 @endsection

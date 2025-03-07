@@ -10,10 +10,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('jquery.js') }}"></script>
     <script src="{{ asset('plugins/bootstrap/js/bootstrap.min.js') }}"></script>
-    <link rel="stylesheet" href="{{ asset('assets/css/typography.css') }}" />
     <link rel="stylesheet" href="{{ asset('plugins/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('style.css') }}">
     <link rel="stylesheet" href="{{ asset('users/attendance_records.css') }}">
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <style>
@@ -143,6 +143,18 @@
             .cp-point-text p {    font-size: 13px; font-weight: 400; margin: 0 0 0px 0; color:#000; padding: 0; line-height: 22px; }
             .cp-action-btn a {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding: 8px; border: 1px solid var(--border); background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); margin-left: 10px; display: inline-block; }
 
+            .badge {
+                padding: .3em .6em;
+                line-height: 1.3;
+                text-transform: capitalize;
+            }
+
+            .iq-bg-primary {
+                background: rgb(224 243 255);
+                color: var(--iq-primary) !important;
+                border: 1px solid #a6dcff;
+            }
+
 
     </style>
 </head>
@@ -177,7 +189,7 @@
         <div class="container">
             <div class="attendance-records-head">
                 <h2>
-                    <a href="javascript:history.back()"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Services
+                    <a href="javascript:history.back()"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Jobs
                 </h2>
                 <div class="Search-filter">
                     <div class="row">
@@ -250,6 +262,7 @@
                         ${service.status == 1 ? 'Active' : 'Inactive'}
                     </span>
                     </div>
+                    
                 </div> 
                 <div class="cp-card-body">
                     <div class="row">

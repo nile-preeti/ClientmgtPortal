@@ -25,7 +25,7 @@
 
                                         <div class="users-filter-search">
                                             <div id="user_list_datatable_info" class="dataTables_filter filter-search-info">
-                                                <form class="position-relative d-flex" style="gap: 5px">
+                                            <form class="position-relative d-flex" style="gap: 5px">
                                                     <div class="form-group mb-0" style="width: 100%">
                                                         <input type="search" class="form-control" name="search"
                                                         placeholder="Search..." aria-controls="user-list-table"

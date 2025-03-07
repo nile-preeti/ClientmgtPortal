@@ -84,7 +84,7 @@ h1, h2, h3, h4, h5, h6 {padding: 5px 0 15px 0;font-weight: normal;-webkit-font-s
     padding: 10px 20px;
     font-size: 14px;
     border: none;
-    border-radius: 50px;
+    border-radius: 5px;
     background-color:#064086;
     color: white;
     font-weight: 500;
@@ -101,6 +101,11 @@ h1, h2, h3, h4, h5, h6 {padding: 5px 0 15px 0;font-weight: normal;-webkit-font-s
     margin-bottom: 1rem;
 }
 
+.punching-btn button[data-id='start_break'],
+.punching-btn button[data-id='end_break'] {background: #232323; }
+
+
+
 button.btn-bl {background: var(--blue); border: 1px solid var(--blue); padding: 6px 20px; display: inline-block; font-size: 12px; color: var(--white); border-radius: 5px; text-transform: uppercase; font-weight: bold; text-align: center; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); }
 
 .punching-controls-icon{margin-bottom: 2rem;}
@@ -110,7 +115,7 @@ button.btn-bl {background: var(--blue); border: 1px solid var(--blue); padding: 
 
  .hrmodule-punching-item {background-color: hsl(0deg 0% 100% / 75%); position: relative; padding: 0; border: 5px solid #fff; border-radius:20px; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); backdrop-filter: blur(3px); overflow:hidden; }
 
-.hrmodule-punching-controls-box{padding: 2rem; position: relative; text-align: center;}
+.hrmodule-punching-controls-box{padding:  2rem 2rem 0; position: relative; text-align: center;}
 .punching-time {font-size: 35px; margin-bottom: 2rem; color:#000; }
 
 
@@ -165,6 +170,12 @@ button:disabled {
 .punching-time{color: #000;}
 .backbtn-ovrlp{position: absolute;}
 
+.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+a.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+.user-profile {height: 140px;border-radius: 24px;}
+.btnUpdate {color: #fff;    white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+.btnCancel {color: #fff;   white-space: nowrap; background: #c93126; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+
 
 
 /*
@@ -215,9 +226,3 @@ Responsive
 
 @media(max-width:359px) { }
 
-
-.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
-a.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
-.user-profile {height: 140px;border-radius: 24px;}
-.btnUpdate {color: #fff;    white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
-.btnCancel {color: #fff;   white-space: nowrap; background: #c93126; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }

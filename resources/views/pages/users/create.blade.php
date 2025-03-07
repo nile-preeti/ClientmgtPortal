@@ -88,11 +88,11 @@
                                         </div>
                                     @endif
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <label for="">Profile Image</label>
                                         <input type="hidden" name="image" id="create_image" class="form-control">
                                         <div class="form-group">
-                                            <div class="dropzone" id="myDropzone"></div>
+                                            <div class="dropzone form-control" id="myDropzone"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -144,7 +144,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="btnSubmit mb-2"> <button type="submit" class="btnSubmit">Submit</button>
+                            <div class=" mb-2"> <button type="submit" class="btnSubmit">Submit</button>
                             </div>
                         </form>
                     </div>

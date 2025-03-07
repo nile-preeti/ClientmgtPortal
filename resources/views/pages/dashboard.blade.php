@@ -85,7 +85,60 @@
 
             </div>
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-md-6 col-lg-6">
+                    <div class="iq-card iq-card-block iq-card-stretch iq-card-height overflow-hidden">
+                        <div class="iq-card-header d-flex justify-content-between">
+                           <div class="iq-header-title">
+                              <h4 class="card-title">Column Chart</h4>
+                           </div>
+                           <div class="iq-card-header-toolbar d-flex align-items-center">
+                              <div class="dropdown">
+                                 <span class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown">
+                                 <i class="ri-more-fill"></i>
+                                 </span>
+                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" >
+                                    <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>
+                                    <a class="dropdown-item" href="#"><i class="ri-delete-bin-6-fill mr-2"></i>Delete</a>
+                                    <a class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
+                                    <a class="dropdown-item" href="#"><i class="ri-printer-fill mr-2"></i>Print</a>
+                                    <a class="dropdown-item" href="#"><i class="ri-file-download-fill mr-2"></i>Download</a>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="iq-card-body">
+                        <div id="home-chart-02"></div>
+                    </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <div class="iq-card">
+                        <div class="iq-card-header d-flex justify-content-between">
+                           <div class="iq-header-title">
+                              <h4 class="card-title">Radial Bar Charts</h4>
+                           </div>
+                        </div>
+                        <div class="iq-card-body">
+                           <div id="apex-radialbar-chart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <div class="iq-card">
+                        <div class="iq-card-header d-flex justify-content-between">
+                           <div class="iq-header-title">
+                              <h4 class="card-title"> Pie Charts</h4>
+                           </div>
+                        </div>
+                        <div class="iq-card-body">
+                           <div id="apex-pie-chart"></div>
+                        </div>
+                    </div>
+                </div>
+                
+
+
+                <!-- <div class="col-lg-12">
                     <div class="iq-card iq-card-block iq-card-stretch iq-card-height">
                         <div class="iq-card-header d-flex justify-content-between">
                             <div class="iq-header-title">
@@ -110,20 +163,20 @@
                                 </div>
                             </div>
 
-                            <!-- <div class="iq-card-header-toolbar d-flex align-items-center">
-                                                          <div class="dropdown">
-                                                             <span class="dropdown-toggle text-primary" id="dropdownMenuButton5" data-toggle="dropdown">
-                                                             <i class="ri-more-fill"></i>
-                                                             </span>
-                                                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton5">
-                                                                <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>
-                                                                <a class="dropdown-item" href="#"><i class="ri-delete-bin-6-fill mr-2"></i>Delete</a>
-                                                                <a class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
-                                                                <a class="dropdown-item" href="#"><i class="ri-printer-fill mr-2"></i>Print</a>
-                                                                <a class="dropdown-item" href="#"><i class="ri-file-download-fill mr-2"></i>Download</a>
-                                                             </div>
-                                                          </div>
-                                                       </div> -->
+                                <div class="iq-card-header-toolbar d-flex align-items-center">
+                                      <div class="dropdown">
+                                         <span class="dropdown-toggle text-primary" id="dropdownMenuButton5" data-toggle="dropdown">
+                                         <i class="ri-more-fill"></i>
+                                         </span>
+                                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton5">
+                                            <a class="dropdown-item" href="#"><i class="ri-eye-fill mr-2"></i>View</a>
+                                            <a class="dropdown-item" href="#"><i class="ri-delete-bin-6-fill mr-2"></i>Delete</a>
+                                            <a class="dropdown-item" href="#"><i class="ri-pencil-fill mr-2"></i>Edit</a>
+                                            <a class="dropdown-item" href="#"><i class="ri-printer-fill mr-2"></i>Print</a>
+                                            <a class="dropdown-item" href="#"><i class="ri-file-download-fill mr-2"></i>Download</a>
+                                         </div>
+                                      </div>
+                                </div> 
                         </div>
                         <div class="iq-card-body">
                             <div class="table-responsive">
@@ -177,7 +230,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 {{-- <div class="col-lg-4">
                     <div class="iq-card iq-card-block iq-card-stretch ">
                         <div class="iq-card mb-0" style="box-shadow: none;">

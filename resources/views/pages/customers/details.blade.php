@@ -59,7 +59,7 @@
             <div class="Scheduled-card mt-2">
                 <h5 class="mt-2">Scheduled Jobs</h5>
                 <div class="table-responsive">
-                    <table id="user-list-table" class="table table-striped table-hover table-borderless mt-4" role="grid"
+                    <table id="user-list-table" class="table table-striped table-borderless mt-4" role="grid"
                         aria-describedby="user-list-page-info">
                         <thead>
                             <tr>

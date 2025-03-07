@@ -17,7 +17,7 @@
                                     <div class="col-sm-12 col-md-5">
                                         <div class="users-filter-search">
                                             <div id="user_list_datatable_info" class="dataTables_filter filter-search-info">
-                                                <form class="position-relative d-flex" style="gap: 5px">
+                                            <form class="position-relative d-flex" style="gap: 5px">
                                                     <div class="form-group mb-0" style="width: 100%">
                                                         <input type="search" class="form-control" name="search"
                                                         placeholder="Search by  name..." aria-controls="user-list-table" value="{{$search}}">
@@ -56,7 +56,7 @@
                                     </div>
                                 </div>
                                 <div class="table-responsive">
-                                    <table id="user-list-table" class="table table-striped table-hover table-borderless mt-0" role="grid"
+                                    <table id="user-list-table" class="table table-striped table-borderless mt-0" role="grid"
                                         aria-describedby="user-list-page-info">
                                         <thead>
                                             <tr>

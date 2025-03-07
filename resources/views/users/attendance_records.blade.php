@@ -682,9 +682,9 @@ Swal.fire({
             _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
         },
         success: function (response) {
-            if (response.success) {
-                let breakDetails = response.breaks.map(breakItem => `
-                    <p><strong>Break Start - End:</strong> ${breakItem.start_break} - ${breakItem.end_break}</p>
+            if (response.success && response.breaks.length > 0) {
+                let breakDetails = response.breaks.map((breakItem, index) => `
+                    <p><strong>${index + 1}. Break Start - End:</strong> ${breakItem.start_break} - ${breakItem.end_break}</p>
                 `).join("");
 
                 $("#exampleModal .modal-body").html(breakDetails);
@@ -697,6 +697,7 @@ Swal.fire({
         }
     });
 });
+
 </script>
 
 <!-- Modal -->

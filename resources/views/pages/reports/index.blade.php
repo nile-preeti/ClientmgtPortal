@@ -1,6 +1,10 @@
 @extends('layouts.app')
 @section('content')
-
+    <style>
+        .search-filter-info .form-group select.form-control {
+            padding: 10px 15px 14px 15px !important;
+        }
+    </style>
     <!-- Page Content  -->
     <div id="content-page" class="content-page">
         <div class="container-fluid">
@@ -15,11 +19,11 @@
                         <div class="iq-card-body">
                             <div class="search-filter-info">
                                 <div class="row justify-content-between">
-                                    <div class="col-sm-12 col-md-4">
+                                    <div class="col-sm-12 col-md-3">
 
                                         <div class="users-filter-search">
                                             <div id="user_list_datatable_info" class="dataTables_filter filter-search-info">
-                                                <form class="position-relative d-flex" style="gap: 5px">
+                                            <form class="position-relative d-flex" style="gap: 5px">
                                                     <div class="form-group mb-0" style="width: 100%">
                                                         <input type="search" class="form-control" name="search"
                                                             placeholder="Search..." aria-controls="user-list-table"
@@ -82,11 +86,11 @@
                                     </div>
                                 </div>
                                 
-                                    <div class="col-sm-12 col-md-1">
+                                    <div class="col-sm-12 col-md-2">
                                         <div class="form-group">
                                             <a class="btnChangePassword" href="{{ route('reports') }}?export=true"><i
                                                     class="ri-download-line"></i>
-                                                &nbsp;</a>
+                                                &nbsp; Download Report</a>
                                         </div>
                                     </div>
 
@@ -132,17 +136,17 @@
                                                                 data-designation="{{ $item->designation }}"
                                                                 data-phone="{{ $item->phone }}"
                                                                 data-image="{{ $item->image ? asset("uploads/images/$item->image") : null }}"
-                                                                data-url="{{ route('userss.update', $item->id) }}"
+                                                                data-url="{{ route('users.update', $item->id) }}"
                                                                 onclick="showData(this)" data-target="#EditModel"
                                                                 style="cursor: pointer"><i class="ri-pencil-fill"></i></a> --}}
 
                                                             {{-- edit button --}}
-                                                            <a href="{{ route('userss.edit', $item->id) }}"
+                                                            <a href="{{ route('users.edit', $item->id) }}"
                                                                 class="btnedit"><i class="ri-pencil-fill"></i></a>
                                                             {{-- delete  button --}}
                                                             <a class="btndelete" data-id="{{ $item->id }}"
                                                                 style="cursor: pointer"
-                                                                data-url="{{ route('userss.destroy', $item->id) }}"
+                                                                data-url="{{ route('users.destroy', $item->id) }}"
                                                                 onclick="deletePublic(this)"><i
                                                                     class="ri-delete-bin-7-line"></i></a>
                                                             <a class="btnview" data-id="{{ $item->id }}"

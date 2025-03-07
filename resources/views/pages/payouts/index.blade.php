@@ -20,7 +20,7 @@
 
                                         <div class="users-filter-search">
                                             <div id="user_list_datatable_info" class="dataTables_filter filter-search-info">
-                                                <form class="position-relative d-flex" style="gap: 5px">
+                                            <form class="position-relative d-flex" style="gap: 5px">
                                                     <div class="form-group mb-0" style="width: 100%">
                                                         <input type="search" class="form-control" name="search"
                                                             placeholder="Search..." aria-controls="user-list-table"
@@ -85,21 +85,7 @@
 
                                                     <td>
                                                         <div class="flex align-items-center list-user-action">
-                                                            {{-- <a  data-toggle="modal"
-                                                                data-name="{{ $item->name ?? '' }}"
-                                                                data-status="{{ $item->status ?? '' }}"
-                                                                data-email="{{ $item->email ?? '' }}"
-                                                                data-designation="{{ $item->designation }}"
-                                                                data-phone="{{ $item->phone }}"
-                                                                data-image="{{ $item->image ? asset("uploads/images/$item->image") : null }}"
-                                                                data-url="{{ route('userss.update', $item->id) }}"
-                                                                onclick="showData(this)" data-target="#EditModel"
-                                                                style="cursor: pointer"><i class="ri-pencil-fill"></i></a> --}}
-
-                                                            {{-- edit button --}}
-                                                            {{-- <a href="{{ route('userss.edit', $item->id) }}"
-                                                                class="btnedit"><i class="ri-eye-fill"></i></a> --}}
-                                                            {{-- delete  button --}}
+                                                        <a href="{{ route('payouts.show', $item->id) }}" class="btnedit"><i class="ri-eye-fill"></i></a>
                                                            
 
 
