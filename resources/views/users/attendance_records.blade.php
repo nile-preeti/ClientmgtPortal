@@ -672,32 +672,31 @@ Swal.fire({
     });
 
     $(document).on("click", ".view-break-details", function () {
-    let attendanceId = $(this).data("id");
+        let attendanceId = $(this).data("id");
 
-    $.ajax({
-        url: "{{ route('user.fetch.break.details') }}", // Update the route accordingly
-        type: "POST",
-        data: {
-            id: attendanceId,
-            _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
-        },
-        success: function (response) {
-            if (response.success && response.breaks.length > 0) {
-                let breakDetails = response.breaks.map((breakItem, index) => `
-                    <p><strong>${index + 1}. Break Start - End:</strong> ${breakItem.start_break} - ${breakItem.end_break}</p>
-                `).join("");
+        $.ajax({
+            url: "{{ route('user.fetch.break.details') }}", // Update the route accordingly
+            type: "POST",
+            data: {
+                id: attendanceId,
+                _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
+            },
+            success: function (response) {
+                if (response.success && response.breaks.length > 0) {
+                    let breakDetails = response.breaks.map((breakItem, index) => `
+                        <p><strong>${index + 1}. Break Start - End:</strong> ${breakItem.start_break} - ${breakItem.end_break}</p>
+                    `).join("");
 
-                $("#exampleModal .modal-body").html(breakDetails);
-            } else {
-                $("#exampleModal .modal-body").html("<p>No break records found.</p>");
+                    $("#exampleModal .modal-body").html(breakDetails);
+                } else {
+                    $("#exampleModal .modal-body").html("<p>No break records found.</p>");
+                }
+            },
+            error: function () {
+                $("#exampleModal .modal-body").html("<p>Error fetching data.</p>");
             }
-        },
-        error: function () {
-            $("#exampleModal .modal-body").html("<p>Error fetching data.</p>");
-        }
+        });
     });
-});
-
 </script>
 
 <!-- Modal -->

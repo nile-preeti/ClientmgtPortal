@@ -415,15 +415,16 @@
                     </div>
 
 
-                    <!-- <div class="col-md-4">
+                    <div class="col-md-4">
                         <div class="mark-attendance-sec">
+                        <a href="{{route('user.payout')}}">
                             <div class="bg-gradient-warning card card-img-holder">
                                 <div class="card-body p-3">
                                   <img src="..public/assets/images/circle.svg" class="card-img-absolute" alt="circle-image">
                                   <div class="row">
                                     <div class="col-8">
                                       <div class="numbers">
-                                        <p class="text-light text-sm text-uppercase fw-medium">View Attandance</p>
+                                        <p class="text-light text-sm text-uppercase fw-medium">Payout</p>
                                         <h3 class="text-light font-weight-bolder pb-0"> 120 </h3>
                                       </div>
                                     </div>
@@ -435,8 +436,9 @@
                                   </div>
                                 </div>
                             </div>
+                          </a>
                         </div>
-                    </div> -->
+                    </div>
 
                 </div>
               

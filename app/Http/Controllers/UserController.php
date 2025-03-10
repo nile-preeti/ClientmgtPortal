@@ -418,6 +418,13 @@ class UserController extends Controller
         return view("users.profile", compact('user'));
     }
 
+
+    public function payout(Request $request)
+    {
+        $user = auth()->user();
+        return view("users.payout", compact('user'));
+    }
+
     public function directory(Request $request)
     {
         return view("users.directory");

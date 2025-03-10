@@ -102,6 +102,9 @@
         .swal2-popup.swal2-modal.swal2-show {
             padding: 40px;
         }
+        
+        .backbtn-ovrlp {position: absolute; z-index: 9; top: 12px; left: 12px; }
+        .ic-arrow-left {padding: 6px; border-radius: 8px; border: 2px solid #064086; margin-right: 12px; background: #fff; }
 
         .crm-card-table .record-entry, .record-item{display: flex; justify-content: space-between; border-bottom: 1px solid #d0e1f5; padding: 10px;}
         .crm-card-table .record-entry .record-label, .record-item{color: #000; font-weight: 500;}
@@ -172,9 +175,9 @@
             <div class="container">
 
                 <div class="hrmodule-punching-item">
+
                     <div class="backbtn-ovrlp text-center"><a href="javascript:history.back()">
-                            <img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg"
-                                class="ic-arrow-left"></a>
+                        <img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"></a>
                     </div>
 
                     <div id="map"></div>

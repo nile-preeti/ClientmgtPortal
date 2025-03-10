@@ -152,14 +152,6 @@
 
 .cat-text {background: var(--body); padding: 3px 20px; display: inline-block; font-size: 13px; width: 100%; color: var(--purple); border-radius: 5px; font-weight: bold; text-align: center; }
 
-.cp-card {box-shadow: 0 0 #0000, 0 0 #0000, 0px 12px 28px 0px rgba(36, 7, 70, .06); background: var(--white); border-radius: 10px; position: relative; margin-bottom:10px; }
-
-.cp-card-head {display: flex; align-items: center; padding: 14px;  }
-
-.cp-date {font-size: 13px; font-weight: bold; margin: 0 0 0px 0; color: #064086; padding: 0; }
-
-.iq-bg-primary {background: rgb(224 243 255); color: var(--iq-primary) !important; border: 1px solid #a6dcff; }
-
 
 
 
@@ -196,173 +188,49 @@
     <div class="profile-page-section">
         <div class="container">
             <div class="profile-head">
-                <h2>
-                    <a href="{{route('user.dashboard')}}"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Profile
-                </h2>
-                <div class="Search-filter">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <button class="btnChangePassword btn-signin" data-toggle="modal" data-target="#changePasswordModal"> Change Password </button>
-                            </div>
-                        </div>
+                    <h2>
+                        <a href="{{route('user.dashboard')}}"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Payouts
+                    </h2>
+                    <div class="cp-date">Total Earning:<span> $0</span>
                     </div>
-                </div>
             </div>
             <div class="profile-records-body">
-            <form >
-                <div class="profile-form">
-                    <div class="profile-section">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="user-table-item">
-                                    <div class="row g-1 align-items-center">
-                                        <div class="col-md-4">
-                                            <div class="user-profile-item mb-2">
-                                                <div class="user-profile-media">
-                                                    <img src="{{ auth()->user()->image ? asset('uploads/images/' . auth()->user()->image) : 'https://nileprojects.in/client-portal/public/assets/images/image.png' }}"  class="user-profile">
-                                                </div>
-                                                <div class="user-profile-text">
-                                                    <h2>{{ auth()->user()->name }}</h2>
-                                                    <div class="cat-text">Employee ID: {{ auth()->user()->emp_id }}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="User-contact-info mb-2">
-                                                <div class="User-contact-info-icon">
-                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/sms.svg">
-                                                </div> 
-                                                <div class="User-contact-info-content">
-                                                    <h2>Email Address</h2>
-                                                    <p>{{ auth()->user()->email }}</p>
-                                                </div>    
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <div class="User-contact-info">
-                                                <div class="User-contact-info-icon">
-                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/call.svg">
-                                                </div> 
-                                                <div class="User-contact-info-content">
-                                                    <h2>Phone</h2>
-                                                    <p>{{ auth()->user()->phone ?? 'N/A' }}</p>
-                                                </div>    
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2  d-none">
-                                           <div class="user-profile-action ">
-                                                <button type="submit" class="btn btn-submit px-5">Submit</button>    
-                                           </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="profile-head mt-3"><h2>Services</h2></div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="cp-card d-flex justify-content-between">
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Service Name:<span> New Service</span>
-                                        <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
-                                            Active
-                                        </span>
-                                        </div>
-                                    </div> 
-                                
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Salary:<span> $500</span>
-                                        </div>
-                                    </div> 
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="cp-card d-flex justify-content-between">
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Service Name:<span> New Service</span>
-                                        <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
-                                            Active
-                                        </span>
-                                        </div>
-                                    </div> 
-                                
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Salary:<span> $500</span>
-                                        </div>
-                                    </div> 
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="cp-card d-flex justify-content-between">
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Service Name:<span> New Service</span>
-                                        <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
-                                            Active
-                                        </span>
-                                        </div>
-                                    </div> 
-                                
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Salary:<span> $500</span>
-                                        </div>
-                                    </div> 
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="cp-card d-flex justify-content-between">
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Service Name:<span> New Service</span>
-                                        <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
-                                            Active
-                                        </span>
-                                        </div>
-                                    </div> 
-                                
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Salary:<span> $500</span>
-                                        </div>
-                                    </div> 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- <div class="row">
-                      <div class="col-lg-6 col-md-6 col-sm-12 mt-4">
-                        <label for="inputEmail4" class="form-label">Name</label>
-                        <input type="" class="form-control" id="inputEmail4" placeholder="Enter Name">
-                      </div>
-                      <div class="col-lg-6 col-md-6 col-sm-12 mt-4">
-                        <label for="inputPassword4" class="form-label">Designation</label>
-                        <input type="" class="form-control" id="inputPassword4" placeholder="Enter Designation">
-                      </div>
-                      <div class="col-lg-6 col-md-6 col-sm-12 mt-4">
-                        <label for="inputAddress" class="form-label">Phone Number</label>
-                        <input type="text" class="form-control" id="inputAddress" placeholder="Enter Phone No.">
-                      </div>
-                      <div class="col-lg-6 col-md-6 col-sm-12 mt-4">
-                        <label for="inputAddress2" class="form-label">Email ID</label>
-                        <input type="text" class="form-control" id="inputAddress2" placeholder="Enter Email ID">
-                      </div>
-                      <div class="col-lg-6 col-md-6 col-sm-12 mt-4">
-                        <label for="inputAddress2" class="form-label">Employee ID</label>
-                        <input type="text" class="form-control" id="inputAddress2" placeholder="Enter Employee ID">
-                      </div>
-                      <div class="col-lg-12 col-md-12 col-sm-12 mt-4">
-                        <button type="submit" class="btn btn-submit px-5">Submit</button>
-                      </div>
-                  </div> -->
-
-              </div>
-            </form>
-        </div>
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">First</th>
+                      <th scope="col">Last</th>
+                      <th scope="col">Handle</th>
+                      <th scope="col">Handle</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">1</th>
+                      <td>Mark</td>
+                      <td>Otto</td>
+                      <td>@mdo</td>
+                      <td>@mdo</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">2</th>
+                      <td>Jacob</td>
+                      <td>Thornton</td>
+                      <td>@fat</td>
+                      <td>@fat</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">3</th>
+                      <td>Jacob</td>
+                      <td>Thornton</td>
+                      <td>@fat</td>
+                      <td>@fat</td>
+                    </tr>
+                    
+                  </tbody>
+                </table>
+            </div>
     </div>
     <!-- Change Password Modal -->
   <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel" aria-hidden="true">

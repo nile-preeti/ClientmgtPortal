@@ -73,6 +73,7 @@ Route::prefix('user')->as("user.")->group(function () {
         Route::get("dashboard", [UserController::class, 'dashboard'])->name("dashboard");
         Route::get("attendance", [UserController::class, 'attendance'])->name('attendance');
         Route::get("profile", [UserController::class, 'profile'])->name("profile");
+        Route::get("payout", [UserController::class, 'payout'])->name("payout");
         Route::post('/attendance/store', [AjaxController::class, 'storeAttendance'])->name('attendance.store');
 
         // Route for updating attendance (Check-out)
