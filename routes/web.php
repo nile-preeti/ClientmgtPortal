@@ -50,7 +50,10 @@ Route::group(['middleware' => 'admin'], function () {
 
     Route::prefix("master")->as("master.")->group(function () {
         Route::resource("services", ServiceController::class);
+        Route::post("services/subcategory", [ServiceController::class, 'subCategory'])->name("services.subCategory");
     });
+
+    
     Route::get("reports", [AdminController::class, 'reports'])->name("reports");
     Route::get("settings", [AdminController::class, 'settings'])->name("settings");
     Route::post("settings", [AdminController::class, 'settings_store'])->name("settings.store");

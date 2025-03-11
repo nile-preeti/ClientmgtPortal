@@ -398,11 +398,87 @@ class UserController extends Controller
     public function dashboard()
     {
         $currentYear = Carbon::now()->year;
-
+        $user =  $user = auth()->user();
         // Count holidays for the current year
         $holidaysCount = Holiday::whereYear('date', $currentYear)->count();
 
-        return view("users.dashboard", compact('holidaysCount'));
+
+        $adminFeePercent = config('constant.admin_fee', 11);
+        $weeklyData = [];
+
+        // Start from the user's creation date
+        $start_date = Carbon::parse($user->created_at)->startOfWeek();
+        $end_date = Carbon::now()->endOfWeek(); // Current week
+
+        while ($start_date <= $end_date) {
+            $weekKey = $start_date->format('Y-W'); // Year-Week format
+
+            // Fetch attendance records for the user in this week
+            $attendances = Attendance::where("user_id", $user->id)
+                ->whereBetween('date', [$start_date, $start_date->copy()->endOfWeek()])
+                ->whereNotNull('check_out_time')
+                ->with('attendanceBreaks')
+                ->get();
+
+            $totalEarnings = 0;
+
+            foreach ($attendances as $attendance) {
+                // Match job based on attendance date
+                $job = JobSchedule::where('user_id', $user->id)
+                    ->whereDate('start_date', '<=', $attendance->date)
+                    ->whereDate('end_date', '>=', $attendance->date)
+                    ->first();
+
+                if (!$job) continue;
+
+                // Get service rate for the user and service
+                $serviceRate = UserService::where('user_id', $user->id)
+                    ->where('service_id', $job->service_id)
+                    ->value('price_per_hour');
+
+                if (!$serviceRate) continue;
+
+                // Calculate total hours worked
+                $checkInTime = Carbon::parse($attendance->check_in_time);
+                $checkOutTime = Carbon::parse($attendance->check_out_time);
+                $totalHoursWorked = $checkInTime->diffInSeconds($checkOutTime) / 3600; // Convert to hours
+
+                // Subtract break time from total worked hours
+                $breakHours = $attendance->attendanceBreaks->sum(function ($break) {
+                    $breakStart = Carbon::parse($break->start_break);
+                    $breakEnd = Carbon::parse($break->end_break);
+                    return $breakStart->diffInSeconds($breakEnd) / 3600;
+                });
+
+                $actualWorkedHours = max($totalHoursWorked - $breakHours, 0); // Ensure no negative values
+
+                // Calculate earnings
+                $totalEarnings += floor($actualWorkedHours * $serviceRate * 100) / 100; // Floor to 2 decimal places
+            }
+
+            // Calculate admin fee and user's final earnings
+            $adminEarnings = round(($totalEarnings * $adminFeePercent) / 100, 2);
+            $userEarnings = round($totalEarnings - $adminEarnings, 2);
+
+            $weeklyData[] = [
+                'week_key' => $weekKey,
+                'week_label' => $start_date->format('M d, Y') . ' - ' . $start_date->copy()->endOfWeek()->format('M d, Y'),
+                'total_earnings' => $totalEarnings, // Total before admin cut
+                'admin_earnings' => $adminEarnings, // Admin fee
+                'user_earnings' => $userEarnings  // Final earnings for the user
+            ];
+
+            // Move to the next week
+            $start_date->addWeek();
+        }
+
+        // Reverse the array so the most recent week appears first
+        $weeklyData = array_reverse($weeklyData);
+
+        $grandTotalEarnings = array_sum(array_column($weeklyData, 'user_earnings'));//total earning of user
+
+
+        return view("users.dashboard", compact('holidaysCount','grandTotalEarnings'));
     }
 
     public function logout(Request $request)
@@ -415,14 +491,104 @@ class UserController extends Controller
     public function profile(Request $request)
     {
         $user = auth()->user();
-        return view("users.profile", compact('user'));
+        $services = UserService::where('user_id',$user->id)->with('service')->get();
+        // dd($services);
+        return view("users.profile", compact('user','services'));
     }
 
 
     public function payout(Request $request)
     {
         $user = auth()->user();
-        return view("users.payout", compact('user'));
+
+        $adminFeePercent = config('constant.admin_fee', 11);
+        $weeklyData = [];
+
+        // Start from the user's creation date
+        $start_date = Carbon::parse($user->created_at)->startOfWeek();
+        $end_date = Carbon::now()->endOfWeek(); // Current week
+
+        while ($start_date <= $end_date) {
+            $weekKey = $start_date->format('Y-W'); // Year-Week format
+
+            // Fetch attendance records for the user in this week
+            $attendances = Attendance::where("user_id", $user->id)
+                ->whereBetween('date', [$start_date, $start_date->copy()->endOfWeek()])
+                ->whereNotNull('check_out_time')
+                ->with('attendanceBreaks')
+                ->get();
+
+            $totalEarnings = 0;
+
+            foreach ($attendances as $attendance) {
+                // Match job based on attendance date
+                $job = JobSchedule::where('user_id', $user->id)
+                    ->whereDate('start_date', '<=', $attendance->date)
+                    ->whereDate('end_date', '>=', $attendance->date)
+                    ->first();
+
+                if (!$job) continue;
+
+                // Get service rate for the user and service
+                $serviceRate = UserService::where('user_id', $user->id)
+                    ->where('service_id', $job->service_id)
+                    ->value('price_per_hour');
+
+                if (!$serviceRate) continue;
+
+                // Calculate total hours worked
+                $checkInTime = Carbon::parse($attendance->check_in_time);
+                $checkOutTime = Carbon::parse($attendance->check_out_time);
+                $totalHoursWorked = $checkInTime->diffInSeconds($checkOutTime) / 3600; // Convert to hours
+
+                // Subtract break time from total worked hours
+                $breakHours = $attendance->attendanceBreaks->sum(function ($break) {
+                    $breakStart = Carbon::parse($break->start_break);
+                    $breakEnd = Carbon::parse($break->end_break);
+                    return $breakStart->diffInSeconds($breakEnd) / 3600;
+                });
+
+                $actualWorkedHours = max($totalHoursWorked - $breakHours, 0); // Ensure no negative values
+
+                // Calculate earnings
+                $totalEarnings += floor($actualWorkedHours * $serviceRate * 100) / 100; // Floor to 2 decimal places
+            }
+
+            // Calculate admin fee and user's final earnings
+            $adminEarnings = round(($totalEarnings * $adminFeePercent) / 100, 2);
+            $userEarnings = round($totalEarnings - $adminEarnings, 2);
+
+            $weeklyData[] = [
+                'week_key' => $weekKey,
+                'week_label' => $start_date->format('M d, Y') . ' - ' . $start_date->copy()->endOfWeek()->format('M d, Y'),
+                'total_earnings' => $totalEarnings, // Total before admin cut
+                'admin_earnings' => $adminEarnings, // Admin fee
+                'user_earnings' => $userEarnings  // Final earnings for the user
+            ];
+
+            // Move to the next week
+            $start_date->addWeek();
+        }
+
+        // Reverse the array so the most recent week appears first
+        $weeklyData = array_reverse($weeklyData);
+
+        $grandTotalEarnings = array_sum(array_column($weeklyData, 'user_earnings'));//total earning of user
+
+        // Implement pagination (10 per page)
+        $currentPage = request()->input('page', 1); // Get current page from query string
+        $perPage = 10; // Number of records per page
+        $offset = ($currentPage - 1) * $perPage;
+        
+        $weeks = new LengthAwarePaginator(
+            array_slice($weeklyData, $offset, $perPage), // Slice data for current page
+            count($weeklyData), // Total items
+            $perPage, // Items per page
+            $currentPage, // Current page
+            ['path' => request()->url(), 'query' => request()->query()] // Maintain query params
+        );
+
+        return view("users.payout", compact('user',"weeks","grandTotalEarnings"));
     }
 
     public function directory(Request $request)

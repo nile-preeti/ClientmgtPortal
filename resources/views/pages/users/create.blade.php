@@ -99,51 +99,65 @@
                             </div>
 
                             <div class="client-form-item">
-                                <div class="client-form-item-head">
-                                    <h4>Services</h4>
-                                    <button type="button" class="btnAdd" id="addService">Add</button>
-                                </div>
+    <div class="client-form-item-head">
+        <h4>Services</h4>
+        <button type="button" class="btnAdd" id="addService">Add</button>
+    </div>
 
-                                @if (isset($user))
-                                    @foreach ($user->services as $item)
-                                        <div class="client-form-item-body" id="old_service_{{ $item->id }}">
-                                            <div class="row">
-                                                <div class="col-md-5">
-                                                    <div class="form-group  service-box ">
-                                                        <input type="hidden" name="service_user_id[]"
-                                                            value="{{ $item->id }}">
-                                                        <select name="old_services[]" class="form-control">
-                                                            <option value="">Select Service</option>
-                                                            @foreach ($services as $subitem)
-                                                                <option value="{{ $subitem->id }}"
-                                                                    @selected($item->service_id == $subitem->id)>{{ $subitem->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-5">
-                                                    <div class="form-group  service-box ">
-                                                        <input type="number" name="old_price_per_hour[]"
-                                                            value="{{ $item->price_per_hour }}" class="form-control"
-                                                            placeholder="Price per hour">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <div class="form-group">
-                                                        <button type="button" class="btnremove"
-                                                            onclick="$('#old_service_{{ $item->id }}').remove()">Remove</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @endif
-                                <div class="client-form-serviceContainer">
-                                    <div class="" id="serviceContainer">
-                                    </div>
-                                </div>
-                            </div>
+    @if (isset($user))
+        @foreach ($user->services as $item)
+            <div class="client-form-item-body" id="old_service_{{ $item->id }}">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group service-box">
+                            <input type="hidden" name="service_user_id[]" value="{{ $item->id }}">
+                            <select name="old_services[]" class="form-control service-select" data-id="{{ $item->id }}">
+                                <option value="">Select Service</option>
+                                @foreach ($services as $subitem)
+                                    <option value="{{ $subitem->id }}" 
+                                        data-subcategory="{{ $subitem->sub_category }}" 
+                                        @selected($item->service_id == $subitem->id)>
+                                        {{ $subitem->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group service-box">
+                            <input type="text" name="old_sub_category[]" 
+                                class="form-control sub-category" 
+                                value="{{ $item->sub_category ?? ($services->where('id', $item->service_id)->first()->sub_category ?? 'null') }}" 
+                                readonly>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group service-box">
+                            <input type="number" name="old_price_per_hour[]" 
+                                value="{{ $item->price_per_hour }}" 
+                                class="form-control" placeholder="Price per hour">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <button type="button" class="btnremove" 
+                                onclick="$('#old_service_{{ $item->id }}').remove()">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @endif
+
+    <div class="client-form-serviceContainer">
+        <div class="" id="serviceContainer"></div>
+    </div>
+</div>
+
+
                             <div class=" mb-2"> <button type="submit" class="btnSubmit">Submit</button>
                             </div>
                         </form>
@@ -155,46 +169,66 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/jquery.inputmask.bundle.min.js"></script>
     <script>
+        $(document).ready(function () {
+    $(".service-select").on("change", function () {
+        let subCategory = $(this).find("option:selected").data("subcategory");
+        $(this).closest(".row").find(".sub-category").val(subCategory);
+    });
+});
+    </script>
+    <script>
         $(":input").inputmask();
-        document.getElementById("addService").addEventListener("click", function() {
-            let container = document.getElementById("serviceContainer");
-            let services = @json($services);
-            let newRow = document.createElement("div");
-            newRow.classList.add("row", "mt-2");
+        document.getElementById("addService").addEventListener("click", function () {
+    let container = document.getElementById("serviceContainer");
+    let services = @json($services);
+    let newRow = document.createElement("div");
+    newRow.classList.add("row", "mt-2");
 
-            var innerHTML = `
-                <div class="col-md-5">
-                    <div class="form-group  service-box">
-                        <select name="services[]" class="form-control">
-                            <option value="">Select Service</option>`;
-            services.map(item => {
-                innerHTML +=
-                    `<option value="${item.id}">${item.name}</option>`;
-            })
+    var innerHTML = `
+        <div class="col-md-4">
+            <div class="form-group service-box">
+                <select name="services[]" class="form-control service-select">
+                    <option value="">Select Service</option>`;
+    services.map(item => {
+        innerHTML += `<option value="${item.id}" data-subcategory="${item.sub_category}">${item.name}</option>`;
+    });
 
+    innerHTML += `
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group service-box">
+                <input type="text" name="sub_category[]" class="form-control sub-category" placeholder="Sub Category" readonly>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group service-box">
+                <input type="number" name="price_per_hour[]" class="form-control" placeholder="Price per hour">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <button type="button" class="btnremove removeService">Remove</button>
+            </div>
+        </div>
+    `;
 
-            innerHTML += `
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-5">
-                    <div class="form-group  service-box">
-                        <input type="number" name="price_per_hour[]" class="form-control" placeholder="Price per hour">
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <button type="button" class="btnremove removeService">Remove</button>
-                    </div>
-                </div>
-            `;
-            newRow.innerHTML = innerHTML;
-            container.appendChild(newRow);
+    newRow.innerHTML = innerHTML;
+    container.appendChild(newRow);
 
-            newRow.querySelector(".removeService").addEventListener("click", function() {
-                newRow.remove();
-            });
-        });
+    // Add event listener to remove button
+    newRow.querySelector(".removeService").addEventListener("click", function () {
+        newRow.remove();
+    });
+
+    // Add event listener to service dropdown to auto-fill sub-category
+    newRow.querySelector(".service-select").addEventListener("change", function () {
+        let subCategory = this.options[this.selectedIndex].getAttribute("data-subcategory") || "";
+        newRow.querySelector(".sub-category").value = subCategory;
+    });
+});
+
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/jquery.inputmask.bundle.min.js"></script>
 

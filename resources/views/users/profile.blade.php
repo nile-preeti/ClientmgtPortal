@@ -156,10 +156,11 @@
 
 .cp-card-head {display: flex; align-items: center; padding: 14px;  }
 
-.cp-date {font-size: 13px; font-weight: bold; margin: 0 0 0px 0; color: #064086; padding: 0; }
-
+.cp-date {font-size: 13px; font-weight: bold; margin: 0 0 0px 0; color: #000; padding: 0; }
+.cp-date .service-name{font-size: 13px; font-weight: 500; margin: 0 0 0px 0; color: #404040;}
+.cp-date .badge {color: #064086 !important;}
 .iq-bg-primary {background: rgb(224 243 255); color: var(--iq-primary) !important; border: 1px solid #a6dcff; }
-
+.dropdown-menu .dropdown-item.active, .dropdown-item:active {background-color: #064086 !important;}
 
 
 
@@ -263,73 +264,47 @@
                             <div class="col-md-12">
                                 <div class="profile-head mt-3"><h2>Services</h2></div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="cp-card d-flex justify-content-between">
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Service Name:<span> New Service</span>
-                                        <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
-                                            Active
-                                        </span>
-                                        </div>
-                                    </div> 
-                                
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Salary:<span> $500</span>
-                                        </div>
-                                    </div> 
-                                </div>
-                            </div>
+                            @if($services->isNotEmpty())
+                                @foreach($services as $userService)
+                                    <div class="col-md-12">
+                                        <div class="cp-card d-flex justify-content-between">
+                                            <div class="cp-card-head">
+                                                <div class="cp-date">
+                                                    Service Name: <span class="service-name">{{ $userService->service->name ?? 'N/A' }}</span>
+                                                    <span class="badge dark-icon-light iq-bg-primary" style="margin-left: 10px;">
+                                                        {{ $userService->service->status == 1 ? 'Active' : 'Inactive' }}
+                                                    </span>
+                                                    
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="cp-card-head">
+                                                <div class="cp-date">
+                                                    Sub Category: <span class="service-name">{{ $userService->service->sub_category ?? 'N/A' }}</span>
+                                                    
+                                                </div>
+                                            </div> 
 
-                            <div class="col-md-6">
-                                <div class="cp-card d-flex justify-content-between">
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Service Name:<span> New Service</span>
-                                        <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
-                                            Active
-                                        </span>
+                                            <div class="cp-card-head">
+                                                <div class="cp-date">
+                                                    Rate Per Hour: <span class="service-name"> ${{ $userService->price_per_hour ?? '0' }}</span>
+                                                </div>
+                                            </div> 
                                         </div>
-                                    </div> 
-                                
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Salary:<span> $500</span>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="col-12 text-center">
+                                <div class="cp-card d-flex justify-content-center">
+                                            <div class="cp-card-head">
+                                                <div class="cp-date">
+                                                    No services found
+                                                </div>
+                                            </div>  
                                         </div>
-                                    </div> 
                                 </div>
-                            </div>
+                            @endif
 
-                            <div class="col-md-6">
-                                <div class="cp-card d-flex justify-content-between">
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Service Name:<span> New Service</span>
-                                        <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
-                                            Active
-                                        </span>
-                                        </div>
-                                    </div> 
-                                
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Salary:<span> $500</span>
-                                        </div>
-                                    </div> 
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="cp-card d-flex justify-content-between">
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Service Name:<span> New Service</span>
-                                        <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
-                                            Active
-                                        </span>
-                                        </div>
-                                    </div> 
-                                
-                                    <div class="cp-card-head">
-                                        <div class="cp-date">Salary:<span> $500</span>
-                                        </div>
-                                    </div> 
-                                </div>
-                            </div>
                         </div>
                     </div>
 

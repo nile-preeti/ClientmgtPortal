@@ -254,94 +254,109 @@
         listItem.classList.add("mt-2");
 
         listItem.innerHTML = `
-        <div class="col-md-12">
-            <div class="cp-card">
-                <div class="cp-card-head">
-                    <div class="cp-date">Service Name:<span> ${service.service ? service.service.name : 'N/A'}</span>
-                    <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
-                        ${service.status == 1 ? 'Active' : 'Inactive'}
-                    </span>
-                    </div>
-                    
-                </div> 
-                <div class="cp-card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Customer Name:</h4>
-                                    <p>${service.customer ? service.customer.name : 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
+       <div class="col-md-12">
+    <div class="cp-card">
+        <div class="cp-card-head">
+            <div class="cp-date">Service Name:<span> ${service.service ? service.service.name : 'N/A'}</span>
+                <span class="badge dark-icon-light iq-bg-primary" style=" margin-left: 10px;">
+                    ${service.status == 1 ? 'Active' : 'Inactive'}
+                </span>
+            </div>
+        </div> 
 
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Start Date:</h4>
-                                    <p>${service.start_date || 'N/A'}</p>
-                                </div>
-                            </div>
+        <div class="cp-card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="cp-point-box">
+                        <div class="cp-point-icon">
+                            <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
                         </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>End Date:</h4>
-                                    <p>${service.end_date || 'N/A'}</p>
-                                </div>
-                            </div>
+                        <div class="cp-point-text">
+                            <h4>Customer Name:</h4>
+                            <p>${service.customer ? service.customer.name : 'N/A'}</p>
                         </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Start Time:</h4>
-                                    <p>${service.start_time || 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>End Time:</h4>
-                                    <p>${service.end_time || 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Description:</h4>
-                                    <p>${service.customer ? service.description : 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
+
+                <div class="col-md-4">
+                    <div class="cp-point-box">
+                        <div class="cp-point-icon">
+                            <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
+                        </div>
+                        <div class="cp-point-text">
+                            <h4>Start Date:</h4>
+                            <p>${service.start_date || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="cp-point-box">
+                        <div class="cp-point-icon">
+                            <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
+                        </div>
+                        <div class="cp-point-text">
+                            <h4>End Date:</h4>
+                            <p>${service.end_date || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="cp-point-box">
+                        <div class="cp-point-icon">
+                            <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
+                        </div>
+                        <div class="cp-point-text">
+                            <h4>Start Time:</h4>
+                            <p>${service.start_time || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="cp-point-box">
+                        <div class="cp-point-icon">
+                            <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
+                        </div>
+                        <div class="cp-point-text">
+                            <h4>End Time:</h4>
+                            <p>${service.end_time || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="cp-point-box">
+                        <div class="cp-point-icon">
+                            <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
+                        </div>
+                        <div class="cp-point-text">
+                            <h4>Description:</h4>
+                            <p>${service.customer ? service.description : 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub Category Moved Here -->
+                <div class="col-md-4">
+                    <div class="cp-point-box">
+                        <div class="cp-point-icon">
+                            <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
+                        </div>
+                        <div class="cp-point-text">
+                            <h4>Sub Category:</h4>
+                          <p>${service.service && service.service.sub_category ? service.service.sub_category : 'N/A'}</p>
+
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        </div>`;
+        </div>
+    </div>
+</div>
+`;
 
         recordsList.appendChild(listItem);
     });

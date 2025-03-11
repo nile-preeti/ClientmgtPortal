@@ -23,8 +23,8 @@ class ServiceController extends Controller
             ->orderBy("id", "desc")->paginate(config("contant.paginatePerPage"));
 
         $title = "Service Management";
-
-        return view("pages.master.services", compact("title", 'services','search'));
+        $all_services = Service::where('status',1)->get();
+        return view("pages.master.services", compact("title", 'services','search','all_services'));
     }
     public function store(Request $request)
     {
@@ -74,4 +74,28 @@ class ServiceController extends Controller
         }
         return response()->json(['success' => false, 'message' => "Service does not exists"]);
     }
+
+
+
+    public function subCategory(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required',
+            'sub_category' => 'required|string|max:255', // Ensure category name is provided
+        ]);
+
+        // Find the service by ID
+        $service = Service::find($request->service_id);
+
+        if (!$service) {
+            return response()->json(['success' => false, 'message' => "Service not found"], 404);
+        }
+
+        // Update only the category (sub-category name)
+        $service->sub_category = $request->sub_category;
+        $service->save();
+
+        return response()->json(['success' => true, 'message' => "Subcategory updated successfully"]);
+    }
+
 }

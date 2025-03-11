@@ -394,7 +394,7 @@
                           <a href="{{route('user.services')}}">
                             <div class="bg-gradient-warning-1 card card-img-holder">
                                 <div class="card-body p-3">
-                                  <img src="../public/assets/images/circle.svg" class="card-img-absolute" alt="circle-image">
+                                  <img src="{{ asset('assets/images/circle.svg') }}" class="card-img-absolute" alt="circle-image">
                                   <div class="row">
                                     <div class="col-8">
                                       <div class="numbers">
@@ -404,7 +404,7 @@
                                     </div>
                                     <div class="col-4 text-end align-items-center d-flex justify-content-end">
                                       <div class="ic-dash rounded-circle">
-                                      <img src="https://nileprojects.in/hrmodule/public/assets/images/ic-profile.png">
+                                      <img src="{{ asset('assets/images/ic-job.png') }}">
                                       </div>
                                     </div>
                                   </div>
@@ -418,19 +418,19 @@
                     <div class="col-md-4">
                         <div class="mark-attendance-sec">
                         <a href="{{route('user.payout')}}">
-                            <div class="bg-gradient-warning card card-img-holder">
+                            <div class="bg-gradient-success card card-img-holder">
                                 <div class="card-body p-3">
-                                  <img src="..public/assets/images/circle.svg" class="card-img-absolute" alt="circle-image">
+                                  <img src="{{ asset('assets/images/circle.svg') }}" class="card-img-absolute" alt="circle-image">
                                   <div class="row">
                                     <div class="col-8">
                                       <div class="numbers">
                                         <p class="text-light text-sm text-uppercase fw-medium">Payout</p>
-                                        <h3 class="text-light font-weight-bolder pb-0"> 120 </h3>
+                                        <h3 class="text-light font-weight-bolder pb-0"> ${{$grandTotalEarnings}} </h3>
                                       </div>
                                     </div>
                                     <div class="col-4 text-end align-items-center d-flex justify-content-end">
                                       <div class="ic-dash rounded-circle">
-                                        <img src="https://nileprojects.in/learni/public/assets/images/ic-view-attendace.png">
+                                        <img src="{{ asset('assets/images/ic-payout.png') }}">
                                       </div>
                                     </div>
                                   </div>

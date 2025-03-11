@@ -33,7 +33,7 @@
                                         </div>
                                     </div>
                                    
-                                    <div class="col-sm-12 col-md-5">
+                                    <div class="col-sm-12 col-md-3">
                                         <div class="form-group">
                                             <select class="form-control" id="selectcountry"
                                                 onchange="changeStatus(this.value)">
@@ -54,6 +54,14 @@
                                                 data-toggle="modal" data-target=".CreateModel" href="#">Create</a>
                                         </div>
                                     </div>
+
+
+                                    <div class="col-sm-12 col-md-2">
+                                        <div class="form-group">
+                                            <a class="addbtn"
+                                                data-toggle="modal" data-target=".CreatesubCatModel" href="#">Add Sub-Category</a>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="table-responsive">
                                     <table id="user-list-table" class="table table-striped table-borderless mt-0" role="grid"
@@ -61,7 +69,7 @@
                                         <thead>
                                             <tr>
                                                 <th> Name</th>
-                                              
+                                                <th>Sub Category</th>
                                                 <th>Status</th>
                                                 <th>Action &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
                                             </tr>
@@ -69,8 +77,9 @@
                                         <tbody>
                                             @forelse ($services as $item)
                                                 <tr>
-                                                    <td class="d-flex align-items-center"> {{ $item->name }}</td>
+                                                    <td class=""> {{ $item->name }}</td>
 
+                                                    <td class="">{{ $item->sub_category ?? 'N/A' }}</td>
                                               
                                                     <td><span
                                                             class="badge dark-icon-light iq-bg-primary">{{ $item->status ? 'Active' : 'Inactive' }}</span>
@@ -245,7 +254,7 @@
                         <div class="modal-footer">
                             <button type="submit" class="btnSubmit">Submit</button>
 
-                            <button type="button" class="btnClose" data-dismiss="modal">Close</button>
+                            <button type="button" class="btnClose" data-dismiss="modal" style="color: #fff;white-space: nowrap;background: #c9271b;box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);display: inline-block;text-align: center;border-radius: 5px;font-size: 14px;font-weight: 600;padding: 10px 20px;border: none;">Close</button>
                             <!-- <button type="button" class="btn btn-success">Approve</button> -->
                         </div>
                     </div>
@@ -254,6 +263,46 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade CreatesubCatModel" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <form action="{{ route('master.services.subCategory') }}" method="post" id="edit_cat_form">
+                @csrf
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h5 class="modal-title">Add Sub Category</h5>
+
+                    <div class="modal-form-item">
+                        <div class="form-group">
+                            <label for="service_id">Select Service*</label>
+                            <select name="service_id" id="service_id" class="form-control" required>
+                                <option value="">Select a Service</option>
+                                @foreach ($all_services as $service)
+                                    <option value="{{ $service->id }}">{{ $service->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name">Subcategory Name*</label>
+                            <input type="text" name="sub_category" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-action">
+                        <button type="submit" class="btnSubmit">Submit</button>
+                        <button type="button" class="btnClose" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 @push('js')
     <script>
@@ -448,6 +497,115 @@
                         error: function(data) {
                             if (data.status == 422) {
                                 var form = $("#edit_form");
+                                let li_htm = '';
+                                $.each(data.responseJSON.errors, function(k, v) {
+                                    const $input = form.find(
+                                        `input[name=${k}],select[name=${k}],textarea[name=${k}]`
+                                    );
+                                    if ($input.next('small').length) {
+                                        $input.next('small').html(v);
+                                        if (k == 'services' || k == 'membership') {
+                                            $('#myselect').next('small').html(v);
+                                        }
+                                    } else {
+                                        $input.after(
+                                            `<small class='text-danger'>${v}</small>`
+                                        );
+                                        if (k == 'services' || k == 'membership') {
+                                            $('#myselect').after(
+                                                `<small class='text-danger'>${v[0]}</small>`
+                                            );
+                                        }
+                                    }
+                                    li_htm += `<li>${v}</li>`;
+                                });
+
+                                return false;
+                            } else {
+                                Swal.fire(
+                                    'Error',
+                                    data.statusText,
+                                    'error'
+                                );
+                            }
+                            return false;
+
+                        }
+                    });
+                }
+            })
+
+            $('#edit_cat_form').validate({
+                rules: {
+
+                    sub_category: {
+                        required: true,
+                        maxlength: 191,
+                    },
+                    
+
+                },
+                errorElement: "span",
+                errorPlacement: function(error, element) {
+                    error.addClass("text-danger");
+                    element.closest(".form-group").append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $('.please-wait').click();
+                    $(element).addClass("text-danger ");
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass("text-danger");
+                },
+                submitHandler: function(form, event) {
+                    event.preventDefault();
+                    let formData = new FormData(form);
+
+                    $.ajax({
+                        type: 'post',
+                        url: form.action,
+                        data: formData,
+                        dataType: 'json',
+                        contentType: false,
+                        processData: false,
+
+                        success: function(response) {
+                            if (response.success) {
+
+                                Swal.fire({
+                                    title: 'Success',
+                                    text: response.message,
+                                    icon: 'success',
+
+                                }).then((result) => {
+
+                                    if (response.redirect == true) {
+                                        window.location = response.route;
+                                    }
+                                    var url = $('#redirect_url').val();
+                                    if (url !== undefined || url != null) {
+                                        window.location = url;
+                                    } else {
+                                        location.reload(true);
+                                    }
+                                })
+
+                                return false;
+                            }
+
+                            if (response.success == false) {
+                                Swal.fire(
+                                    'Error',
+                                    response.message,
+                                    'error'
+                                );
+
+                                return false;
+                            }
+                        },
+                        error: function(data) {
+                            if (data.status == 422) {
+                                var form = $("#edit_cat_form");
                                 let li_htm = '';
                                 $.each(data.responseJSON.errors, function(k, v) {
                                     const $input = form.find(
