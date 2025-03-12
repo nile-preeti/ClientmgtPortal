@@ -682,11 +682,10 @@
     }
 
     function deletePublic(ele) {
-        var title = ' you want to delete this Customer ?';
+        var title = 'Are you sure, you want to delete this Customer ?';
         Swal.fire({
             title: '',
             text: title,
-            iconHtml: '<img src="{{ asset('assets/images/question.png') }}" height="25px">',
             customClass: {
                 icon: 'no-border'
             },

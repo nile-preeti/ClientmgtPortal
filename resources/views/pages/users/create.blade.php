@@ -293,11 +293,7 @@
 
                                     if (response.redirect == true) {
                                         window.location = response.route;
-                                    }
-                                    var url = $('#redirect_url').val();
-                                    if (url !== undefined || url != null) {
-                                        window.location = url;
-                                    } else {
+                                    }else {
                                         location.reload(true);
                                     }
                                 })
@@ -398,15 +394,11 @@
                                     text: response.message,
                                     icon: 'success',
 
-                                }).then((result) => {
+                                }).then(() => {
 
                                     if (response.redirect == true) {
-                                        window.location = response.route;
-                                    }
-                                    var url = $('#redirect_url').val();
-                                    if (url !== undefined || url != null) {
-                                        window.location = url;
-                                    } else {
+                                        window.location.href = response.route; 
+                                    }else {
                                         location.reload(true);
                                     }
                                 })

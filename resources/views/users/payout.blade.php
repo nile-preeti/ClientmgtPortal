@@ -355,6 +355,84 @@
       font-weight: bold;
       text-align: center;
     }
+
+    .profile-records-body {
+      box-shadow: 0 0 #0000, 0 0 #0000, 0px 12px 28px 0px rgba(36, 7, 70, .06);
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .profile-records-body h6 {
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .accordion-button:not(.collapsed) {
+      background: #064086 !important;
+      color: #fff;
+    }
+
+    .table thead tr th {
+      background: #dee2e6;
+      color: #000000;
+    }
+
+    .subtotal-section {
+      margin-left: 50px
+    }
+
+    .subtotal-section table {
+      width: 100% !important;
+    }
+
+    .subtotal-section table tr td {
+      border: 1px solid #dee2e6;
+    }
+
+    .accordion-button:not(.collapsed) {
+      background: #fff;
+    }
+
+    .accordion {
+      --bs-accordion-btn-focus-box-shadow: none !important;
+    }
+
+    .accordion-body {
+      background: #f8fbfd;
+    }
+
+    .accordion-button::after {
+      border-radius: 50px;
+      padding: 10px !important;
+      border: 5px solid #fff;
+    }
+
+    .accordion-button:not(.collapsed)::after {
+      background-color: #fff;
+      border: 6px solid #fff;
+    }
+
+    .accordion-header {
+      margin-bottom: 0;
+      padding: 0;
+    }
+
+    .btn-reload {
+      width: 43px;
+      height: 39px;
+      color: #3d3e3e;
+      white-space: nowrap;
+      background: #fff;
+      box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);
+      display: inline-block;
+      text-align: center;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid #3d3e3e;
+      line-height: 40px;
+    }
   </style>
 
 
@@ -389,94 +467,154 @@
   </header>
   <div class="profile-page-section">
     <div class="container">
-      <div class="profile-head">
+      <div class="profile-head mt-3 mb-4">
         <h2>
           <a href="{{route('user.dashboard')}}"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Payouts
         </h2>
-        <div class="cp-date">Total Earning:<span> ${{$grandTotalEarnings}}</span>
+        <div class="cp-date d-none">Total Earning:<span> $0</span>
         </div>
       </div>
+      <form method="GET" action="{{ route('user.payout') }}">
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <select name="month" class="form-control">
+              @foreach(range(1, 12) as $month)
+              <option value="{{ $month }}" {{ $month == $selectedMonth ? 'selected' : '' }}>
+                {{ \Carbon\Carbon::create()->month($month)->format('F') }}
+              </option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select name="year" class="form-control">
+              @foreach(range(Carbon\Carbon::now()->year, Carbon\Carbon::parse(auth()->user()->created_at)->year) as $year)
+              <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
+                {{ $year }}
+              </option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-primary">Filter</button>
+          </div>
+            <div class="col-md-1 btn-reload"
+              onclick="window.location.href = window.location.origin + window.location.pathname;">
+              <img src="{{ asset('reset.png') }}" height="20" alt="">
+            </div>
+        </div>
+      </form>
       <div class="profile-records-body">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>Week</th>
-              <th>Total Earnings</th>
-              <th>Admin Fee</th>
-              <th>Employee Earnings</th>
-            </tr>
-          </thead>
-          <tbody>
-            @if(isset($weeks) && count($weeks) > 0)
-            @foreach($weeks as $weekData)
-            <tr>
-              <td>{{ $weekData['week_label'] }}</td>
-              <td>${{ number_format($weekData['total_earnings'], 2) }}</td>
-              <td>${{ number_format($weekData['admin_earnings'], 2) }}</td>
-              <td>${{ number_format($weekData['user_earnings'], 2) }}</td>
-            </tr>
-            @endforeach
-            @else
-            <tr>
-              <td colspan="4" class="text-center">No earnings data available</td>
-            </tr>
-            @endif
-          </tbody>
-        </table>
+        <div class="accordion" id="accordionExample">
+          @foreach ($paginatedData as $index => $week)
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ $index }}">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapse{{ $index }}" aria-expanded="false"
+                aria-controls="collapse{{ $index }}">
+                <div class="d-flex align-items-center">
+                  <h6>
+                    @if ($week['is_current_week'])
+                    {{ $week['week_label'] }}
+                    @else
+                    {{ $week['week_label'] }}
+                    @endif
+                  </h6>
+                  <div class="subtotal-section">
+                    <table border="1" cellpadding="0" cellspacing="0" width="100%">
+                      <tr height="50">
+                        <td align="center" width="150" rowspan="2">Payout Total:</td>
+                        <td align="center" width="200">Subtotal:</td>
+                        <td align="center" width="200">Admin Fee:</td>
+                        <td align="center" width="200">Employee Earnings:</td>
+                        <td align="center" width="200">Payable Amount:</td>
+                      </tr>
+                      <tr height="50">
+                        <td align="center" width="150">${{ $week['total_earnings'] }}</td>
+                        <td align="center">${{ $week['admin_earnings'] }}</td>
+                        <td align="center">${{ $week['user_earnings'] }}</td>
+                        <td align="center">${{ $week['user_earnings'] }}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </button>
+            </h2>
+            <div id="collapse{{ $index }}" class="accordion-collapse collapse"
+              aria-labelledby="heading{{ $index }}" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Total Earnings</th>
+                      <th scope="col">Admin Fee</th>
+                      <th scope="col">Total Employee Earnings</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach ($week['daily_earnings'] as $day)
+                    <tr>
+                      <td>{{ \Carbon\Carbon::parse($day['date'])->format('M d, Y') }}</td>
+                      <td>${{ number_format($day['earnings'], 2) }}</td>
+                      <td>${{ number_format($day['admin_fee'], 2) }}</td>
+                      <td>${{ number_format($day['user_earnings'], 2) }}</td>
+                    </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          @endforeach
+        </div>
+        <div class="row d-flex justify-content-end mt-3">
+          <div class="col-md-6">
+            <nav aria-label="Page navigation example">
+              <ul class="pagination justify-content-end mb-0">
+                @if ($paginatedData->onFirstPage())
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+                @else
+                <li class="page-item">
+                  <a class="page-link" href="{{ $paginatedData->previousPageUrl() }}">Previous</a>
+                </li>
+                @endif
+
+                @foreach ($paginatedData->links()->elements as $element)
+                @if (is_string($element))
+                <li class="page-item disabled"><a class="page-link">{{ $element }}</a></li>
+                @endif
+
+                @if (is_array($element))
+                @foreach ($element as $page => $url)
+                @if ($page == $paginatedData->currentPage())
+                <li class="page-item active"><a class="page-link" href="{{ $url }}">{{ $page }}</a></li>
+                @else
+                <li class="page-item"><a class="page-link" href="{{ $url }}">{{ $page }}</a></li>
+                @endif
+                @endforeach
+                @endif
+                @endforeach
+
+                @if ($paginatedData->hasMorePages())
+                <li class="page-item">
+                  <a class="page-link" href="{{ $paginatedData->nextPageUrl() }}">Next</a>
+                </li>
+                @else
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                </li>
+                @endif
+              </ul>
+            </nav>
+          </div>
+        </div>
+
+
+
       </div>
     </div>
-    <!-- Change Password Modal -->
-    @if ($weeks->lastPage() > 1)
-    <div class="row justify-content-between mt-3">
-      <div id="week-list-page-info" class="col-md-6">
-        <!-- <span>Showing {{ $weeks->firstItem() }} to {{ $weeks->lastItem() }} of {{ $weeks->total() }} weeks</span> -->
-      </div>
-      <div class="col-md-6">
-        <nav aria-label="Page navigation example">
-          <ul class="pagination justify-content-end mb-0">
-            {{-- Previous Page Link --}}
-            @if ($weeks->onFirstPage())
-            <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-            </li>
-            @else
-            <li class="page-item">
-              <a class="page-link" href="{{ $weeks->previousPageUrl() }}">Previous</a>
-            </li>
-            @endif
-
-            {{-- Pagination Links --}}
-            @foreach ($weeks->links()->elements as $element)
-            @if (is_string($element))
-            <li class="page-item disabled"><a class="page-link">{{ $element }}</a></li>
-            @endif
-
-            @if (is_array($element))
-            @foreach ($element as $page => $url)
-            @if ($page == $weeks->currentPage())
-            <li class="page-item active"><a class="page-link" href="#">{{ $page }}</a></li>
-            @else
-            <li class="page-item"><a class="page-link" href="{{ $url }}">{{ $page }}</a></li>
-            @endif
-            @endforeach
-            @endif
-            @endforeach
-
-            {{-- Next Page Link --}}
-            @if ($weeks->hasMorePages())
-            <li class="page-item">
-              <a class="page-link" href="{{ $weeks->nextPageUrl() }}">Next</a>
-            </li>
-            @else
-            <li class="page-item disabled">
-              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
-            </li>
-            @endif
-          </ul>
-        </nav>
-      </div>
-    </div>
-    @endif
     <script>
       function logout() {
 
@@ -519,59 +657,6 @@
         })
 
       }
-    </script>
-    <script>
-      $(document).ready(function() {
-        $("#submitPasswordChange").click(function() {
-          let newPassword = $("#new_password").val();
-          let confirmPassword = $("#confirm_password").val();
-
-          if (newPassword !== confirmPassword) {
-            $("#passwordError").removeClass("d-none");
-            return;
-          } else {
-            $("#passwordError").addClass("d-none");
-          }
-
-          $.ajax({
-            url: "{{ route('user.change.password') }}", // Your backend route
-            type: "POST",
-            data: {
-              _token: "{{ csrf_token() }}",
-              new_password: newPassword,
-              new_password_confirmation: confirmPassword
-            },
-            success: function(response) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: 'Password updated successfully!',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK'
-              }).then(() => {
-                location.reload();
-                $("#changePasswordModal").modal("hide"); // Hide the modal
-                $("#changePasswordForm")[0].reset(); // Reset the form
-                $("body").removeClass("modal-open"); // Fix body overflow issue
-                $(".modal-backdrop").remove(); // Remove modal overlay
-              });
-            },
-            error: function(xhr) {
-              let errorMessage = "Something went wrong! Try again.";
-              if (xhr.responseJSON && xhr.responseJSON.errors) {
-                errorMessage = Object.values(xhr.responseJSON.errors).flat().join("\n");
-              }
-              Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: errorMessage,
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'OK'
-              });
-            }
-          });
-        });
-      });
     </script>
 </body>
 

@@ -175,6 +175,7 @@ a.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; backgroun
 .user-profile {height: 140px;border-radius: 24px;}
 .btnUpdate {color: #fff;    white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
 .btnCancel {color: #fff;   white-space: nowrap; background: #c93126; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+.dropdown-menu .dropdown-item.active, .dropdown-item:active {background-color: #064086 !important;}
 
 
 

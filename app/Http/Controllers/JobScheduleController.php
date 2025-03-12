@@ -88,7 +88,7 @@ class JobScheduleController extends Controller
         $user->end_date = $request->end_date;
         $user->save();
 
-        return response()->json(['success' => true, 'message' => "Job Scheduled Successfully"]);
+        return response()->json(['success' => true, 'message' => "Job Scheduled Successfully", 'redirect' => true,'route' => route('job_schedules.index')]);
     }
     public function update(Request $request, $id)
     {
@@ -108,7 +108,7 @@ class JobScheduleController extends Controller
         $user->save();
 
 
-        return response()->json(['success' => true, 'message' => "Job Updated Successfully"]);
+        return response()->json(['success' => true, 'message' => "Job Updated Successfully",'redirect' => true,'route' => route('job_schedules.index')]);
     }
 
     public function  destroy($id)

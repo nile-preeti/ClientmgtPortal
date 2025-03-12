@@ -323,11 +323,7 @@
                                 }).then((result) => {
 
                                     if (response.redirect == true) {
-                                        window.location = response.route;
-                                    }
-                                    var url = $('#redirect_url').val();
-                                    if (url !== undefined || url != null) {
-                                        window.location = url;
+                                        window.location.href = response.route; 
                                     } else {
                                         location.reload(true);
                                     }
@@ -432,11 +428,7 @@
                                 }).then((result) => {
 
                                     if (response.redirect == true) {
-                                        window.location = response.route;
-                                    }
-                                    var url = $('#redirect_url').val();
-                                    if (url !== undefined || url != null) {
-                                        window.location = url;
+                                        window.location.href = response.route; 
                                     } else {
                                         location.reload(true);
                                     }
