@@ -29,15 +29,17 @@
             <div class="container-fluid bg-white p-0">
                 <div class="row no-gutters">
                     
-                    <div class="col-sm-5 text-center">
+                    <div class="col-sm-6 col-lg-6 text-center">
                         <div class="sign-in-detail text-white">
-                            <img src="{{ asset('hrmodule.png') }}" class="img-fluid" class="" alt="" />
+                            <img src="{{ asset('login-graphic.png') }}" class="img-fluid" class="" alt="" />
                         </div>
                     </div>
                     <div class="col-sm-6 align-self-center">
                         <div class="sign-in-from">
-                           
-                            <h1 class="mb-0 dark-signin">Admin Login</h1>
+                            <div class="text-white mb-5">
+                                <img src="{{ asset('login-logo.png') }}" height="70px" alt="" />
+                            </div>
+                            <h3 class="mb-0 dark-signin font-weight-bold">Admin Login</h3>
                             <p></p>
                             <form class="mt-4" id="signin_form" enctype="multipart/form-data" action="{{route('signin.post')}}" method="POST">
                                 @csrf

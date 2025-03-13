@@ -136,17 +136,17 @@
                                                                 data-designation="{{ $item->designation }}"
                                                                 data-phone="{{ $item->phone }}"
                                                                 data-image="{{ $item->image ? asset("uploads/images/$item->image") : null }}"
-                                                                data-url="{{ route('userss.update', $item->id) }}"
+                                                                data-url="{{ route('users.update', $item->id) }}"
                                                                 onclick="showData(this)" data-target="#EditModel"
                                                                 style="cursor: pointer"><i class="ri-pencil-fill"></i></a> --}}
 
                                                             {{-- edit button --}}
-                                                            <a href="{{ route('userss.edit', $item->id) }}"
+                                                            <a href="{{ route('users.edit', $item->id) }}"
                                                                 class="btnedit"><i class="ri-pencil-fill"></i></a>
                                                             {{-- delete  button --}}
                                                             <a class="btndelete" data-id="{{ $item->id }}"
                                                                 style="cursor: pointer"
-                                                                data-url="{{ route('userss.destroy', $item->id) }}"
+                                                                data-url="{{ route('users.destroy', $item->id) }}"
                                                                 onclick="deletePublic(this)"><i
                                                                     class="ri-delete-bin-7-line"></i></a>
                                                             <a class="btnview" data-id="{{ $item->id }}"

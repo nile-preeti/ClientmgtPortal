@@ -6,7 +6,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="client-form">
-                        <form action="{{ isset($user) ? route('userss.update', $user) : route('userss.store') }}" method="post"
+                        <form action="{{ isset($user) ? route('users.update', $user) : route('users.store') }}" method="post"
                             id="create_form" enctype="multipart/form-data">
                             @csrf
                             @if (isset($user))
@@ -292,8 +292,8 @@
                                 }).then((result) => {
 
                                     if (response.redirect == true) {
-                                        window.location = response.route;
-                                    }else {
+                                        window.location.href = response.route; 
+                                    } else {
                                         location.reload(true);
                                     }
                                 })
@@ -394,11 +394,11 @@
                                     text: response.message,
                                     icon: 'success',
 
-                                }).then(() => {
+                                }).then((result) => {
 
                                     if (response.redirect == true) {
                                         window.location.href = response.route; 
-                                    }else {
+                                    } else {
                                         location.reload(true);
                                     }
                                 })

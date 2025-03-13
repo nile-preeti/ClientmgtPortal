@@ -131,7 +131,7 @@
                            </div>
                         </div>
                         <div class="iq-card-body">
-                           <div id="apex-pie-chart"></div>
+                            <div id="services-pie-chart" style="height: 400px;"></div>
                         </div>
                     </div>
                 </div>
@@ -259,4 +259,29 @@
         </div>
 
     </div>
+    
 @endsection
+@push('js')
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        Highcharts.chart('services-pie-chart', {
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Top 5 Assigned Services'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}</b>'
+            },
+            series: [{
+                name: 'Assignments',
+                colorByPoint: true,
+                data: @json($chartData)
+            }]
+        });
+    });
+</script>
+@endpush

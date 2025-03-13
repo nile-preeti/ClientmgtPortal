@@ -290,6 +290,8 @@
     <!-- am core JavaScript -->
     <script src="{{ asset('assets/js/core.js') }}"></script>
 
+    <script async src="{{ asset('assets/js/chart-custom.js') }}"></script>
+
     <!-- am animated JavaScript -->
     <script src="{{ asset('assets/js/animated.js') }}"></script>
     {{-- for dashbaor use only --}}

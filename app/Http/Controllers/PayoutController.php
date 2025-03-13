@@ -121,7 +121,7 @@ class PayoutController extends Controller
         $back_url = route('payouts.index');
         $user = User::findOrFail($id);
 
-        $user = auth()->user();
+        // $user = auth()->user();
     $adminFeePercent = config('constant.admin_fee', 11);
     $weeklyData = [];
 
@@ -230,7 +230,7 @@ class PayoutController extends Controller
         return ($yearB <=> $yearA) ?: ($weekB <=> $weekA);
     });
 
-    $paginatedData = $this->paginate($weeklyData, 10);
+    $paginatedData = $this->paginate($weeklyData, 3);
 
         return view("pages.payouts.details", compact("user", 'title', 'back_url','paginatedData', 'selectedMonth', 'selectedYear'));
     }

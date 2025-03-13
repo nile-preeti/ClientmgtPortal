@@ -33,7 +33,42 @@ class AdminController extends Controller
         $customers = Customer::count();
         $services = Service::count();
 
-        return view("pages.dashboard", compact("users", 'jobs', 'customers', 'services'));
+
+        $topServices = JobSchedule::select('service_id', DB::raw('COUNT(service_id) as service_count'))
+        ->groupBy('service_id')
+        ->orderByDesc('service_count')
+        ->take(5)
+        ->with('service') 
+        ->get();
+
+    // Fetch all services if assigned ones are less than 5
+    $allServices = Service::take(5)->get();
+
+    $chartData = [];
+    $addedServices = [];
+
+    // Add assigned services to the chart data
+    foreach ($topServices as $service) {
+        $chartData[] = [
+            'name' => $service->service->name ?? 'N/A',
+            'y' => (int) $service->service_count,
+        ];
+        $addedServices[] = $service->service_id;
+    }
+
+    // Fill remaining slots with unassigned services
+    foreach ($allServices as $service) {
+        if (count($chartData) >= 5) break; // Ensure we only take 5 services
+
+        if (!in_array($service->id, $addedServices)) {
+            $chartData[] = [
+                'name' => $service->name,
+                'y' => 0, // No assignments
+            ];
+        }
+    }
+
+        return view("pages.dashboard", compact("users", 'jobs', 'customers', 'services', 'chartData'));
     }
     public function signin()
     {

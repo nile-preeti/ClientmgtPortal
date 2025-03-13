@@ -394,7 +394,7 @@
                           <a href="{{route('user.services')}}">
                             <div class="bg-gradient-warning-1 card card-img-holder">
                                 <div class="card-body p-3">
-                                  <img src="{{ asset('assets/images/circle.svg') }}" class="card-img-absolute" alt="circle-image">
+                                  <img src="../public/assets/images/circle.svg" class="card-img-absolute" alt="circle-image">
                                   <div class="row">
                                     <div class="col-8">
                                       <div class="numbers">
@@ -404,7 +404,7 @@
                                     </div>
                                     <div class="col-4 text-end align-items-center d-flex justify-content-end">
                                       <div class="ic-dash rounded-circle">
-                                      <img src="{{ asset('assets/images/ic-job.png') }}">
+                                      <img src="../public/assets/images/ic-job.png">
                                       </div>
                                     </div>
                                   </div>
@@ -420,7 +420,7 @@
                         <a href="{{route('user.payout')}}">
                             <div class="bg-gradient-success card card-img-holder">
                                 <div class="card-body p-3">
-                                  <img src="{{ asset('assets/images/circle.svg') }}" class="card-img-absolute" alt="circle-image">
+                                  <img src="..public/assets/images/circle.svg" class="card-img-absolute" alt="circle-image">
                                   <div class="row">
                                     <div class="col-8">
                                       <div class="numbers">
@@ -430,7 +430,7 @@
                                     </div>
                                     <div class="col-4 text-end align-items-center d-flex justify-content-end">
                                       <div class="ic-dash rounded-circle">
-                                        <img src="{{ asset('assets/images/ic-payout.png') }}">
+                                        <img src="../public/assets/images/ic-payout.png">
                                       </div>
                                     </div>
                                   </div>
