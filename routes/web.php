@@ -94,6 +94,7 @@ Route::prefix('user')->as("user.")->group(function () {
         
         Route::get("services", [UserController::class, 'Services'])->name("services");
         Route::get("all-services", [AjaxController::class, 'userServices'])->name("employee.services");
+        Route::post('/employee/mark-complete', [AjaxController::class, 'markComplete'])->name('employee.markComplete');
 // reports
 
         Route::post('/change-password', [UserController::class, 'changePassword'])->name('change.password');

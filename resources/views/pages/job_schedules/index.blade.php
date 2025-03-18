@@ -94,10 +94,22 @@
                                                     <td>{{ date("Y-m-d", strtotime($item->start_date)) . " / " . date("h:i A", strtotime($item->start_time)) }}</td>
                                                     <td>{{ date("Y-m-d", strtotime($item->end_date)) . " / " . date("h:i A", strtotime($item->end_time)) }}</td>
 
-                                               
-                                                    <td><span
-                                                            class="badge dark-icon-light iq-bg-primary">{{ $item->status ? 'Active' : 'Inactive' }}</span>
-                                                    </td>
+                                                    @php
+                                                        $currentDateTime = now();
+                                                        $jobEndDateTime = \Carbon\Carbon::parse($item->end_date . ' ' . $item->end_time);
+
+                                                        if ($item->status == 2) {
+                                                            $statusLabel = 'Completed';
+                                                            $badgeClass = 'iq-bg-success';
+                                                        } elseif ($currentDateTime->greaterThan($jobEndDateTime) && in_array($item->status, [1])) {
+                                                            $statusLabel = 'Pending';
+                                                            $badgeClass = 'iq-bg-warning';
+                                                        } else {
+                                                            $statusLabel = $item->status ? 'Active' : 'Inactive';
+                                                            $badgeClass = 'iq-bg-primary';
+                                                        }
+                                                    @endphp
+                                                    <td><span class="badge dark-icon-light {{ $badgeClass }}">{{ $statusLabel }}</span></td>
 
                                                     <td>
                                                         <div class="flex align-items-center list-user-action">

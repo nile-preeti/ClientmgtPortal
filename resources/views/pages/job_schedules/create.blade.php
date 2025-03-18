@@ -174,6 +174,7 @@
                                             <select class="form-control" name="status">
                                                 <option value="1" @selected(isset($job_schedule) && $job_schedule->status == 1)>Active </option>
                                                 <option value="0" @selected(isset($job_schedule) && $job_schedule->status == 0)>Inactive </option>
+                                                <option value="2" @selected(isset($job_schedule) && $job_schedule->status == 2)>Completed </option>
                                             </select>
                                         </div>
                                     </div>

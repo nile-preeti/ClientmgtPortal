@@ -386,7 +386,7 @@ class AjaxController extends Controller
         return response()->json(['success' => false, 'message' => 'User does not exist']);
     }
 
-    
+
 
 
 
@@ -478,71 +478,82 @@ class AjaxController extends Controller
 
 
     public function userServices(Request $request)
-{
-    $perPage = 10; // Number of records per page
-    $page = $request->input('page', 1);
-    $authUserId = Auth::id(); // Get the logged-in user ID
-    $search = $request->input('search');
-    $selectedDate = $request->input('date'); // Get selected date
+    {
+        $perPage = 10; // Number of records per page
+        $page = $request->input('page', 1);
+        $authUserId = Auth::id(); // Get the logged-in user ID
+        $search = $request->input('search');
+        $selectedDate = $request->input('date'); // Get selected date
 
-    // Fetch job schedules where user_id matches the logged-in user
-    $query = JobSchedule::where('user_id', $authUserId)
-        ->with(['service:id,name,sub_category', 'customer:id,name']) // Load service and customer details
-        ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date','status');
+        // Fetch job schedules where user_id matches the logged-in user
+        $query = JobSchedule::where('user_id', $authUserId)
+            ->with(['service:id,name,sub_category', 'customer:id,name']) // Load service and customer details
+            ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date', 'status');
 
-    // Apply search filter
-    if (!empty($search)) {
-        $query->where(function ($q) use ($search) {
-            $q->orWhere('description', 'LIKE', "%{$search}%")
-              ->orWhereHas('service', function ($q) use ($search) {
-                  $q->where('name', 'LIKE', "%{$search}%");
-              })
-              ->orWhereHas('customer', function ($q) use ($search) {
-                  $q->where('name', 'LIKE', "%{$search}%");
-              });
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->orWhere('description', 'LIKE', "%{$search}%")
+                    ->orWhereHas('service', function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('customer', function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        // Apply date filter if a date is selected
+        if (!empty($selectedDate)) {
+            $query->where(function ($q) use ($selectedDate) {
+                $q->whereDate('start_date', $selectedDate)
+                    ->orWhereDate('end_date', $selectedDate);
+            });
+        }
+
+        // Paginate results
+        $jobSchedules = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json([
+            'success' => true,
+            'job_schedules' => $jobSchedules->items(),
+            'current_page' => $jobSchedules->currentPage(),
+            'last_page' => $jobSchedules->lastPage(),
+            'total' => $jobSchedules->total(),
+        ]);
+    }
+
+
+    public function fetchBreakDetails(Request $request)
+    {
+        $attendance = Attendance::with('attendanceBreaks')->find($request->id);
+
+        if (!$attendance) {
+            return response()->json(["success" => false, "message" => "Attendance not found"]);
+        }
+
+        $breaks = $attendance->attendanceBreaks->map(function ($break) {
+            return [
+                "start_break" => $break->start_break ? Carbon::parse($break->start_break)->format('H:i') : "N/A",
+                "end_break" => $break->end_break ? Carbon::parse($break->end_break)->format('H:i') : "N/A"
+            ];
         });
+
+        return response()->json(["success" => true, "breaks" => $breaks]);
     }
 
-    // Apply date filter if a date is selected
-    if (!empty($selectedDate)) {
-        $query->where(function ($q) use ($selectedDate) {
-            $q->whereDate('start_date', $selectedDate)
-              ->orWhereDate('end_date', $selectedDate);
-        });
+
+    public function markComplete(Request $request)
+    {
+        $job = JobSchedule::where('id',$request->job_id)->first();
+        if ($job) {
+            $job->status = 2; // Completed
+            $job->completed_date = now();
+            $job->save();
+
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false]);
     }
-
-    // Paginate results
-    $jobSchedules = $query->paginate($perPage, ['*'], 'page', $page);
-
-    return response()->json([
-        'success' => true,
-        'job_schedules' => $jobSchedules->items(),
-        'current_page' => $jobSchedules->currentPage(),
-        'last_page' => $jobSchedules->lastPage(),
-        'total' => $jobSchedules->total(),
-    ]);
-}
-
-
-public function fetchBreakDetails(Request $request)
-{
-    $attendance = Attendance::with('attendanceBreaks')->find($request->id);
-
-    if (!$attendance) {
-        return response()->json(["success" => false, "message" => "Attendance not found"]);
-    }
-
-    $breaks = $attendance->attendanceBreaks->map(function ($break) {
-        return [
-            "start_break" => $break->start_break ? Carbon::parse($break->start_break)->format('H:i') : "N/A",
-            "end_break" => $break->end_break ? Carbon::parse($break->end_break)->format('H:i') : "N/A"
-        ];
-    });
-
-    return response()->json(["success" => true, "breaks" => $breaks]);
-}
-
-    
-
-
 }
