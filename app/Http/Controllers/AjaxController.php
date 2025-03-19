@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use DateTime;
 
 class AjaxController extends Controller
 {
@@ -484,10 +485,15 @@ class AjaxController extends Controller
         $authUserId = Auth::id(); // Get the logged-in user ID
         $search = $request->input('search');
         $selectedDate = $request->input('date'); // Get selected date
+        $adminFeePercent = config('constant.admin_fee', 11);
 
         // Fetch job schedules where user_id matches the logged-in user
-        $query = JobSchedule::where('user_id', $authUserId)
-            ->with(['service:id,name,sub_category', 'customer:id,name']) // Load service and customer details
+        $query = JobSchedule::with([
+            'service:id,name,sub_category',
+            'customer:id,name',
+            'userService:id,service_id,price_per_hour'
+        ])
+            ->where('user_id', $authUserId)
             ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date', 'status');
 
         // Apply search filter
@@ -514,14 +520,50 @@ class AjaxController extends Controller
         // Paginate results
         $jobSchedules = $query->paginate($perPage, ['*'], 'page', $page);
 
+        // Initialize total admin earnings
+        $totalAdminEarnings = 0;
+
+        // Transform each job schedule
+        $jobSchedules->transform(function ($job) use ($adminFeePercent, &$totalAdminEarnings) {
+            $job->total_hours = null;
+            $job->total_earning = null;
+            $job->admin_fee = null;
+            $job->net_earning = null;
+
+            if ($job->status == 2 && $job->userService) {
+                $start = new DateTime("{$job->start_date} {$job->start_time}");
+                $end = new DateTime("{$job->end_date} {$job->end_time}");
+                $interval = $start->diff($end);
+                $hoursWorked = number_format($interval->h + ($interval->days * 24) + ($interval->i / 60), 2, '.', '');
+
+                $ratePerHour = $job->userService->price_per_hour;
+                $totalEarning = $hoursWorked * $ratePerHour;
+                $adminFee = ($totalEarning * $adminFeePercent) / 100;
+                $netEarning = $totalEarning - $adminFee;
+
+                // Assign calculated values
+                $job->total_hours = $hoursWorked;
+                $job->total_earning = number_format($totalEarning, 2, '.', '');
+                $job->admin_fee = number_format($adminFee, 2, '.', '');
+                $job->net_earning = number_format($netEarning, 2, '.', '');
+
+                // Add to total admin earnings
+                $totalAdminEarnings += $adminFee;
+            }
+
+            return $job;
+        });
+
         return response()->json([
             'success' => true,
             'job_schedules' => $jobSchedules->items(),
             'current_page' => $jobSchedules->currentPage(),
             'last_page' => $jobSchedules->lastPage(),
             'total' => $jobSchedules->total(),
+            'admin_fee' => round($totalAdminEarnings, 2), // Send total admin earnings
         ]);
     }
+
 
 
     public function fetchBreakDetails(Request $request)
@@ -545,7 +587,7 @@ class AjaxController extends Controller
 
     public function markComplete(Request $request)
     {
-        $job = JobSchedule::where('id',$request->job_id)->first();
+        $job = JobSchedule::where('id', $request->job_id)->first();
         if ($job) {
             $job->status = 2; // Completed
             $job->completed_date = now();

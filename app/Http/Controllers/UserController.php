@@ -55,7 +55,7 @@ class UserController extends Controller
         }
         $services = Service::all();
 
-        return view("pages.users.create", compact('user', 'services', 'title','back_url'));
+        return view("pages.users.create", compact('user', 'services', 'title', 'back_url'));
     }
     public function store(Request $request)
     {
@@ -93,7 +93,7 @@ class UserController extends Controller
         }
         $user->save();
 
-        return response()->json(['success' => true, 'message' => "User Created Successfully", 'redirect' => true,'route' => route('users.index')]);
+        return response()->json(['success' => true, 'message' => "User Created Successfully", 'redirect' => true, 'route' => route('users.index')]);
     }
 
     public function update(Request $request, $id)
@@ -146,11 +146,11 @@ class UserController extends Controller
 
 
 
-      return response()->json([
+        return response()->json([
             'success' => true,
             'message' => "User Updated Successfully",
             'redirect' => true,
-            'route' => route('users.index') // Returning route for frontend redirection
+            'route' => route('userss.index') // Returning route for frontend redirection
         ]);
     }
 
@@ -166,7 +166,7 @@ class UserController extends Controller
     // user end routes
     public function userAttendance(Request $request, $id)
     {
-        
+
         $month = request('month', date('m'));
         $year = request('year', date('Y'));
         $statusFilter = $request->query('status'); // Store status filter separately
@@ -186,7 +186,7 @@ class UserController extends Controller
             ->get()
             ->keyBy('date'); // Store by date for quick lookup
 
-            // dd($attendanceRecords);
+        // dd($attendanceRecords);
         $title = "Employee Attendance Records";
         $back_url = route('userss.index');
         $holidays = Holiday::whereMonth('date', $month)->whereYear('date', $year)->pluck('date')->toArray();
@@ -299,7 +299,7 @@ class UserController extends Controller
             $currentPage,
             ['path' => request()->url(), 'query' => request()->query()]
         );
-       // dd($allDaysPaginated);
+        // dd($allDaysPaginated);
 
         // Calculate attendance summary
         $totalWorkingDays = collect($allDays)->filter(function ($day) {
@@ -405,87 +405,78 @@ class UserController extends Controller
     public function dashboard()
     {
         $currentYear = Carbon::now()->year;
-        $user =  $user = auth()->user();
-        // Count holidays for the current year
+        $user = auth()->user();
+
         $holidaysCount = Holiday::whereYear('date', $currentYear)->count();
-
-
         $adminFeePercent = config('constant.admin_fee', 11);
         $weeklyData = [];
 
-        // Start from the user's creation date
         $start_date = Carbon::parse($user->created_at)->startOfWeek();
-        $end_date = Carbon::now()->endOfWeek(); // Current week
+        $end_date = Carbon::now()->endOfWeek();
 
         while ($start_date <= $end_date) {
-            $weekKey = $start_date->format('Y-W'); // Year-Week format
-
-            // Fetch attendance records for the user in this week
-            $attendances = Attendance::where("user_id", $user->id)
-                ->whereBetween('date', [$start_date, $start_date->copy()->endOfWeek()])
-                ->whereNotNull('check_out_time')
-                ->with('attendanceBreaks')
-                ->get();
+            $weekKey = $start_date->format('Y-W');
 
             $totalEarnings = 0;
 
-            foreach ($attendances as $attendance) {
-                // Match job based on attendance date
+            for ($i = 0; $i < 7; $i++) {
+                $currentDate = $start_date->copy()->addDays($i);
+
+                $attendance = Attendance::where("user_id", $user->id)
+                    ->whereDate('date', $currentDate)
+                    ->first();
+
+                if (!$attendance) continue;
+
                 $job = JobSchedule::where('user_id', $user->id)
-                    ->whereDate('start_date', '<=', $attendance->date)
-                    ->whereDate('end_date', '>=', $attendance->date)
+                    ->whereDate('start_date', '<=', $currentDate)
+                    ->whereDate('end_date', '>=', $currentDate)
+                    ->where('status', 2)
                     ->first();
 
                 if (!$job) continue;
 
-                // Get service rate for the user and service
                 $serviceRate = UserService::where('user_id', $user->id)
                     ->where('service_id', $job->service_id)
                     ->value('price_per_hour');
 
                 if (!$serviceRate) continue;
 
-                // Calculate total hours worked
-                $checkInTime = Carbon::parse($attendance->check_in_time);
-                $checkOutTime = Carbon::parse($attendance->check_out_time);
-                $totalHoursWorked = $checkInTime->diffInSeconds($checkOutTime) / 3600; // Convert to hours
+                $jobStart = Carbon::parse($attendance->date . ' ' . $job->start_time);
+                $jobEnd   = Carbon::parse($attendance->date . ' ' . $job->end_time);
+                $totalHoursWorked = number_format($jobStart->diffInSeconds($jobEnd) / 3600, 2, '.', '');
 
-                // Subtract break time from total worked hours
-                $breakHours = $attendance->attendanceBreaks->sum(function ($break) {
+                $breakHours = $attendance->attendanceBreaks->sum(function ($break) use ($jobStart, $jobEnd) {
                     $breakStart = Carbon::parse($break->start_break);
-                    $breakEnd = Carbon::parse($break->end_break);
-                    return $breakStart->diffInSeconds($breakEnd) / 3600;
+                    $breakEnd   = Carbon::parse($break->end_break);
+
+                    if ($breakStart->between($jobStart, $jobEnd) && $breakEnd->between($jobStart, $jobEnd)) {
+                        return $breakStart->diffInSeconds($breakEnd) / 3600;
+                    }
+
+                    return 0;
                 });
 
-                $actualWorkedHours = max($totalHoursWorked - $breakHours, 0); // Ensure no negative values
-
-                // Calculate earnings
-                $totalEarnings += floor($actualWorkedHours * $serviceRate * 100) / 100; // Floor to 2 decimal places
+                $actualWorkedHours = max(round($totalHoursWorked - $breakHours, 2), 0);
+                $totalEarnings += round($actualWorkedHours * $serviceRate, 2);
             }
 
-            // Calculate admin fee and user's final earnings
             $adminEarnings = round(($totalEarnings * $adminFeePercent) / 100, 2);
             $userEarnings = round($totalEarnings - $adminEarnings, 2);
 
             $weeklyData[] = [
                 'week_key' => $weekKey,
-                'week_label' => $start_date->format('M d, Y') . ' - ' . $start_date->copy()->endOfWeek()->format('M d, Y'),
-                'total_earnings' => $totalEarnings, // Total before admin cut
-                'admin_earnings' => $adminEarnings, // Admin fee
-                'user_earnings' => $userEarnings  // Final earnings for the user
+                'total_earnings' => $totalEarnings,
+                'admin_earnings' => $adminEarnings,
+                'user_earnings' => $userEarnings
             ];
 
-            // Move to the next week
             $start_date->addWeek();
         }
 
-        // Reverse the array so the most recent week appears first
-        $weeklyData = array_reverse($weeklyData);
+        $grandTotalEarnings = array_sum(array_column($weeklyData, 'user_earnings'));
 
-        $grandTotalEarnings = array_sum(array_column($weeklyData, 'user_earnings'));//total earning of user
-
-
-        return view("users.dashboard", compact('holidaysCount','grandTotalEarnings'));
+        return view("users.dashboard", compact('holidaysCount', 'grandTotalEarnings'));
     }
 
     public function logout(Request $request)
@@ -498,147 +489,168 @@ class UserController extends Controller
     public function profile(Request $request)
     {
         $user = auth()->user();
-        $services = UserService::where('user_id',$user->id)->with('service')->get();
+        $services = UserService::where('user_id', $user->id)->with('service')->get();
         // dd($services);
-        return view("users.profile", compact('user','services'));
+        return view("users.profile", compact('user', 'services'));
     }
 
 
     public function payout(Request $request)
-{
-    $user = auth()->user();
-    $adminFeePercent = config('constant.admin_fee', 11);
-    $weeklyData = [];
+    {
+        $title = "Payout Details";
+        $back_url = route('payouts.index');
+        $user = auth()->user();;
 
-    // Get user-created year to ensure start date is valid
-    $userCreatedYear = Carbon::parse($user->created_at)->year;
+        $adminFeePercent = config('constant.admin_fee', 11);
+        $weeklyData = [];
 
-    // Get filter values from request
-    $selectedMonth = $request->input('month', Carbon::now()->month);
-    $selectedYear = $request->input('year', Carbon::now()->year);
+        // Get the year the user was created, to avoid calculating before that year.
+        $userCreatedYear = Carbon::parse($user->created_at)->year;
 
-    // Set the start and end date based on selected month & year
-    $start_date = Carbon::create($selectedYear, $selectedMonth, 1)->startOfMonth()->startOfWeek();
-    $end_date = Carbon::create($selectedYear, $selectedMonth, 1)->endOfMonth()->endOfWeek();
+        // Get filter values from request, defaulting to current month/year.
+        $selectedMonth = $request->input('month', Carbon::now()->month);
+        $selectedYear = $request->input('year', Carbon::now()->year);
 
-    while ($start_date <= $end_date) {
-        $year = $start_date->year;
+        // Determine the start and end dates for the selected month (extending to full weeks)
+        $start_date = Carbon::create($selectedYear, $selectedMonth, 1)->startOfMonth()->startOfWeek();
+        $end_date = Carbon::create($selectedYear, $selectedMonth, 1)->endOfMonth()->endOfWeek();
 
-        if ($year < $userCreatedYear) {
-            $start_date->addWeek();
-            continue;
-        }
-
-        $weekKey = $start_date->format('Y-W');
-        $weekNumber = $start_date->weekOfYear;
-
-        $totalEarnings = 0;
-        $totalAdminEarnings = 0;
-        $totalUserEarnings = 0;
-        $dailyEarnings = [];
-
-        for ($i = 0; $i < 7; $i++) {
-            $currentDate = $start_date->copy()->addDays($i);
-
-            if ($currentDate->month != $selectedMonth) {
-                continue; // Skip days outside the selected month
+        // Loop week by week
+        while ($start_date <= $end_date) {
+            $year = $start_date->year;
+            if ($year < $userCreatedYear) {
+                $start_date->addWeek();
+                continue;
             }
 
-            $attendances = Attendance::where("user_id", $user->id)
-                ->whereDate('date', $currentDate)
-                ->whereNotNull('check_out_time')
-                ->with('attendanceBreaks')
-                ->get();
+            $weekKey = $start_date->format('Y-W');
+            $weekNumber = $start_date->weekOfYear;
 
-            $dayEarnings = 0;
+            $totalEarnings = 0;
+            $totalAdminEarnings = 0;
+            $totalUserEarnings = 0;
+            $dailyEarnings = [];
 
-            foreach ($attendances as $attendance) {
-                $job = JobSchedule::where('user_id', $user->id)
-                    ->whereDate('start_date', '<=', $attendance->date)
-                    ->whereDate('end_date', '>=', $attendance->date)
-                    ->first();
+            // Loop over 7 days of the week
+            for ($i = 0; $i < 7; $i++) {
+                $currentDate = $start_date->copy()->addDays($i);
 
-                if (!$job) continue;
+                if ($currentDate->month != $selectedMonth) {
+                    continue; // Skip days outside the selected month.
+                }
 
-                $serviceRate = UserService::where('user_id', $user->id)
-                    ->where('service_id', $job->service_id)
-                    ->value('price_per_hour');
+                // Fetch attendances for the current day.
+                // Here, we assume that a record exists if the user was present.
+                $attendances = Attendance::where("user_id", $user->id)
+                    ->whereDate('date', $currentDate)
+                    ->whereNotNull('check_in_time') // Ensures user is present.
+                    ->with('attendanceBreaks')
+                    ->get();
 
-                if (!$serviceRate) continue;
+                $dayEarnings = 0;
 
-                $checkInTime = Carbon::parse($attendance->check_in_time);
-                $checkOutTime = Carbon::parse($attendance->check_out_time);
-                $totalHoursWorked = $checkInTime->diffInSeconds($checkOutTime) / 3600;
+                foreach ($attendances as $attendance) {
+                    // Find a job schedule for this day that is marked completed (status=2)
+                    $job = JobSchedule::where('user_id', $user->id)
+                        ->whereDate('start_date', '<=', $attendance->date)
+                        ->whereDate('end_date', '>=', $attendance->date)
+                        ->where('status', 2)
+                        ->first();
 
-                $breakHours = $attendance->attendanceBreaks->sum(function ($break) {
-                    $breakStart = Carbon::parse($break->start_break);
-                    $breakEnd = Carbon::parse($break->end_break);
-                    return $breakStart->diffInSeconds($breakEnd) / 3600;
-                });
+                    if (!$job) continue;
 
-                $actualWorkedHours = max($totalHoursWorked - $breakHours, 0);
-                $dayEarnings += floor($actualWorkedHours * $serviceRate * 100) / 100;
+                    // Get the rate for the service assigned to the job.
+                    $serviceRate = UserService::where('user_id', $user->id)
+                        ->where('service_id', $job->service_id)
+                        ->value('price_per_hour');
+
+                    if (!$serviceRate) continue;
+
+                    // Calculate the expected working period based on the job_schedule start_time and end_time.
+                    // We use the attendance's date to construct the DateTime.
+                    $jobStart = Carbon::parse($attendance->date . ' ' . $job->start_time);
+                    $jobEnd   = Carbon::parse($attendance->date . ' ' . $job->end_time);
+                    $totalHoursWorked = number_format($jobStart->diffInSeconds($jobEnd) / 3600, 2, '.', '');
+
+                    // Sum break hours recorded during that attendance.
+                    $breakHours = $attendance->attendanceBreaks->sum(function ($break) use ($jobStart, $jobEnd) {
+                        $breakStart = Carbon::parse($break->start_break);
+                        $breakEnd   = Carbon::parse($break->end_break);
+    
+                        if ($breakStart->between($jobStart, $jobEnd) && $breakEnd->between($jobStart, $jobEnd)) {
+                            return $breakStart->diffInSeconds($breakEnd) / 3600;
+                        }
+    
+                        return 0;
+                    });
+
+                    $actualWorkedHours = max(round($totalHoursWorked - $breakHours, 2), 0);
+                   
+                    // Calculate earnings for this attendance record.
+                    $dayEarnings = number_format(($actualWorkedHours * $serviceRate * 100) / 100, 2, '.', '');
+                    // dd($dayEarnings);
+                }
+
+                // Compute admin fee (in dollars) and the user's net earnings.
+                $adminEarnings = number_format(($dayEarnings * $adminFeePercent) / 100, 2, '.', '');
+                $userEarnings  = number_format($dayEarnings - $adminEarnings, 2, '.', '');
+
+                $totalEarnings       += $dayEarnings;
+                $totalAdminEarnings  += $adminEarnings;
+                $totalUserEarnings   += $userEarnings;
+
+                $dailyEarnings[] = [
+                    'date' => $currentDate->format('Y-m-d'),
+                    'earnings' => round($dayEarnings, 2),
+                    'admin_fee' => $adminEarnings,
+                    'user_earnings' => $userEarnings
+                ];
             }
 
-            $adminEarnings = round(($dayEarnings * $adminFeePercent) / 100, 2);
-            $userEarnings = round($dayEarnings - $adminEarnings, 2);
-
-            $totalEarnings += $dayEarnings;
-            $totalAdminEarnings += $adminEarnings;
-            $totalUserEarnings += $userEarnings;
-
-            $dailyEarnings[] = [
-                'date' => $currentDate->format('Y-m-d'),
-                'earnings' => round($dayEarnings, 2),
-                'admin_fee' => $adminEarnings,
-                'user_earnings' => $userEarnings
+            $weeklyData[] = [
+                'week_key' => $weekKey,
+                'week_label' => "Week $weekNumber/$year",
+                'total_earnings' => $totalEarnings,
+                'admin_earnings' => $totalAdminEarnings,
+                'user_earnings' => $totalUserEarnings,
+                'daily_earnings' => $dailyEarnings,
+                'is_current_week' => ($weekNumber === Carbon::now()->weekOfYear),
             ];
+
+            $start_date->addWeek();
         }
 
-        $weeklyData[] = [
-            'week_key' => $weekKey,
-            'week_label' => "Week $weekNumber/$year",
-            'total_earnings' => $totalEarnings,
-            'admin_earnings' => $totalAdminEarnings,
-            'user_earnings' => $totalUserEarnings,
-            'daily_earnings' => $dailyEarnings,
-            'is_current_week' => ($weekNumber === Carbon::now()->weekOfYear),
-        ];
+        // Sort the weeks in descending order.
+        usort($weeklyData, function ($a, $b) {
+            [$yearA, $weekA] = explode('-', $a['week_key']);
+            [$yearB, $weekB] = explode('-', $b['week_key']);
+            return ($yearB <=> $yearA) ?: ($weekB <=> $weekA);
+        });
 
-        $start_date->addWeek();
+        $paginatedData = $this->paginate($weeklyData, 3);
+
+        return view('users.payout', compact('paginatedData', 'selectedMonth', 'selectedYear'));
     }
 
-    usort($weeklyData, function ($a, $b) {
-        [$yearA, $weekA] = explode('-', $a['week_key']);
-        [$yearB, $weekB] = explode('-', $b['week_key']);
-
-        return ($yearB <=> $yearA) ?: ($weekB <=> $weekA);
-    });
-
-    $paginatedData = $this->paginate($weeklyData, 10);
-
-    return view('users.payout', compact('paginatedData', 'selectedMonth', 'selectedYear'));
-}
 
 
-    
 
-    
+
     // Pagination function
     private function paginate($items, $perPage)
-{
-    $currentPage = Paginator::resolveCurrentPage();
-    $collection = new Collection($items);
-    $currentPageItems = $collection->slice(($currentPage - 1) * $perPage, $perPage)->all();
+    {
+        $currentPage = Paginator::resolveCurrentPage();
+        $collection = new Collection($items);
+        $currentPageItems = $collection->slice(($currentPage - 1) * $perPage, $perPage)->all();
 
-    return new LengthAwarePaginator(
-        $currentPageItems,
-        count($collection),
-        $perPage,
-        $currentPage,
-        ['path' => request()->url(), 'query' => request()->query()]
-    );
-}
+        return new LengthAwarePaginator(
+            $currentPageItems,
+            count($collection),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+    }
 
 
     public function directory(Request $request)
@@ -667,7 +679,7 @@ class UserController extends Controller
 
     public function job_schedule($id)
     {
-        $title ="Scheduled Jobs";
+        $title = "Scheduled Jobs";
         $back_url = route('userss.index');
         $job_schedules = JobSchedule::where("user_id", $id)->get();
         foreach ($job_schedules as $key => $value) {
@@ -679,6 +691,6 @@ class UserController extends Controller
             }
         }
         $user = User::find($id);
-        return view("pages.users.job_schedule", compact("job_schedules", 'user','title','back_url'));
+        return view("pages.users.job_schedule", compact("job_schedules", 'user', 'title', 'back_url'));
     }
 }

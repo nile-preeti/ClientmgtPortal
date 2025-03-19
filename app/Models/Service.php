@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Service extends Model
 {
     use HasFactory;
+
+    public function userServices()
+{
+    return $this->hasMany(UserService::class, 'service_id');
+}
 }
