@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Logo;
 
 class AdminController extends Controller
 {
@@ -281,6 +282,13 @@ class AdminController extends Controller
         return view("pages.settings", compact('title'));
     }
 
+
+    public function addLogo()
+    {
+        $title = 'Add Logo';
+        return view("pages.add-logo", compact('title'));
+    }
+
     public function settings_store(Request $request)
     {
         $validate = Validator::make($request->all(), [
@@ -312,6 +320,61 @@ class AdminController extends Controller
 
         return response()->json(['success' => true, ',message' => 'Settings updated successfully']);
     }
+
+
+    public function logo_store(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+    
+        // Check if there is an existing logo
+        $existingLogo = Logo::first();
+        if ($existingLogo) {
+            $existingFilePath = public_path('uploads/logo/' . $existingLogo->name);
+    
+            // Delete the existing file if it exists
+            if (file_exists($existingFilePath)) {
+                unlink($existingFilePath);
+            }
+    
+            // Delete the existing record from the database
+            $existingLogo->delete();
+        }
+    
+        // Store new file in "uploads/logo/" directory
+        $file = $request->file('file');
+        $fileName = time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('uploads/logo'), $fileName);
+    
+        // Save new file name in the "logo" table
+        $logo = new Logo();
+        $logo->name = $fileName;
+        $logo->save();
+    
+        return response()->json([
+            'file_path' => asset("uploads/logo/$fileName"),
+            'message' => 'Logo uploaded and saved successfully!',
+        ]);
+    }
+
+
+    public function logo_delete()
+    {
+        $logo = Logo::first();
+        if ($logo) {
+            $filePath = public_path('uploads/logo/' . $logo->name);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            $logo->delete();
+        }
+
+        return response()->json(['success' => true, 'message' => 'Logo deleted successfully!']);
+    }
+    
+
+
 
     public function payouts(Request $request) {}
     public function payout_details(Request $request, $id) {}

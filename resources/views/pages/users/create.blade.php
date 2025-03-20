@@ -6,7 +6,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="client-form">
-                        <form action="{{ isset($user) ? route('userss.update', $user) : route('userss.store') }}" method="post"
+                        <form action="{{ isset($user) ? route('users.update', $user) : route('users.store') }}" method="post"
                             id="create_form" enctype="multipart/form-data">
                             @csrf
                             @if (isset($user))
@@ -101,7 +101,7 @@
                             <div class="client-form-item">
     <div class="client-form-item-head">
         <h4>Services</h4>
-        <button type="button" class="btnAdd" id="addService">Add</button>
+        <button type="button" class="btnAdd" id="addService"><i class="ri-add-circle-line"></i> Add</button>
     </div>
 
     @if (isset($user))
@@ -144,7 +144,7 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <button type="button" class="btnremove" 
-                                onclick="$('#old_service_{{ $item->id }}').remove()">Remove</button>
+                                onclick="$('#old_service_{{ $item->id }}').remove()"> <i class="ri-delete-bin-line"></i> Remove</button>
                         </div>
                     </div>
                 </div>
@@ -209,7 +209,7 @@
         </div>
         <div class="col-md-2">
             <div class="form-group">
-                <button type="button" class="btnremove removeService">Remove</button>
+                <button type="button" class="btnremove removeService"> <i class="ri-delete-bin-line"></i> Remove</button>
             </div>
         </div>
     `;

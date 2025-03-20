@@ -141,6 +141,12 @@
         justify-content: space-between;
       }
 
+      .profile-records-body h6{margin-bottom: 6px !important;}
+
+      .subtotal-section{ margin-left: 0px !important;}
+      .subtotal-section table tr td{font-size: 14px; padding: 0px 3px;}
+      .accordion-button{padding: 10px;}
+
     }
 
     .swal2-confirm {
@@ -418,8 +424,8 @@
     }
 
     .btn-reload {
-      width: 43px;
-      height: 39px;
+      width: 44px;
+      height: 44px;
       color: #3d3e3e;
       white-space: nowrap;
       background: #fff;
@@ -432,6 +438,42 @@
       border: 1px solid #3d3e3e;
       line-height: 40px;
     }
+
+    .btn-filter{
+      background: #064086;
+      white-space: nowrap;
+      width: 100%;
+      padding: 10px 20px;
+      display: inline-block;
+      font-size: 13px;
+      color: var(--white);
+      border-radius: 5px;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);
+      border: none;
+    }
+
+    .active>.page-link, .page-link.active {
+    z-index: 3;
+    color: var(--bs-pagination-active-color);
+    background-color: #064086;
+    border-color: #064086;
+    }
+    .profile-page-section .form-control{
+    position: relative;
+    color: var(--gray);
+    border-radius: 5px;
+    font-weight: 400;
+    font-size: 13px;
+    box-sizing: border-box;
+    padding: 12px 15px 12px 15px;
+    border: 1px solid var(--border);
+    width: 100%;
+    background: #FFF;
+    box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);
+    appearance: auto;
+    }
   </style>
 
 
@@ -441,8 +483,10 @@
   <header class="header py-2">
     <div class="container-fluid">
       <div class="d-flex flex-wrap align-items-center justify-content-between">
-
-        <a href="#"> <img src="{{asset('hrmodule.png')}}" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
+      @php
+          $logo = \App\Models\Logo::first();
+      @endphp
+        <a href="#"> <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
 
 
 
@@ -464,6 +508,7 @@
       </div>
     </div>
   </header>
+  <div class="profile-page-section">
     <div class="container">
       <div class="profile-head mt-3 mb-4">
         <h2>
@@ -474,6 +519,7 @@
       </div>
       <form method="GET" action="{{ route('user.payout') }}">
         <div class="row mb-3">
+
           <div class="col-md-3">
             <select name="month" class="form-control">
               @foreach(range(1, 12) as $month)
@@ -493,12 +539,13 @@
             </select>
           </div>
           <div class="col-md-1">
-            <button type="submit" class="btn btn-primary">Filter</button>
+            <button type="submit" class="btn-primary btn-filter">Filter</button>
           </div>
-            <div class="col-md-1 btn-reload"
-              onclick="window.location.href = window.location.origin + window.location.pathname;">
+          <div class="col-md-1">
+            <div class="btn-reload" onclick="window.location.href = window.location.origin + window.location.pathname;">
               <img src="{{ asset('reset.png') }}" height="20" alt="">
             </div>
+          </div>
         </div>
       </form>
       <div class="profile-records-body">
@@ -509,7 +556,7 @@
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                 data-bs-target="#collapse{{ $index }}" aria-expanded="false"
                 aria-controls="collapse{{ $index }}">
-                <div class="d-flex align-items-center">
+                <div class="d-md-flex align-items-center">
                   <h6>
                     @if ($week['is_current_week'])
                     {{ $week['week_label'] }}
@@ -539,7 +586,7 @@
             </h2>
             <div id="collapse{{ $index }}" class="accordion-collapse collapse"
               aria-labelledby="heading{{ $index }}" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
+              <div class="accordion-body table-responsive">
                 <table class="table table-bordered">
                   <thead>
                     <tr>

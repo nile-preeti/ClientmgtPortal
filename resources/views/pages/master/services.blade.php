@@ -7,10 +7,10 @@
                 <div class="col-sm-12">
                     <div class="iq-card">
                         <!-- <div class="iq-card-header d-flex justify-content-between">
-                                                                                                              <div class="iq-header-title">
-                                                                                                                 <h4 class="card-title">Service List</h4>
-                                                                                                              </div>
-                                                                                                           </div> -->
+                                  <div class="iq-header-title">
+                                     <h4 class="card-title">Service List</h4>
+                                  </div>
+                               </div> -->
                         <div class="iq-card-body">
                             <div class="search-filter-info">
                                 <div class="row justify-content-between">
@@ -23,12 +23,12 @@
                                                         placeholder="Search by  name..." aria-controls="user-list-table" value="{{$search}}">
                                                     </div>
                                                     <button type="submit" class="" style="border: none; background: none; cursor: pointer;">
-                                                                <i class="fa fa-search" style="color:#3d3e3e;font-size:20px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);padding: 10px 0px;text-align: center;border-radius: 5px;width: 45px;height:45px;"></i>
+                                                                <i class="fa fa-search" style="color:#3d3e3e;font-size:16px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);border-radius: 5px;width: 45px;height:44px; justify-content: center; display: flex; align-items: center;"></i>
                                                             </button>
                                                 </form>
                                             </div>
                                             <div class="btn-reload" onclick="window.location.href = window.location.origin + window.location.pathname;">
-                                                <img src="{{ asset('reset.png') }}" height="20" alt="">
+                                                <img src="{{ asset('reset.png') }}" height="15" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -51,7 +51,7 @@
                                     <div class="col-sm-12 col-md-2">
                                         <div class="form-group">
                                             <a class="addbtn"
-                                                data-toggle="modal" data-target=".CreateModel" href="#">Create</a>
+                                                data-toggle="modal" data-target=".CreateModel" href="#"><i class="ri-file-add-line"></i> Create</a>
                                         </div>
                                     </div>
 
@@ -59,7 +59,7 @@
                                     <div class="col-sm-12 col-md-2">
                                         <div class="form-group">
                                             <a class="addbtn"
-                                                data-toggle="modal" data-target=".CreatesubCatModel" href="#">Add Sub-Category</a>
+                                                data-toggle="modal" data-target=".CreatesubCatModel" href="#"><i class="ri-add-circle-line"></i> Add Sub-Category</a>
                                         </div>
                                     </div>
                                 </div>
@@ -191,7 +191,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h5 class="modal-title">Create Service</h5>
+                        <h4 class="mb-3 dark-signin font-weight-bold">Create Service</h4>
                         
                     
 
@@ -209,11 +209,12 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="modal-action">
+                        <div class="modal-action justify-content-end d-flex">
+                            <div class="">
                             <button type="submit" class="btnSubmit">Submit</button>
 
                             <button type="button" class="btnClose" data-dismiss="modal">Close</button>
-                            <!-- <button type="button" class="btn btn-success">Approve</button> -->
+                            <!-- <button type="button" class="btn btn-success">Approve</button> --></div>
                         </div>
                     </div>
                     
@@ -231,10 +232,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h5 class="modal-title">Edit Service</h5>
-                        
-                    
-
+                        <h4 class="mb-3 dark-signin font-weight-bold">Edit Service</h4>
                         <div class="modal-form-item">
                             <div class="form-group">
                                 <label for="name">Name*</label>
@@ -251,11 +249,11 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="modal-footer">
+                        <div class="justify-content-end d-flex">
+                            <div>
                             <button type="submit" class="btnSubmit">Submit</button>
-
                             <button type="button" class="btnClose" data-dismiss="modal" style="color: #fff;white-space: nowrap;background: #c9271b;box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);display: inline-block;text-align: center;border-radius: 5px;font-size: 14px;font-weight: 600;padding: 10px 20px;border: none;">Close</button>
-                            <!-- <button type="button" class="btn btn-success">Approve</button> -->
+                            <!-- <button type="button" class="btn btn-success">Approve</button> --></div>
                         </div>
                     </div>
                     
@@ -274,7 +272,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    <h5 class="modal-title">Add Sub Category</h5>
+                    <h4 class="mb-3 dark-signin font-weight-bold">Add Sub Category</h4>
 
                     <div class="modal-form-item">
                         <div class="form-group">
@@ -293,9 +291,10 @@
                         </div>
                     </div>
                     
-                    <div class="modal-action">
+                    <div class="modal-action mt-4 justify-content-end d-flex">
+                        <div>
                         <button type="submit" class="btnSubmit">Submit</button>
-                        <button type="button" class="btnClose" data-dismiss="modal">Close</button>
+                        <button type="button" class="btnClose" data-dismiss="modal">Close</button></div>
                     </div>
                 </div>
             </form>

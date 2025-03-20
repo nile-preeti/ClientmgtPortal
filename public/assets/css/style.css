@@ -267,17 +267,26 @@ a:hover { text-decoration: none; }
 
 -----------------------------------------------------------------------*/
 
-.sign-in-detail { color: var(--iq-white); background: rgba(130, 122, 243, 1) !important; }
+.sign-in-detail { color: var(--iq-white); background-image: url('https://nileprojects.in/client-portal/public/waves-bg.svg'), linear-gradient(to right, #7c96f4, #4b4ef8); background-size: cover;}
+
 
 .sign-in-page { height: 100vh; }
 
-.sign-in-detail { padding: 100px; height: 100vh; }
+.sign-in-detail { padding: 60px; height: 100vh; }
 
 .sign-in-logo { display: inline-block; width: 100%; }
 
 .sign-in-logo img { height: 50px; }
 
-.sign-in-from { padding: 0 60px; }
+.sign-in-from p{color: #7f7f7f;}
+
+.logo-res{margin-bottom: 70px;}
+
+.sign-in-from { padding: 0 0px; }
+
+.sign-in-from::after{background: #f1efe7; content: "rea"; border-radius: 100%; height: 400px; width: 420px; left: -80px; display: inline; top: -254px; position: absolute; z-index: -1; box-shadow: #d6d6d6 6px 4px 12px 0px; border: 2px solid #d9d9d9; }
+
+#signin_form input:-internal-autofill-selected {background-color: #fff !important;}
 
 .sign-info { border-top: 1px solid var(--iq-dark-border); margin-top: 30px; padding-top: 20px; }
 
@@ -291,6 +300,8 @@ a:hover { text-decoration: none; }
 
 .iq-social-media li a:hover { text-decoration: none; }
 
+
+button.btn-signin{color: #fff; width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 5px; font-size: 16px; font-weight: 600; padding: 10px 20px; border: none; margin-top: 20px;}
 
 
 /*---------------------------------------------------------------------
@@ -369,7 +380,7 @@ a:hover { text-decoration: none; }
 
 .iq-sidebar-menu .iq-menu li li a { font-size: 14px; }
 
-.iq-sidebar-menu .iq-menu li a i { font-size: 20px; margin-right: 10px; vertical-align: middle; width: 20px; display: inline-block; float: left; }
+.iq-sidebar-menu .iq-menu li a i { font-size: 20px; margin-right: 10px; font-weight: normal; vertical-align: middle; width: 20px; display: inline-block; float: left; }
 
 .iq-sidebar-menu .iq-menu li li a i { font-size: 16px; }
 
@@ -557,7 +568,7 @@ div#lottie-beil svg path, div#lottie-mail svg path, div#lottie-fullscreen svg pa
 
 .iq-search-bar { padding: 0 15px; }
 
-.iq-search-bar .searchbox { width: 480px; position: relative; }
+.iq-search-bar .searchbox { width: 480px; position: relative; align-items: center; display: flex; }
 
 .iq-search-bar .search-input { width: 100%; padding: 5px 40px 5px 15px; border-radius: 8px; border: none; background: var(--iq-body-bg); }
 
@@ -2146,7 +2157,8 @@ input.increment { text-align: center; }
 
 .client-form-card {background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); position: relative; padding: 1rem; border-radius:10px; margin-bottom:1rem; }
 
-.client-form-card h2{font-size: 20px;font-weight: 600;margin: 0 0 10px;padding: 0;color:var(--black);}
+.client-form-card h2{font-size: 20px;font-weight: 600;margin: 0 0 10px;padding: 0;color:var(--black); background: #eef3f7; padding: 8px 10px; border-radius: 6px; color: #000000; border: 1px solid #e0ecf5; margin-bottom: 12px;}
+
 .client-form-card .form-group label {margin: 0; padding: 0; }
 .client-form-card .search-form-group {position: relative; }
 .client-form-card .form-group input.form-control {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding: 13px 15px 13px 15px; border:1px solid var(--iq-dark-border); width: 100%; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);}
@@ -2163,12 +2175,12 @@ input.increment { text-align: center; }
 .btnUpdate {color: #fff;    white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
 .btnCancel {color: #fff;   white-space: nowrap; background: #c93126; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
 
-a.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
-a.addemployeebtn {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
-a.downloadbtn {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+a.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 9px 20px; border: none; }
+a.addemployeebtn {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding:9px 20px; border: none; }
+a.downloadbtn {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 9px 20px; border: none; }
 
-.addbtn{color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
-
+.addbtn{color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 6px 20px; border: none; }
+.addbtn i{font-weight: normal; font-size: 18px; margin-right: 5px;}
 
 .iq-card .iq-card-header .iq-header-title h4.card-title {font-size: 20px; font-weight: bold; margin: 0; padding: 0; color: #000; }
 
@@ -2176,9 +2188,9 @@ a.downloadbtn {color: #fff;    width: 100%; white-space: nowrap; background: #00
 form.searchbox h4 {font-size: 20px; font-weight: 600; margin: 0; padding: 0; }
 
 
-a.btnedit {width: 36px; height: 36px; color: #0069ac; white-space: nowrap; background: #fff; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; border: 1px solid #0069ac; line-height: 32px; }
-a.btndelete {width: 36px;height: 36px;color: #c9271b;white-space: nowrap;background: #fff;box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);display: inline-block;text-align: center;border-radius: 5px;font-size: 14px;font-weight: 600;border: 1px solid #c9271b;line-height: 32px;}
-a.btnview {width: 36px;height: 36px;color: #3d3e3e;white-space: nowrap;background: #fff;box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);display: inline-block;text-align: center;border-radius: 5px;font-size: 14px;font-weight: 600;border: 1px solid #3d3e3e;line-height: 32px;}
+a.btnedit {width: 36px; height: 36px; color: #0069ac; white-space: nowrap; background: #fff; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 400; border: 1px solid #0069ac; line-height: 32px; }
+a.btndelete {width: 36px;height: 36px;color: #c9271b;white-space: nowrap;background: #fff;box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);display: inline-block;text-align: center;border-radius: 5px;font-size: 14px;font-weight: 400;border: 1px solid #c9271b;line-height: 32px;}
+a.btnview {width: 36px;height: 36px;color: #3d3e3e;white-space: nowrap;background: #fff;box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);display: inline-block;text-align: center;border-radius: 5px;font-size: 14px;font-weight: 400;border: 1px solid #3d3e3e;line-height: 32px;}
 
 
 
@@ -2194,7 +2206,7 @@ a.btnview {width: 36px;height: 36px;color: #3d3e3e;white-space: nowrap;backgroun
 .search-filter-info .search-form-group span.search-icon {position: absolute; top: 50%; left: 10px; pointer-events: none; transform: translateY(-50%) scaleX(-1); color: #6362e7; font-size: 18px; }
 .search-filter-info button.btnSubmit {color: #fff; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
 .users-filter-search {display: flex ; align-items: center; gap: 5px; }
- .btn-reload {width: 45px; height: 45px; color: #3d3e3e; white-space: nowrap; background: #fff; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; border: 1px solid #3d3e3e; line-height: 40px; }
+ .btn-reload {width: 45px; height: 44px; color: #3d3e3e; white-space: nowrap; background: #fff; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; border: 1px solid #3d3e3e; line-height: 40px; }
  .filter-search-info {flex: 1; }
 
 .search-filter-info .row{ margin-left:-5px;margin-right:-5px; }
@@ -2269,3 +2281,6 @@ a.btnSubmit {color: #fff; white-space: nowrap; background:#0069ac; box-shadow: 0
 .client-form-card .dropzone .dz-preview .dz-details {padding: 1.1em 0em !important;}
 .client-form-card .dropzone .dz-preview .dz-image img{height: 80px;}
 #myDropzone .dz-button img{height: 30px !important;}
+
+
+div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm) {border: 0; border-radius: .25em; background: initial; background-color: #0069ac !important; color: #fff; font-size: 1em; }

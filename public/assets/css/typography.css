@@ -83,7 +83,7 @@ a, button, input, btn { outline: medium none !important; }
 
 a { color: var(--iq-primary); }
 
-a:hover{color: var(--iq-primary-dark);}
+a:hover{color: var(--iq-bg-light-color);}
 
 .uppercase { text-transform: uppercase; }
 
@@ -123,7 +123,7 @@ label { color: var(--iq-dark); font-weight:500; }
 
 input.form-control { height: 45px; line-height: 45px; background: #fff; border: 1px solid var(--iq-dark-border); font-size: 14px; color: var(--iq-body-text); border-radius: 8px; }
 
-select.form-control { height: 45px; line-height: 45px; background: #fff; border: 1px solid var(--iq-dark-border); font-size: 14px; color: var(--iq-body-text); border-radius: 8px; }
+select.form-control { height: 45px; background: #fff; border: 1px solid var(--iq-dark-border); font-size: 14px; color: var(--iq-body-text); border-radius: 8px; }
 
 .form-control:focus { color: var(--iq-dark); border-color: var(--iq-primary); box-shadow: none; }
 
@@ -493,7 +493,7 @@ Buttons
 
 .btn.focus, .btn:focus { box-shadow: none !important; }
 
-.btn i { padding-right: 8px; }
+.btn i { padding-right: 0px; }
 
 .iq-sign-btn { display: inline-block; text-align: center; border: 1px solid transparent; padding: .375rem 1rem; border-radius: 8px; }
 

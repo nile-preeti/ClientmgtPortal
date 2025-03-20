@@ -34,7 +34,7 @@
 
                                     <td> <button class="btn btn-primary" data-key="{{ 'ADMIN_FEE' }}" data-options="#admin_fee"
                                             data-value="{{ config('constant.ADMIN_FEE') }}"
-                                            onclick="openRely(this)">Edit</button>
+                                            onclick="openRely(this)"><i class="ri-pencil-fill"></i> Edit</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -49,7 +49,7 @@
                     <div class="modal-content">
                         <div class="modal-body">
                             <div class="Sendreply-modal-form">
-                                <h2>Settings</h2>
+                                <h4 class="mb-3 dark-signin font-weight-bold">Settings</h4>
                                 <form action="{{ route('settings.store') }}" method="post" id="signin_form">
                                     @csrf
 
@@ -84,8 +84,8 @@
 
 
                                         <div class="col-md-12">
-                                            <div class="form-group">
-                                                <button class="brn btn-danger" data-bs-dismiss="modal" type="button" onclick="$('#Sendreply').modal('hide')"
+                                            <div class="form-group float-right">
+                                                <button class="btn btn-danger" data-bs-dismiss="modal" type="button" onclick="$('#Sendreply').modal('hide')"
                                                     aria-label="Close">Cancel</button>
                                                 <button class="btn btn-success">Update</button>
                                             </div>

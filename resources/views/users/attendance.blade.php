@@ -120,8 +120,11 @@
     <header class="header py-2">
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
+            @php
+                $logo = \App\Models\Logo::first();
+            @endphp
 
-                <a href="#"> <img src="{{ asset('hrmodule.png') }}" class="logo card-img-absolute"
+                <a href="#"> <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute"
                         alt="circle-image" height="50px"></a>
 
                 <div class="dropdown text-end">

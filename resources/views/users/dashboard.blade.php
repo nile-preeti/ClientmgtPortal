@@ -80,7 +80,13 @@
         <div class="container-fluid">
           <div class="d-flex flex-wrap align-items-center justify-content-between">
             
-            <a href="#"> <img src="{{asset('hrmodule.png')}}" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
+            <a href="#"> 
+            @php
+                $logo = \App\Models\Logo::first();
+            @endphp
+
+              <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute" alt="circle-image" height="50px">
+            </a>
 
            
             <div class="dropdown text-end">
@@ -389,7 +395,7 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-6 col-md-6 col-lg-4">
+                    <div class="col-sm-6 col-md-6 col-lg-4 mb-3">
                         <div class="mark-attendance-sec">
                           <a href="{{route('user.services')}}">
                             <div class="bg-gradient-warning-1 card card-img-holder">
@@ -415,7 +421,7 @@
                     </div>
 
 
-                    <div class="col-md-4">
+                    <div class="col-sm-6 col-md-6 col-lg-4 ">
                         <div class="mark-attendance-sec">
                         <a href="{{route('user.payout')}}">
                             <div class="bg-gradient-success card card-img-holder">

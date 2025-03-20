@@ -14,10 +14,10 @@
                 <div class="col-sm-12">
                     <div class="iq-card">
                         <!-- <div class="iq-card-header d-flex justify-content-between">
-                                                                                                                              <div class="iq-header-title">
-                                                                                                                                 <h4 class="card-title">User List</h4>
-                                                                                                                              </div>
-                                                                                                                           </div> -->
+                              <div class="iq-header-title">
+                                 <h4 class="card-title">User List</h4>
+                              </div>
+                           </div> -->
                         <div class="iq-card-body">
                             <div class="search-filter-info">
                                 <div class="row justify-content-between">
@@ -32,12 +32,11 @@
                                                         value="{{ $search }}">
                                                     </div>
                                                     <button type="submit" class="" style="border: none; background: none; cursor: pointer;">
-                                                                <i class="fa fa-search" style="color:#3d3e3e;font-size:20px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);padding: 10px 0px;text-align: center;border-radius: 5px;width: 45px;height:45px;"></i>
-                                                            </button>
+                                                        <i class="fa fa-search" style="color:#3d3e3e; font-size:16px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12); border-radius: 5px;width: 45px;height:44px; justify-content: center; display: flex; align-items: center;"></i>
+                                                    </button>
                                                 </form>
                                             </div>
-                                            <div class="btn-reload" onclick="window.location.href = window.location.origin + window.location.pathname;">
-                                                <img src="{{ asset('reset.png') }}" height="20" alt="">
+                                            <div class="btn-reload" onclick="window.location.href = window.location.origin + window.location.pathname;"><img src="{{ asset('reset.png') }}" height="15" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -59,7 +58,7 @@
 
                                     <div class="col-sm-12 col-md-2">
                                         <div class="form-group">
-                                            <a class="addbtn" href="{{ route('job_schedules.create') }}">Create</a>
+                                            <a class="addbtn" href="{{ route('job_schedules.create') }}"><i class="ri-file-add-line"></i> Create</a>
                                         </div>
                                     </div>
                                 </div>
@@ -94,6 +93,7 @@
                                                     <td>{{ date("Y-m-d", strtotime($item->start_date)) . " / " . date("h:i A", strtotime($item->start_time)) }}</td>
                                                     <td>{{ date("Y-m-d", strtotime($item->end_date)) . " / " . date("h:i A", strtotime($item->end_time)) }}</td>
 
+                                               
                                                     @php
                                                         $currentDateTime = now();
                                                         $jobEndDateTime = \Carbon\Carbon::parse($item->end_date . ' ' . $item->end_time);

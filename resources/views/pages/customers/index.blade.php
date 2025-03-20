@@ -32,6 +32,16 @@
     .mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon-search {
         display: none !important;
     }
+    .popup-heading .close{color: #fff !important; opacity: 1 !important;}
+    .popup-heading h5{color: #fff;}
+    .popup-heading{
+        background: #0069ac;
+        align-items: center;
+        display: flex;
+        margin-bottom: 20px;
+        padding: 10px;
+        justify-content: space-between;}
+
     </style>
 @endpush
 
@@ -60,13 +70,13 @@
                                                             value="{{ $search }}">
                                                     </div>
                                                     <button type="submit" class="" style="border: none; background: none; cursor: pointer;">
-                                                                <i class="fa fa-search" style="color:#3d3e3e;font-size:20px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);padding: 10px 0px;text-align: center;border-radius: 5px;width: 45px;height:45px;"></i>
+                                                                <i class="fa fa-search" style="color:#3d3e3e;font-size:16px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);border-radius: 5px;width: 45px;height:44px; justify-content: center; display: flex; align-items: center;"></i>
                                                             </button>
                                                 </form>
                                             </div>
                                             <div class="btn-reload"
                                                 onclick="window.location.href = window.location.origin + window.location.pathname;">
-                                                <img src="{{ asset('reset.png') }}" height="20" alt="">
+                                                <img src="{{ asset('reset.png') }}" height="15" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -88,7 +98,7 @@
                                     <div class="col-sm-12 col-md-2">
                                         <div class="form-group">
                                             <a class="addbtn" {{-- onclick='initializeDropzone("myDropzone", "{{ route('image-upload') }}", null)' --}} data-toggle="modal"
-                                                data-target=".CreateModel" href="#">Add</a>
+                                                data-target=".CreateModel" href="#"><i class="ri-add-circle-line"></i> Add</a>
                                         </div>
                                     </div>
                                 </div>
@@ -111,8 +121,8 @@
                                             @forelse ($customers as $item)
                                                 <tr>
                                                     <td class="d-flex align-items-center"><img
-                                                            class="avatar-40 rounded mr-2"
-                                                            src="{{ $item->image ? asset("uploads/images/$item->image") : asset('avatar.png') }}"
+                                                            class="avatar-30 rounded mr-2"
+                                                            src="{{ $item->image ? asset("uploads/images/$item->image") : asset('avatar-1.png') }}"
                                                             alt="profile"> {{ $item->name }}</td>
 
                                                     <td>{{ $item->email }}</td>
@@ -229,46 +239,47 @@
     </div> <!-- Large Approved modal -->
 
     <div class="modal fade CreateModel" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <div class="modal-body">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="overflow: hidden;">
+                <div class="modal-body pt-0" style="padding-left: 15px; padding-right: 15px;">
                     <form action="{{ route('customers.store') }}" method="post" id="create_form" enctype="multipart/form-data">
                         @csrf
 
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <div class="row modal-form-item">
+                            <div class="col-lg-12 popup-heading">
+                                <h5 class="modal-title">Add Customer</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
 
-                        <div class="modal-form-item">
-                            <h5 class="modal-title">Add Customer</h5>
-
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="name">Name*</label>
                                 <input type="text" name="name" class="form-control" required>
                             </div>
 
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="email">Email*</label>
                                 <input type="email" name="email" class="form-control" required>
                             </div>
 
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="phone">Phone Number*</label>
                                 <input type="text" name="phone" placeholder="(678) 878-9909" data-inputmask="'mask': '(999) 999-9999'" class="form-control" required>
                             </div>
 
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="full_address">Full Address*</label>
                                 <div id="geocoder-container"></div>
                                 <input type="hidden" id="full_address" name="full_address" required>
                             </div>
 
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="city">City*</label>
                                 <input type="text" id="city" name="city" class="form-control" required>
                             </div>
 
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="state_id">State</label>
                                 <select class="form-control" name="state_id" id="state">
                                     @foreach ($states as $item)
@@ -277,12 +288,12 @@
                                 </select>
                             </div>
 
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="zipcode">Zip Code *</label>
                                 <input type="number" name="zipcode" min="0" class="form-control" required id="zipcode">
                             </div>
 
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="status">Status</label>
                                 <select class="form-control" name="status">
                                     <option value="1">Active </option>
@@ -291,7 +302,7 @@
                             </div>
                         </div>
 
-                        <div class="modal-action">
+                        <div class="modal-action ">
                             <button type="submit" class="btnSubmit">Submit</button>
                             <button type="button" class="btnClose" data-dismiss="modal">Close</button>
                         </div>
@@ -301,56 +312,56 @@
         </div>
     </div>
     <div class="modal fade EditModel" tabindex="-1" role="dialog" aria-hidden="true" id="EditModel">
-        <div class="modal-dialog modal-md">
-            <div class="modal-content">
-                <div class="modal-body">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content overflow-hidden">
+                <div class="modal-body pt-0" style="padding-left: 15px; padding-right: 15px;">
                     <form action="{{ route('customers.store') }}" method="post" id="edit_form"
                         enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <div class="modal-form-item">
-                            <h5 class="modal-title">Edit Customer</h5>
-                            <div class="form-group">
+                        
+                        <div class="row modal-form-item">
+                            <div class="col-lg-12 popup-heading">
+                                <h5 class="modal-title">Edit Customer</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="col-lg-6 form-group">
                                 <label for="name">Name*</label>
                                 <input type="text" name="name" id="name" class="form-control" required>
                             </div>
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="name">Email*</label>
                                 <input type="email" name="email" id="email" class="form-control" required>
                             </div>
 
-
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="name">Phone Number*</label>
                                 <input type="text" name="phone" id="phone" placeholder="(678) 878-9909"
                                     data-inputmask="'mask': '(999) 999-9999'" id="phone" class="form-control"
                                     required>
                             </div>
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="full_address_edit">Full Address*</label>
                                 <div id="edit-geocoder-container"></div> <!-- Geocoder will be attached here -->
                                 <input type="hidden" id="full_address_edit" name="full_address" required>
                             </div>
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="name">City*</label>
                                 <input type="text" name="city"  class="form-control" required id="city_edit">
                             </div>
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="name">State</label>
                                 <select class="form-control" name="state_id" id="state_id">
                                     @foreach ($states as $item)
                                         <option value="{{ $item->id }}">{{ $item->name }} </option>
                                     @endforeach
-
-
                                 </select>
                             </div>
 
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="name">Zip Code *</label>
                                 <input type="number" name="zipcode" id="zipcode_edit" min="0" class="form-control"
                                     required>
@@ -359,7 +370,7 @@
                         <div class="form-group">
                             <div class="dropzone" id="myDropzone"></div>
                         </div> --}}
-                            <div class="form-group">
+                            <div class="col-lg-6 form-group">
                                 <label for="name">Status</label>
                                 <select class="form-control" name="status" id="status">
                                     <option value="1">Active </option>
@@ -367,11 +378,12 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="modal-action">
+                        <div class="modal-action justify-content-end d-flex">
+                            <div>
                             <button type="submit" class="btnSubmit">Submit</button>
 
                             <button type="button" class="btnClose" data-dismiss="modal">Close</button>
-                            <!-- <button type="button" class="btn btn-success">Approve</button> -->
+                            <!-- <button type="button" class="btn btn-success">Approve</button> --></div>
                         </div>
                     </form>
                 </div>

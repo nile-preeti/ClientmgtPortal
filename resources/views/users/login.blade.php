@@ -33,9 +33,9 @@
         <!-- Sign in Start -->
         <section class="sign-in-page">
             <div class="container-fluid bg-white p-0">
-                <div class="row no-gutters">
+                <div class="row no-gutters sign-in-detail align-self-center justify-content-center d-flex">
                     
-                    <div class="col-sm-6 col-lg-6 text-center">
+                    <!-- <div class="col-sm-6 col-lg-6 text-center">
                         <div class="sign-in-detail text-white">
                             <img src="{{ asset('login-graphic.png') }}" class="img-fluid" class="" alt="" />
                         </div>
@@ -67,7 +67,42 @@
                                 </div> --}}
                             </form>
                         </div>
+                    </div> -->
+
+
+                    <div class="p-4 card overflow-hidden col-lg-5 col-sm-12">
+                        <div class="sign-in-from">
+                            <div class="text-white" >
+                            @php
+                                $logo = \App\Models\Logo::first();
+                            @endphp
+
+                                <img class="rounded-pill logo-res" src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" height="90px"  alt="" />
+                            </div>
+                           
+                            <h3 class="mb-0 dark-signin font-weight-bold">Employee Login</h3>
+                            <p>Please enter your details to login.</p>
+                            <form class="mt-4" id="signin_form" enctype="multipart/form-data" action="{{route('user.login_post')}}" method="POST">
+                                @csrf
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1"><i class="ri-profile-line"></i> &nbsp;Employee Id</label>
+                                    <input type="text" name="emp_id" class="form-control mb-0" id="exampleInputEmail1" placeholder="Enter emp id">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputPassword1"><i class="ri-lock-password-line"></i> &nbsp;Password</label>
+                                    <input type="password"  name="password" class="form-control mb-0" id="exampleInputPassword1" placeholder="Password">
+                                </div>
+                                <div class="d-inline-block w-100">
+                                    <button type="submit" class=" btn-primary btn-signin"> <i class="ri-login-circle-line font-weight-normal"></i> &nbsp;Sign in</button>
+                                    {{-- <a href="#" class="float-right">Forgot password?</a> --}}
+                                </div>
+                                {{-- <div class="sign-info">
+                                    <span class="dark-color d-inline-block line-height-2">Don't have an account? <a href="sign-up.html">Sign up</a></span>
+                                </div> --}}
+                            </form>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </section>

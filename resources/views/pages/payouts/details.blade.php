@@ -3,10 +3,6 @@
 
 <style>
   .profile-records-body {
-    box-shadow: 0 0 #0000, 0 0 #0000, 0px 12px 28px 0px rgba(36, 7, 70, .06);
-    background: var(--white);
-    border-radius: 10px;
-    padding: 20px;
   }
 
   .profile-records-body h6 {
@@ -26,7 +22,7 @@
   }
 
   .subtotal-section {
-    margin-left: 50px
+    margin-left: 30px
   }
 
   .subtotal-section table {
@@ -35,6 +31,7 @@
 
   .subtotal-section table tr td {
     border: 1px solid #dee2e6;
+    color: #000;
   }
 
   .accordion-button:not(.collapsed) {
@@ -66,21 +63,17 @@
   }
 
   .btn-reloads {
-    width: 43px !important;
-    height: 39px;
-    color: #3d3e3e;
-    white-space: nowrap;
-    background: #fff;
-    box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);
-    display: inline-block;
-    text-align: center;
+    width: 45px !important;
+    height: 44px;
+    display: flex;
     border-radius: 5px;
-    font-size: 14px;
-    font-weight: 600;
     border: 1px solid #3d3e3e;
     line-height: 40px;
+    align-items: center;
+    justify-content: center;
   }
 
+  button.btn-filter{padding: 11px 20px;}
 
   .accordion-button:not(.collapsed) .subtotal-section table tr td {
     color: white !important;
@@ -118,20 +111,24 @@
                 </div>
                 <div class="col-md-4">
                   <select name="year" class="form-control">
-                    @foreach(range(Carbon\Carbon::now()->year, Carbon\Carbon::parse(auth()->user()->created_at)->year) as $year)
+                    @foreach(range(Carbon\Carbon::now()->year, Carbon\Carbon::parse($user->created_at)->year) as $year)
                     <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
                       {{ $year }}
                     </option>
                     @endforeach
                   </select>
                 </div>
-                <div class="col-md-1">
-                  <button type="submit" class="btn btn-primary">Filter</button>
+                <div class="col-md-2 align-items-center d-flex ">
+                  <button type="submit" class="btn btn-primary btn-filter">Filter</button>
+
+                  <div class="btn-reloads ml-3"
+                    onclick="window.location.href = window.location.origin + window.location.pathname;" style="">
+                    <img src="{{ asset('reset.png') }}" height="15px" alt="">
+                  </div>
                 </div>
-                <div class="col-md-1 btn-reloads"
-                  onclick="window.location.href = window.location.origin + window.location.pathname;" style="">
-                  <img src="{{ asset('reset.png') }}" height="20" alt="">
-                </div>
+
+
+                
               </div>
             </form>
             <div class="profile-records-body">
@@ -155,8 +152,8 @@
                           <table border="1" cellpadding="0" cellspacing="0" width="100%">
                             <tr height="50">
                               <td align="center" width="150" rowspan="2">Payout Total:</td>
-                              <td align="center" width="200">Subtotal:</td>
-                              <td align="center" width="200">Admin Fee:</td>
+                              <td align="center" width="150">Subtotal:</td>
+                              <td align="center" width="150">Admin Fee:</td>
                               <td align="center" width="200">Employee Earnings:</td>
                               <td align="center" width="200">Payable Amount:</td>
                             </tr>

@@ -40,9 +40,13 @@
         <div class="iq-sidebar">
             <div class="iq-sidebar-logo d-flex justify-content-center">
                 <a href="#">
+                @php
+                    $logo = \App\Models\Logo::first();
+                @endphp
+
                     <div class="iq-light-logo">
                         <div class="iq-light-logo">
-                            <img src="{{ asset('hrmodule.png') }}" height="100" class="" alt="" />
+                        <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" height="100" class="" alt="Logo" />
                         </div>
                     </div>
                 </a>
@@ -67,9 +71,6 @@
                                 <span>Dashboard</span></a>
                         </li>
 
-
-
-
                         <li @if (Route::is('userss.index')) class="active" @endif>
                             <a href="{{ route('userss.index') }}" class="iq-waves-effect">
                                 <i class="ri-user-settings-line"></i><span>Employee Management</span></a>
@@ -81,7 +82,7 @@
                         </li> --}}
                         <li>
                             <a href="{{ route('customers.index') }}" class="iq-waves-effect">
-                                <i class="ri-calendar-event-line"></i><span>Customers</span></a>
+                                <i class="ri-user-3-line"></i><span>Customers</span></a>
                         </li>
                         <li>
                             <a href="{{ route('job_schedules.index') }}" class="iq-waves-effect">
@@ -89,19 +90,44 @@
                         </li>
                         <li>
                             <a href="{{ route('master.services.index') }}" class="iq-waves-effect">
-                                <i class="ri-calendar-event-line"></i><span>Services</span></a>
+                                <i class="ri-list-check-2"></i><span>Services</span></a>
                         </li>
                         <li>
                             <a href="{{ route('payouts.index') }}" class="iq-waves-effect">
-                                <i class="ri-calendar-event-line"></i><span>Payouts</span></a>
+                                <i class="ri-wallet-3-line"></i><span>Payouts</span></a>
                         </li>
                         <li>
                             <a href="{{ route('reports') }}" class="iq-waves-effect">
-                                <i class="ri-calendar-event-line"></i><span>Reports</span></a>
+                                <i class="ri-file-list-3-line"></i><span>Reports</span></a>
                         </li>
-                        <li>
+                        <!-- <li>
                             <a href="{{ route('settings') }}" class="iq-waves-effect">
-                                <i class="ri-home-gear-fill"></i><span>Settings</span></a>
+                                <i class="ri-settings-3-line"></i><span>Settings</span></a>
+                        </li> -->
+
+                        @php
+                            $currentRoute = Route::currentRouteName();
+                            $isActive = in_array($currentRoute, ['settings', 'logo']) ? 'active' : '';
+                        @endphp
+
+                        <li class="{{ $isActive }}">
+                            <a href="#userinfo" class="iq-waves-effect collapsed" data-toggle="collapse" aria-expanded="false">
+                                <i class="ri-settings-3-line"></i><span>Settings</span>
+                                <i class="ri-arrow-right-s-line iq-arrow-right"></i>
+                            </a>
+                            <ul id="userinfo" class="iq-submenu collapse show" data-parent="#iq-sidebar-toggle">
+                                <li class="{{ $currentRoute == 'settings' ? 'active' : '' }}">
+                                    <a href="{{ route('settings') }}">
+                                        <i class="ri-profile-line"></i>Admin Fee 
+                                    </a>
+                                </li>
+                                <li class="{{ $currentRoute == 'logo' ? 'active' : '' }}">
+                                    <a href="{{ route('logo') }}">
+                                        <i class="ri-file-edit-line"></i>
+                                        Add Logo
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
 
                         <li>
@@ -129,11 +155,6 @@
                                 <div class="py-2 collapse-inner rounded">
 
                                     <a class="collapse-item" href="{{ route('master.services.index') }}">Services</a>
-
-
-
-
-
 
                                 </div>
 
@@ -181,7 +202,7 @@
                         <li>
                             <a href="#"
                                 class="search-toggle iq-waves-effect d-flex align-items-center bg-primary rounded">
-                                <img src="{{ asset('avatar.png') }}" class="img-fluid rounded mr-3"
+                                <img src="{{ asset('avatar.png') }}" class="img-fluid rounded mr-2"
                                     alt="user">
                                 <div class="caption">
                                     <h6 class="mb-0 line-height text-white">{{ auth()->guard("admin")->user()->name }}</h6>

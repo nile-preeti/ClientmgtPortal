@@ -75,7 +75,7 @@
                                     <h2 class="over-title-value">{{ ($services) }}</h2>
                                 </div>
                                 <div class="iq-card-icon">
-                                    <i class="ri-settings-3-line"></i>
+                                    <i class="ri-list-check-2"></i>
 
                                 </div>
                             </div>
@@ -259,8 +259,8 @@
         </div>
 
     </div>
-    
 @endsection
+
 @push('js')
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/highcharts.js"></script>

@@ -179,8 +179,10 @@
     <header class="header py-2">
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
-
-                <a href="#"> <img src="{{asset('hrmodule.png')}}" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
+            @php
+                $logo = \App\Models\Logo::first();
+            @endphp
+            <a href="#"> <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
 
 
 
@@ -270,7 +272,7 @@
             services.forEach((service) => {
                 const jobEndDateTime = new Date(`${service.end_date}T${service.end_time}`);
 
-                let statusLabel, badgeClass;
+                let statusLabel, badgeClass, disableCompleteButton = false;
 
                 if (service.status == 2) {
                     statusLabel = 'Completed';
@@ -282,6 +284,11 @@
                     statusLabel = service.status == 1 ? 'Active' : 'Inactive';
                     badgeClass = 'iq-bg-primary';
                 }
+
+                if (service.status == 1 && currentDateTime > jobEndDateTime) {
+                    disableCompleteButton = true;
+                }
+
 
                 const listItem = document.createElement("li");
                 listItem.classList.add("mt-2");
@@ -407,18 +414,6 @@
                                     <div class="cp-point-text">
                                         <h4>Total Earnings:</h4>
                                         <p>$${service.total_earning ? service.total_earning : '0.00'}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="cp-point-box">
-                                    <div class="cp-point-icon">
-                                        <img src="https://nileprojects.in/client-portal/public/assets/images/money.svg">
-                                    </div>
-                                    <div class="cp-point-text">
-                                        <h4>Admin Fee:</h4>
-                                        <p>$${service.admin_fee ? service.admin_fee : '0.00'}</p>
                                     </div>
                                 </div>
                             </div>

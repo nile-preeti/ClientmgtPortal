@@ -58,6 +58,9 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get("settings", [AdminController::class, 'settings'])->name("settings");
     Route::post("settings", [AdminController::class, 'settings_store'])->name("settings.store");
 
+    Route::get("logo", [AdminController::class, 'addLogo'])->name("logo");
+    Route::post("logo", [AdminController::class, 'logo_store'])->name("logo.store");
+    Route::post('/logo/delete', [AdminController::class, 'logo_delete'])->name('logo.delete');
 
     Route::get("users/attendance/{id}", [UserController::class, 'userAttendance'])->name("userAttendance");
 

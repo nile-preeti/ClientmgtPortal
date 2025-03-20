@@ -22,7 +22,7 @@ NOTE: This file contains the styling for responsive Template.
 
 	.sign-in-page { height: 100%; }
 
-	.sign-in-detail { height: 100%}
+/*	.sign-in-detail { height: 100%}*/
 
 	body.icon-with-text .iq-menu-bt-sidebar{display: none;}
 
@@ -621,6 +621,7 @@ NOTE: This file contains the styling for responsive Template.
 	.checkout-product-details {padding-left: 0 !important; margin: 15px 0 0 0 !important;}
 
 	.checkout-button{justify-content: center;}
+
 
 }
 

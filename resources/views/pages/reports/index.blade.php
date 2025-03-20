@@ -11,11 +11,11 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="iq-card">
-                        <!-- <div class="iq-card-header d-flex justify-content-between">
-                                                                                                                                          <div class="iq-header-title">
-                                                                                                                                             <h4 class="card-title">User List</h4>
-                                                                                                                                          </div>
-                                                                                                                                       </div> -->
+                   <!-- <div class="iq-card-header d-flex justify-content-between">
+                          <div class="iq-header-title">
+                             <h4 class="card-title">User List</h4>
+                          </div>
+                       </div> -->
                         <div class="iq-card-body">
                             <div class="search-filter-info">
                                 <div class="row justify-content-between">
@@ -30,13 +30,13 @@
                                                             value="{{ $search }}">
                                                     </div>
                                                     <button type="submit" class="" style="border: none; background: none; cursor: pointer;">
-                                                                <i class="fa fa-search" style="color:#3d3e3e;font-size:20px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);padding: 10px 0px;text-align: center;border-radius: 5px;width: 45px;height:45px;"></i>
-                                                            </button>
+                                                        <i class="fa fa-search" style="color:#3d3e3e;font-size:16px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);border-radius: 5px;width: 45px;height:44px;  display: flex; justify-content: center; align-items: center;"></i>
+                                                    </button>
                                                 </form>
                                             </div>
                                             <div class="btn-reload"
                                                 onclick="window.location.href = window.location.origin + window.location.pathname;">
-                                                <img src="{{ asset('reset.png') }}" height="20" alt="">
+                                                <img src="{{ asset('reset.png') }}" height="15" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -115,8 +115,8 @@
                                             @forelse ($users as $item)
                                                 <tr>
                                                     <td class="d-flex align-items-center"><img
-                                                            class="avatar-40 rounded mr-2"
-                                                            src="{{ $item->image ? asset("uploads/images/$item->image") : asset('avatar.png') }}"
+                                                            class="avatar-30 rounded mr-2"
+                                                            src="{{ $item->image ? asset("uploads/images/$item->image") : asset('avatar-1.png') }}"
                                                             alt="profile"> {{ $item->name }}</td>
 
                                                     <td>{{ $item->email }}</td>
