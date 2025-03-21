@@ -108,6 +108,7 @@
                         @php
                             $currentRoute = Route::currentRouteName();
                             $isActive = in_array($currentRoute, ['settings', 'logo']) ? 'active' : '';
+                            $submenuActive = in_array($currentRoute, ['settings', 'logo']) ? 'show' : ''; // Add condition for submenu
                         @endphp
 
                         <li class="{{ $isActive }}">
@@ -115,7 +116,7 @@
                                 <i class="ri-settings-3-line"></i><span>Settings</span>
                                 <i class="ri-arrow-right-s-line iq-arrow-right"></i>
                             </a>
-                            <ul id="userinfo" class="iq-submenu collapse show" data-parent="#iq-sidebar-toggle">
+                            <ul id="userinfo" class="iq-submenu collapse {{ $submenuActive }}" data-parent="#iq-sidebar-toggle">
                                 <li class="{{ $currentRoute == 'settings' ? 'active' : '' }}">
                                     <a href="{{ route('settings') }}">
                                         <i class="ri-profile-line"></i>Admin Fee 

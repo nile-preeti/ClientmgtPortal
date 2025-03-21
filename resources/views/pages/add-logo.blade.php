@@ -85,6 +85,7 @@ var myDropzone = new Dropzone("#logoUploadForm", {
                 $('#logoPreview').attr('src', response.file_path).removeClass('d-none');
                 $("#deleteLogo").show(); // Show delete icon
                 toastr.success(response.message || "Logo uploaded successfully!");
+                window.location.reload();
             } else {
                 toastr.error("Upload failed. Please try again.");
             }
@@ -114,6 +115,7 @@ $("#deleteLogo").click(function () {
                 $("#logoPreview").attr("src", "").addClass("d-none");
                 $("#deleteLogo").hide();
                 toastr.success("Logo deleted successfully!");
+                window.location.reload();
             } else {
                 toastr.error("Failed to delete logo.");
             }

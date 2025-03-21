@@ -9,9 +9,8 @@ use App\Models\AttendanceBreak;
 use App\Models\Customer;
 use App\Models\Holiday;
 use App\Models\JobSchedule;
-use App\Models\Order;
-use App\Models\Product;
 use App\Models\Service;
+use App\Models\UserService;
 use App\Models\User;
 use App\Models\Vendor;
 use Carbon\Carbon;
@@ -29,48 +28,98 @@ class AdminController extends Controller
     public function dashboard(Request $request)
     {
         $users = User::where("role_id", 2)->orderBy('id', 'DESC')->get();
-
-        $jobs = JobSchedule::count();
+        $user_jobs = JobSchedule::count();
         $customers = Customer::count();
         $services = Service::count();
 
-
+        // Fetch Top Services for the Services Chart
         $topServices = JobSchedule::select('service_id', DB::raw('COUNT(service_id) as service_count'))
-        ->groupBy('service_id')
-        ->orderByDesc('service_count')
-        ->take(5)
-        ->with('service') 
-        ->get();
+            ->groupBy('service_id')
+            ->orderByDesc('service_count')
+            ->take(5)
+            ->with('service')
+            ->get();
 
-    // Fetch all services if assigned ones are less than 5
-    $allServices = Service::take(5)->get();
+        $allServices = Service::take(5)->get();
+        $chartData = [];
+        $addedServices = [];
 
-    $chartData = [];
-    $addedServices = [];
-
-    // Add assigned services to the chart data
-    foreach ($topServices as $service) {
-        $chartData[] = [
-            'name' => $service->service->name ?? 'N/A',
-            'y' => (int) $service->service_count,
-        ];
-        $addedServices[] = $service->service_id;
-    }
-
-    // Fill remaining slots with unassigned services
-    foreach ($allServices as $service) {
-        if (count($chartData) >= 5) break; // Ensure we only take 5 services
-
-        if (!in_array($service->id, $addedServices)) {
+        foreach ($topServices as $service) {
             $chartData[] = [
-                'name' => $service->name,
-                'y' => 0, // No assignments
+                'name' => $service->service->name ?? 'N/A',
+                'y' => (int) $service->service_count,
+            ];
+            $addedServices[] = $service->service_id;
+        }
+
+        foreach ($allServices as $service) {
+            if (count($chartData) >= 5) break;
+            if (!in_array($service->id, $addedServices)) {
+                $chartData[] = [
+                    'name' => $service->name,
+                    'y' => 0,
+                ];
+            }
+        }
+
+        // Admin Revenue Data with Year Filter
+        $adminFeePercent = config('constant.admin_fee', 11);
+        $selectedYear = $request->input('year', now()->year);
+        $monthlyData = [];
+
+        for ($month = 1; $month <= 12; $month++) {
+            $start_date = Carbon::create($selectedYear, $month, 1)->startOfMonth();
+            $end_date = Carbon::create($selectedYear, $month, 1)->endOfMonth();
+
+            $totalEarnings = 0;
+            $totalAdminEarnings = 0;
+            $totalUserEarnings = 0;
+
+            $jobs = JobSchedule::whereBetween('start_date', [$start_date, $end_date])
+                ->where('status', 2)
+                ->get();
+
+            foreach ($jobs as $job) {
+                $user = User::find($job->user_id);
+                if (!$user) continue;
+
+                $serviceRate = UserService::where('user_id', $job->user_id)
+                    ->where('service_id', $job->service_id)
+                    ->value('price_per_hour');
+
+                if (!$serviceRate) continue;
+
+                $jobStart = Carbon::parse($job->start_date . ' ' . $job->start_time);
+                $jobEnd = Carbon::parse($job->end_date . ' ' . $job->end_time);
+                $totalHoursWorked = $jobStart->diffInSeconds($jobEnd) / 3600;
+
+                $breakHours = AttendanceBreak::where('user_id', $job->user_id)
+                    ->whereBetween('start_break', [$jobStart, $jobEnd])
+                    ->whereBetween('end_break', [$jobStart, $jobEnd])
+                    ->sum(DB::raw('TIMESTAMPDIFF(SECOND, start_break, end_break)')) / 3600;
+
+                $actualWorkedHours = max(round($totalHoursWorked - $breakHours, 2), 0);
+
+                $monthlyEarnings = round($actualWorkedHours * $serviceRate, 2);
+                $adminEarnings = round(($monthlyEarnings * $adminFeePercent) / 100, 2);
+                $userEarnings = round($monthlyEarnings - $adminEarnings, 2);
+
+                $totalEarnings += $monthlyEarnings;
+                $totalAdminEarnings += $adminEarnings;
+                $totalUserEarnings += $userEarnings;
+            }
+
+            $monthlyData[] = [
+                'month' => $start_date->format('F'),
+                'total_earnings' => $totalEarnings,
+                'admin_earnings' => $totalAdminEarnings,
+                'user_earnings' => $totalUserEarnings,
             ];
         }
+
+        return view("pages.dashboard", compact("users", 'user_jobs', 'customers', 'services', 'chartData', "monthlyData", "selectedYear"));
     }
 
-        return view("pages.dashboard", compact("users", 'jobs', 'customers', 'services', 'chartData'));
-    }
     public function signin()
     {
         return view("pages.signin");
@@ -327,31 +376,31 @@ class AdminController extends Controller
         $request->validate([
             'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-    
+
         // Check if there is an existing logo
         $existingLogo = Logo::first();
         if ($existingLogo) {
             $existingFilePath = public_path('uploads/logo/' . $existingLogo->name);
-    
+
             // Delete the existing file if it exists
             if (file_exists($existingFilePath)) {
                 unlink($existingFilePath);
             }
-    
+
             // Delete the existing record from the database
             $existingLogo->delete();
         }
-    
+
         // Store new file in "uploads/logo/" directory
         $file = $request->file('file');
         $fileName = time() . '.' . $file->getClientOriginalExtension();
         $file->move(public_path('uploads/logo'), $fileName);
-    
+
         // Save new file name in the "logo" table
         $logo = new Logo();
         $logo->name = $fileName;
         $logo->save();
-    
+
         return response()->json([
             'file_path' => asset("uploads/logo/$fileName"),
             'message' => 'Logo uploaded and saved successfully!',
@@ -372,7 +421,7 @@ class AdminController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Logo deleted successfully!']);
     }
-    
+
 
 
 

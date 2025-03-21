@@ -431,19 +431,19 @@
                             </div>
                         ` : '' }
 
-                         <div class="col-md-4">
+                        <div class="col-md-4">
                             <div class="cp-point-box">
                                 <div class="cp-point-text">
                                     <!-- Mark as Complete Button -->
                         ${service.status == 1 ? `
-                        <button class="btn btn-success btn-sm mark-complete" 
-                                data-id="${service.id}" 
-                                style="margin-left: 10px;font-size:11px;">
-                            Mark as Complete
-                        </button>` : ''}
+                            <button class="btn btn-success mark-complete" data-id="${service.id}" 
+                                ${disableCompleteButton ? 'disabled' : ''}  style="margin-left: 10px;font-size:11px;">
+                                Mark as Complete
+                            </button>` : ''}
                                 </div>
                             </div>
                         </div>
+
 
                        
 
