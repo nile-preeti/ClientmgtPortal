@@ -10,7 +10,13 @@ class Service extends Model
     use HasFactory;
 
     public function userServices()
-{
-    return $this->hasMany(UserService::class, 'service_id');
-}
+    {
+        return $this->hasMany(UserService::class, 'service_id');
+    }
+
+
+    public function subCategories()
+    {
+        return $this->hasMany(ServiceSubCategory::class, 'category_id');
+    }
 }

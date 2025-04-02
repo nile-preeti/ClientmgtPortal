@@ -489,12 +489,13 @@ class AjaxController extends Controller
 
         // Fetch job schedules where user_id matches the logged-in user
         $query = JobSchedule::with([
-            'service:id,name,sub_category',
+            'service:id,name',
+            'subCategory:id,category_id,sub_category', // Add this to fetch subcategory
             'customer:id,name',
             'userService:id,service_id,price_per_hour'
         ])
             ->where('user_id', $authUserId)
-            ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date', 'status');
+            ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date', 'status','sub_category_id');
 
         // Apply search filter
         if (!empty($search)) {

@@ -3,28 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use App\Models\ServiceSubCategory;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
     public function index(Request $request)
     {
-
         $search = $request->search;
-        $services = Service::when(request()->filled("search"), function ($query) {
-            $keyword = trim(request("search"));
-            return $query->where("name", "LIKE", "%$keyword%");
-        })
-           
-            ->when(request()->filled("status"), function ($query) {
-                return $query->where("status", request("status"));
-            })
 
-            ->orderBy("id", "desc")->paginate(config("contant.paginatePerPage"));
+        $services = Service::with('subCategories') // Load subcategories
+            ->when($request->filled("search"), function ($query) use ($request) {
+                $keyword = trim($request->search);
+                return $query->where("name", "LIKE", "%$keyword%");
+            })
+            ->when($request->filled("status"), function ($query) use ($request) {
+                return $query->where("status", $request->status);
+            })
+            ->orderBy("id", "desc")
+            ->paginate(config("contant.paginatePerPage"));
 
         $title = "Service Management";
-        $all_services = Service::where('status',1)->get();
-        return view("pages.master.services", compact("title", 'services','search','all_services'));
+        $all_services = Service::where('status', 1)->with('subCategories')->get();
+
+        return view("pages.master.services", compact("title", 'services', 'search', 'all_services'));
     }
     public function store(Request $request)
     {
@@ -48,22 +50,33 @@ class ServiceController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|exists:services,email',
-            'full_address'=> 'required',
-            'phone' => 'required',
-
-
+            'status' => 'required|in:0,1',
+            'sub_category' => 'nullable|string|max:255',
+            'sub_category_id' => 'nullable|exists:service_sub_categories,id', // Ensure valid subcategory ID
         ]);
 
-        $user =  Service::find($id);
-        $user->name = $request->name;
-       
-        $user->status = $request->status;
-      
+        // Find the existing service
+        $service = Service::findOrFail($id);
+        $service->name = $request->name;
+        $service->status = $request->status;
+        $service->save();
 
-        $user->save();
+        // Update or Create Subcategory
+        if ($request->filled('sub_category_id')) {
+            // Update existing subcategory
+            ServiceSubCategory::where('id', $request->sub_category_id)
+                ->update(['sub_category' => $request->sub_category, 'category_id' => $service->id]);
+        } elseif ($request->filled('sub_category')) {
+            // Create new subcategory if no ID exists
+            ServiceSubCategory::create([
+                'category_id' => $service->id,
+                'sub_category' => $request->sub_category,
+            ]);
+        }
+
         return response()->json(['success' => true, 'message' => "Service Updated Successfully"]);
     }
+
 
     public function  destroy($id)
     {
@@ -80,22 +93,17 @@ class ServiceController extends Controller
     public function subCategory(Request $request)
     {
         $request->validate([
-            'service_id' => 'required',
-            'sub_category' => 'required|string|max:255', // Ensure category name is provided
+            'service_id' => 'required|exists:services,id',
+            'sub_category' => 'required|string|max:255',
         ]);
 
-        // Find the service by ID
-        $service = Service::find($request->service_id);
+        // Directly create a new subcategory without checking for duplicates
+        ServiceSubCategory::create([
+            'category_id' => $request->service_id,
+            'sub_category' => $request->sub_category,
+        ]);
 
-        if (!$service) {
-            return response()->json(['success' => false, 'message' => "Service not found"], 404);
-        }
-
-        // Update only the category (sub-category name)
-        $service->sub_category = $request->sub_category;
-        $service->save();
-
-        return response()->json(['success' => true, 'message' => "Subcategory updated successfully"]);
+        return response()->json(['success' => true, 'message' => "Subcategory added successfully"]);
     }
 
 }

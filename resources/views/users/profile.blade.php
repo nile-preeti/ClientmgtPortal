@@ -173,6 +173,7 @@
     <header class="header py-2">
         <div class="container-fluid">
           <div class="d-flex flex-wrap align-items-center justify-content-between">
+            
           @php
             $logo = \App\Models\Logo::first();
         @endphp
@@ -269,32 +270,34 @@
                             </div>
                             @if($services->isNotEmpty())
                                 @foreach($services as $userService)
-                                    <div class="col-md-12">
-                                        <div class="cp-card d-flex justify-content-between">
-                                            <div class="cp-card-head">
-                                                <div class="cp-date">
-                                                    Service Name: <span class="service-name">{{ $userService->service->name ?? 'N/A' }}</span>
-                                                    <span class="badge dark-icon-light iq-bg-primary" style="margin-left: 10px;">
-                                                        {{ $userService->service->status == 1 ? 'Active' : 'Inactive' }}
-                                                    </span>
-                                                    
+                                    @if(!empty($userService->service->name)) 
+                                        <div class="col-md-12">
+                                            <div class="cp-card d-flex justify-content-between">
+                                                <div class="cp-card-head">
+                                                    <div class="cp-date">
+                                                        Service Name: <span class="service-name">{{ $userService->service->name }}</span>
+                                                        <span class="badge dark-icon-light iq-bg-primary" style="margin-left: 10px;">
+                                                            {{ isset($userService->service) && $userService->service->status == 1 ? 'Active' : 'Inactive' }}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            
-                                            <div class="cp-card-head">
-                                                <div class="cp-date">
-                                                    Sub Category: <span class="service-name">{{ $userService->service->sub_category ?? 'N/A' }}</span>
-                                                    
-                                                </div>
-                                            </div> 
 
-                                            <div class="cp-card-head">
-                                                <div class="cp-date">
-                                                    Rate Per Hour: <span class="service-name"> ${{ $userService->price_per_hour ?? '0' }}</span>
-                                                </div>
-                                            </div> 
+                                                <div class="cp-card-head">
+                                                    <div class="cp-date">
+                                                        Sub Category:  <span class="service-name">
+                                                            {{ $userService->subCategory->sub_category ?? 'N/A' }}
+                                                        </span>
+                                                    </div>
+                                                </div> 
+
+                                                <div class="cp-card-head">
+                                                    <div class="cp-date">
+                                                        Rate Per Hour: <span class="service-name"> ${{ $userService->price_per_hour ?? '0' }}</span>
+                                                    </div>
+                                                </div> 
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
                                 @endforeach
                             @else
                                 <div class="col-12 text-center">

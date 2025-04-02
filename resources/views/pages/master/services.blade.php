@@ -51,7 +51,7 @@
                                     <div class="col-sm-12 col-md-2">
                                         <div class="form-group">
                                             <a class="addbtn"
-                                                data-toggle="modal" data-target=".CreateModel" href="#"><i class="ri-file-add-line"></i> Create</a>
+                                                data-toggle="modal" data-target=".CreateModel" href="#"><i class="ri-file-add-line"></i> Add Category</a>
                                         </div>
                                     </div>
 
@@ -64,59 +64,94 @@
                                     </div>
                                 </div>
                                 <div class="table-responsive">
-                                    <table id="user-list-table" class="table table-striped table-borderless mt-0" role="grid"
-                                        aria-describedby="user-list-page-info">
-                                        <thead>
-                                            <tr>
-                                                <th> Name</th>
-                                                <th>Sub Category</th>
-                                                <th>Status</th>
-                                                <th>Action &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse ($services as $item)
-                                                <tr>
-                                                    <td class=""> {{ $item->name }}</td>
-
-                                                    <td class="">{{ $item->sub_category ?? 'N/A' }}</td>
-                                              
-                                                    <td><span
-                                                            class="badge dark-icon-light iq-bg-primary">{{ $item->status ? 'Active' : 'Inactive' }}</span>
-                                                    </td>
-
-                                                    <td>
-                                                        <div class="flex align-items-center list-user-action">
+                                <table id="user-list-table" class="table table-striped table-borderless mt-0" role="grid"
+                                    aria-describedby="user-list-page-info">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Sub Category</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($services as $item)
+                                            @if ($item->subCategories->isNotEmpty()) 
+                                                @foreach ($item->subCategories as $key => $subcategory)
+                                                    <tr>
+                                                        <td>{{ $item->name  }}</td> <!-- Show service name only once -->
+                                                        <td>{{ $subcategory->sub_category }}</td>
+                                                        <td>
+                                                            <span class="badge dark-icon-light iq-bg-primary">
+                                                                {{ $item->status ? 'Active' : 'Inactive' }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <div class="flex align-items-center list-user-action">
                                                             <a class="btnedit" data-toggle="modal"
-                                                                data-name="{{ $item->name ?? '' }}"
-                                                                data-status="{{ $item->status ?? '' }}"
-                                                               
+                                                                data-name="{{ $item->name }}"
+                                                                data-status="{{ $item->status }}"
+                                                                data-subcategory="{{ $subcategory->sub_category ?? '' }}" 
+                                                                data-subcategory-id="{{ $subcategory->id ?? '' }}" 
                                                                 data-url="{{ route('master.services.update', $item->id) }}"
                                                                 onclick="showData(this)" data-target="#EditModel"
-                                                                style="cursor: pointer"><i class="ri-pencil-fill"></i></a>
-                                                            {{-- delete  button --}}
+                                                                style="cursor: pointer">
+                                                                <i class="ri-pencil-fill"></i>
+                                                            </a>
+
+                                                                {{-- Delete button --}}
+                                                                <a class="btndelete" data-id="{{ $item->id }}"
+                                                                    style="cursor: pointer"
+                                                                    data-url="{{ route('master.services.destroy', $item->id) }}"
+                                                                    onclick="deletePublic(this)">
+                                                                    <i class="ri-delete-bin-7-line"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <!-- If no subcategories, show a single row -->
+                                                <tr>
+                                                    <td>{{ $item->name }}</td>
+                                                    <td>N/A</td>
+                                                    <td>
+                                                        <span class="badge dark-icon-light iq-bg-primary">
+                                                            {{ $item->status ? 'Active' : 'Inactive' }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="flex align-items-center list-user-action">
+                                                        <a class="btnedit" data-toggle="modal"
+                                                            data-name="{{ $item->name }}"
+                                                            data-status="{{ $item->status }}"
+                                                            data-subcategory="{{ $subcategory->sub_category ?? '' }}" 
+                                                            data-subcategory-id="{{ $subcategory->id ?? '' }}" 
+                                                            data-url="{{ route('master.services.update', $item->id) }}"
+                                                            onclick="showData(this)" data-target="#EditModel"
+                                                            style="cursor: pointer">
+                                                            <i class="ri-pencil-fill"></i>
+                                                        </a>
+
+                                                            {{-- Delete button --}}
                                                             <a class="btndelete" data-id="{{ $item->id }}"
                                                                 style="cursor: pointer"
                                                                 data-url="{{ route('master.services.destroy', $item->id) }}"
-                                                                onclick="deletePublic(this)"><i
-                                                                    class="ri-delete-bin-7-line"></i></a>
-                                                          
-
-
+                                                                onclick="deletePublic(this)">
+                                                                <i class="ri-delete-bin-7-line"></i>
+                                                            </a>
                                                         </div>
-
                                                     </td>
                                                 </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="5" align="center">No records found</td>
-                                                </tr>
-                                            @endforelse
+                                            @endif
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" align="center">No records found</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
 
-
-
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
                             <div class="row justify-content-between mt-3">
@@ -237,6 +272,12 @@
                             <div class="form-group">
                                 <label for="name">Name*</label>
                                 <input type="text" name="name" id="name" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sub_category">Sub Category</label>
+                                <input type="text" name="sub_category" id="sub_category" class="form-control">
+                                <input type="hidden" name="sub_category_id" id="sub_category_id"> <!-- Hidden Subcategory ID -->
                             </div>
                           
                             <div class="form-group">
@@ -646,12 +687,13 @@
 
         function showData(ele) {
             $("#edit_form").attr("action", ele.getAttribute("data-url"));
-
+            
           
             $("#status").val(ele.getAttribute("data-status"));
             $("#name").val(ele.getAttribute("data-name"));
        
-           
+            $("#sub_category").val(ele.getAttribute("data-subcategory") || ""); // Set subcategory name
+            $("#sub_category_id").val(ele.getAttribute("data-subcategory-id") || ""); 
 
         }
 

@@ -25,4 +25,9 @@ class JobSchedule extends Model
         return $this->hasOne(UserService::class, 'service_id', 'service_id')
             ->where('user_id', Auth::id()); // Ensure it matches the logged-in user
     }
+
+    public function subCategory()
+    {
+        return $this->belongsTo(ServiceSubCategory::class, 'sub_category_id');
+    }
 }

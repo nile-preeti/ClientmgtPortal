@@ -297,7 +297,7 @@
         <div class="col-md-12">
             <div class="cp-card">
                 <div class="cp-card-head">
-                    <div class="cp-date">Service Name:<span> ${service.service ? service.service.name : 'N/A'}</span>
+                    <div class="cp-date">Job Title:<span> ${service.service ? service.service.name : 'N/A'}</span>
                         <span class="badge dark-icon-light ${badgeClass}" style="margin-left: 10px;">
                             ${statusLabel}
                         </span>
@@ -351,7 +351,7 @@
                                 </div>
                                 <div class="cp-point-text">
                                     <h4>Start Time:</h4>
-                                    <p>${service.start_time || 'N/A'}</p>
+                                 <p>${(service?.start_time ? service.start_time.slice(0, 5) : 'N/A')}</p>
                                 </div>
                             </div>
                         </div>
@@ -363,7 +363,7 @@
                                 </div>
                                 <div class="cp-point-text">
                                     <h4>End Time:</h4>
-                                    <p>${service.end_time || 'N/A'}</p>
+                                    <p>${(service?.end_time ? service.end_time.slice(0, 5) : 'N/A')}</p>
                                 </div>
                             </div>
                         </div>
@@ -399,8 +399,9 @@
                                 </div>
                                 <div class="cp-point-text">
                                     <h4>Sub Category:</h4>
-                                    <p>${service.service && service.service.sub_category ? service.service.sub_category : 'N/A'}</p>
+                                    <p>${service.sub_category ? service.sub_category.sub_category : 'N/A'}</p>
                                 </div>
+
                             </div>
                         </div>
 

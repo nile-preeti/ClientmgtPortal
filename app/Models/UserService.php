@@ -12,4 +12,9 @@ class UserService extends Model
     public function service(){
         return $this->belongsTo(Service::class);
     }
+
+    public function subCategory()
+    {
+        return $this->belongsTo(ServiceSubCategory::class, 'service_sub_category', 'id');
+    }
 }

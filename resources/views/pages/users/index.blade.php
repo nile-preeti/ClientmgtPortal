@@ -53,7 +53,7 @@
 
                                     <div class="col-sm-12 col-md-2">
                                         <div class="form-group">
-                                            <a class="addbtn" href="{{ route('users.create') }}"><i class="ri-add-circle-line"></i> Add</a>
+                                            <a class="addbtn" href="{{ route('userss.create') }}"><i class="ri-add-circle-line"></i> Add</a>
                                         </div>
                                     </div>
                                 </div>
@@ -95,17 +95,17 @@
                                                                 data-designation="{{ $item->designation }}"
                                                                 data-phone="{{ $item->phone }}"
                                                                 data-image="{{ $item->image ? asset("uploads/images/$item->image") : null }}"
-                                                                data-url="{{ route('users.update', $item->id) }}"
+                                                                data-url="{{ route('userss.update', $item->id) }}"
                                                                 onclick="showData(this)" data-target="#EditModel"
                                                                 style="cursor: pointer"><i class="ri-pencil-fill"></i></a> --}}
 
                                                             {{-- edit button --}}
-                                                            <a href="{{ route('users.edit', $item->id) }}"
+                                                            <a href="{{ route('userss.edit', $item->id) }}"
                                                                 class="btnedit"><i class="ri-pencil-fill"></i></a>
                                                             {{-- delete  button --}}
                                                             <a class="btndelete" data-id="{{ $item->id }}"
                                                                 style="cursor: pointer"
-                                                                data-url="{{ route('users.destroy', $item->id) }}"
+                                                                data-url="{{ route('userss.destroy', $item->id) }}"
                                                                 onclick="deletePublic(this)"><i
                                                                     class="ri-delete-bin-7-line"></i></a>
                                                             <a class="btnview" data-id="{{ $item->id }}"
@@ -199,7 +199,7 @@
     <div class="modal fade CreateModel" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <form action="{{ route('users.store') }}" method="post" id="create_form"
+                <form action="{{ route('userss.store') }}" method="post" id="create_form"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header">
@@ -264,7 +264,7 @@
     <div class="modal fade EditModel" tabindex="-1" role="dialog" aria-hidden="true" id="EditModel">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
-                <form action="{{ route('users.store') }}" method="post" id="edit_form" enctype="multipart/form-data">
+                <form action="{{ route('userss.store') }}" method="post" id="edit_form" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="modal-header">

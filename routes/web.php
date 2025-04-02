@@ -12,6 +12,8 @@ use App\Http\Controllers\ServiceController;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Models\Service;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +54,11 @@ Route::group(['middleware' => 'admin'], function () {
         Route::resource("services", ServiceController::class);
         Route::post("services/subcategory", [ServiceController::class, 'subCategory'])->name("services.subCategory");
     });
+
+    Route::get('/get-subcategories', function (Request $request) {
+        $service = Service::with('subCategories')->find($request->service_id);
+        return response()->json($service ? $service->subCategories : []);
+    })->name('get-subcategories');
 
     
     Route::get("reports", [AdminController::class, 'reports'])->name("reports");

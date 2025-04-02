@@ -75,11 +75,12 @@ class JobScheduleController extends Controller
 
 
         ]);
-
+        //dd($request->all());
         $user = new JobSchedule();
         $user->user_id = $request->user_id;
         $user->customer_id = $request->customer_id;
         $user->service_id = $request->service_id;
+        $user->sub_category_id = $request->sub_category_id;
         $user->description = $request->description;
         $user->status = $request->status;
         $user->start_time = $request->start_time;
@@ -99,6 +100,7 @@ class JobScheduleController extends Controller
         $user->user_id = $request->user_id;
         $user->customer_id = $request->customer_id;
         $user->service_id = $request->service_id;
+        $user->sub_category_id = $request->sub_category_id;
         $user->description = $request->description;
         $user->status = $request->status;
         $user->start_time = $request->start_time;

@@ -41,7 +41,7 @@ class UserController extends Controller
     public function create(Request $request)
     {
         $title = "Create Employee";
-        $services = Service::all();
+        $services = Service::with('subCategories')->get();
         return view("pages.users.create", compact('services', 'title'));
     }
     public function edit(Request $request, $id)
@@ -81,12 +81,12 @@ class UserController extends Controller
         $user->status = $request->status;
 
         $user->password = Hash::make($request->password);
-
         if ($request->has("services") && is_array($request->services)) {
             foreach ($request->services as $i => $is_) {
                 $service = new UserService();
                 $service->user_id = $user->id;
                 $service->service_id = $is_;
+                $service->service_sub_category = $request->sub_categories[$i] ?? null;
                 $service->price_per_hour = $request->price_per_hour[$i];
                 $service->save();
             }
@@ -121,23 +121,25 @@ class UserController extends Controller
 
         if ($request->has("old_services") && is_array($request->old_services)) {
             foreach ($request->old_services as $i => $is) {
-                $service =  UserService::find($request->service_user_id[$i]);
+                $service = UserService::find($request->service_user_id[$i]);
                 if ($service) {
                     $service->user_id = $user->id;
                     $service->service_id = $is;
+                    $service->service_sub_category = $request->old_sub_category[$i] ?? null; // Store subcategory ID
                     $service->price_per_hour = $request->old_price_per_hour[$i];
                     $service->save();
                 }
             }
-            // UserService::where("user_id", $id)->whereNotIn("id", $request->service_user_id)->delete();
         } else {
             UserService::where("user_id", $id)->delete();
         }
+        
         if ($request->has("services") && is_array($request->services)) {
             foreach ($request->services as $i => $is) {
                 $service = new UserService();
                 $service->user_id = $user->id;
                 $service->service_id = $is;
+                $service->service_sub_category = $request->sub_categories[$i] ?? null; // Store subcategory ID
                 $service->price_per_hour = $request->price_per_hour[$i];
                 $service->save();
             }
@@ -489,8 +491,10 @@ class UserController extends Controller
     public function profile(Request $request)
     {
         $user = auth()->user();
-        $services = UserService::where('user_id', $user->id)->with('service')->get();
-        // dd($services);
+        $services = UserService::where('user_id', $user->id)
+        ->with(['service', 'subCategory']) // Correct relationship
+        ->get();
+        //dd($services);
         return view("users.profile", compact('user', 'services'));
     }
 
