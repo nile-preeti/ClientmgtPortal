@@ -85,6 +85,7 @@ class JobScheduleController extends Controller
         $user->status = $request->status;
         $user->start_time = $request->start_time;
         $user->end_time = $request->end_time;
+        $user->location = $request->location;
         $user->start_date = $request->start_date;
         $user->end_date = $request->end_date;
         $user->save();
@@ -105,6 +106,7 @@ class JobScheduleController extends Controller
         $user->status = $request->status;
         $user->start_time = $request->start_time;
         $user->end_time = $request->end_time;
+        $user->location = $request->location;
         $user->start_date = $request->start_date;
         $user->end_date = $request->end_date;
         $user->save();

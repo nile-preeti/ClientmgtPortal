@@ -261,16 +261,25 @@
             if (services.length === 0) {
                 // Show "No Records Found" when there is no data
                 recordsList.innerHTML = `
-        <li class="text-center mt-2">
-            <h5 class="text-danger">No Records Found</h5>
-        </li>`;
-                return; // Do nothing if no records exist
+                <li class="text-center mt-2">
+                    <h5 class="text-danger">No Records Found</h5>
+                </li>`;
+                        return; // Do nothing if no records exist
             }
 
             const currentDateTime = new Date(); // Get the current date and time
 
             services.forEach((service) => {
                 const jobEndDateTime = new Date(`${service.end_date}T${service.end_time}`);
+                const hasCheckedIn = service.attendance && service.attendance.some(att => 
+                    new Date(att.date).toDateString() === new Date(service.start_date).toDateString() && 
+                    att.check_in_time !== null
+                );
+
+                const hasCheckedOut = service.attendance && service.attendance.some(att => 
+                    new Date(att.date).toDateString() === new Date(service.start_date).toDateString() && 
+                    att.check_out_time !== null
+                );
 
                 let statusLabel, badgeClass, disableCompleteButton = false;
 
@@ -284,9 +293,30 @@
                     statusLabel = service.status == 1 ? 'Active' : 'Inactive';
                     badgeClass = 'iq-bg-primary';
                 }
+                let bufferMinutes = 30;
+                let bufferTime = new Date(jobEndDateTime.getTime() + bufferMinutes * 60000);
 
-                if (service.status == 1 && currentDateTime > jobEndDateTime) {
-                    disableCompleteButton = true;
+                if (service.status == 1) {
+                    if (currentDateTime < jobEndDateTime) {
+                        disableCompleteButton = true;
+                        disableReason = "Cannot complete before job end time";
+                    } else if (currentDateTime >= bufferTime) {
+                        disableCompleteButton = true;
+                        disableReason = "Cannot complete this job as time as been exceeded";
+                    }else {
+                        // Calculate working hours to prevent zero earning
+                        const start = new Date(`${service.start_date}T${service.start_time}`);
+                        const end = new Date(`${service.end_date}T${service.end_time}`);
+                        const diffMs = end - start;
+                        const hoursWorked = diffMs / (1000 * 60 * 60);
+                        
+                        if (hoursWorked <= 0) {
+                            disableCompleteButton = true;
+                            disableReason = "Cannot complete with zero working hours";
+                        } else {
+                            disableCompleteButton = false;
+                        }
+                    }
                 }
 
 
@@ -294,164 +324,168 @@
                 listItem.classList.add("mt-2");
 
                 listItem.innerHTML = `
-        <div class="col-md-12">
-            <div class="cp-card">
-                <div class="cp-card-head">
-                    <div class="cp-date">Job Title:<span> ${service.service ? service.service.name : 'N/A'}</span>
-                        <span class="badge dark-icon-light ${badgeClass}" style="margin-left: 10px;">
-                            ${statusLabel}
-                        </span>
+                    <div class="col-md-12">
+                        <div class="cp-card">
+                            <div class="cp-card-head">
+                                <div class="cp-date">Job Title:<span> ${service.service ? service.service.name : 'N/A'}</span>
+                                    <span class="badge dark-icon-light ${badgeClass}" style="margin-left: 10px;">
+                                        ${statusLabel}
+                                    </span>
 
-                       
-                    </div>
-                </div> 
+                                
+                                </div>
+                            </div> 
 
-                <div class="cp-card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Customer Name:</h4>
-                                    <p>${service.customer ? service.customer.name : 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Start Date:</h4>
-                                    <p>${service.start_date || 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>End Date:</h4>
-                                    <p>${service.end_date || 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Start Time:</h4>
-                                 <p>${(service?.start_time ? service.start_time.slice(0, 5) : 'N/A')}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>End Time:</h4>
-                                    <p>${(service?.end_time ? service.end_time.slice(0, 5) : 'N/A')}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Description:</h4>
-                                    <p>${service.description || 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Rate Per Hour:</h4>
-                                   <p>${service.user_service ? `$${service.user_service.price_per_hour}` : 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Sub Category:</h4>
-                                    <p>${service.sub_category ? service.sub_category.sub_category : 'N/A'}</p>
-                                </div>
-
-                            </div>
-                        </div>
-
-
-                        ${ service.status == 2 ? `
-                            <div class="col-md-4">
-                                <div class="cp-point-box">
-                                    <div class="cp-point-icon">
-                                        <img src="https://nileprojects.in/client-portal/public/assets/images/money.svg">
+                            <div class="cp-card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="cp-point-box">
+                                            <div class="cp-point-icon">
+                                                <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
+                                            </div>
+                                            <div class="cp-point-text">
+                                                <h4>Customer Name:</h4>
+                                                <p>${service.customer ? service.customer.name : 'N/A'}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="cp-point-text">
-                                        <h4>Total Earnings:</h4>
-                                        <p>$${service.total_earning ? service.total_earning : '0.00'}</p>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="col-md-4">
-                                <div class="cp-point-box">
-                                    <div class="cp-point-icon">
-                                        <img src="https://nileprojects.in/client-portal/public/assets/images/money.svg">
+                                    <div class="col-md-4">
+                                        <div class="cp-point-box">
+                                            <div class="cp-point-icon">
+                                                <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
+                                            </div>
+                                            <div class="cp-point-text">
+                                                <h4>Start Date:</h4>
+                                                <p>${service.start_date || 'N/A'}</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="cp-point-text">
-                                        <h4>Net Earning:</h4>
-                                        <p><strong>$${service.net_earning ? service.net_earning : '0.00'}</strong></p>
-                                    </div>
-                                </div>
-                            </div>
-                        ` : '' }
 
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-text">
-                                    <!-- Mark as Complete Button -->
-                        ${service.status == 1 ? `
-                            <button class="btn btn-success mark-complete" data-id="${service.id}" 
-                                ${disableCompleteButton ? 'disabled' : ''}  style="margin-left: 10px;font-size:11px;">
-                                Mark as Complete
-                            </button>` : ''}
+                                    <div class="col-md-4">
+                                        <div class="cp-point-box">
+                                            <div class="cp-point-icon">
+                                                <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
+                                            </div>
+                                            <div class="cp-point-text">
+                                                <h4>End Date:</h4>
+                                                <p>${service.end_date || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="cp-point-box">
+                                            <div class="cp-point-icon">
+                                                <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
+                                            </div>
+                                            <div class="cp-point-text">
+                                                <h4>Start Time:</h4>
+                                            <p>${(service?.start_time ? service.start_time.slice(0, 5) : 'N/A')}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="cp-point-box">
+                                            <div class="cp-point-icon">
+                                                <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
+                                            </div>
+                                            <div class="cp-point-text">
+                                                <h4>End Time:</h4>
+                                                <p>${(service?.end_time ? service.end_time.slice(0, 5) : 'N/A')}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="cp-point-box">
+                                            <div class="cp-point-icon">
+                                                <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
+                                            </div>
+                                            <div class="cp-point-text">
+                                                <h4>Description:</h4>
+                                                <p>${service.description || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="cp-point-box">
+                                            <div class="cp-point-icon">
+                                                <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
+                                            </div>
+                                            <div class="cp-point-text">
+                                                <h4>Rate Per Hour:</h4>
+                                            <p>${service.user_service ? `$${service.user_service.price_per_hour}` : 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="cp-point-box">
+                                            <div class="cp-point-icon">
+                                                <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
+                                            </div>
+                                            <div class="cp-point-text">
+                                                <h4>Sub Category:</h4>
+                                                <p>${service.sub_category ? service.sub_category.sub_category : 'N/A'}</p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                                    ${ service.status == 2 ? `
+                                        <div class="col-md-4">
+                                            <div class="cp-point-box">
+                                                <div class="cp-point-icon">
+                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/money.svg">
+                                                </div>
+                                                <div class="cp-point-text">
+                                                    <h4>Total Earnings:</h4>
+                                                    <p>$${service.total_earning ? service.total_earning : '0.00'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="cp-point-box">
+                                                <div class="cp-point-icon">
+                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/money.svg">
+                                                </div>
+                                                <div class="cp-point-text">
+                                                    <h4>Net Earning:</h4>
+                                                    <p><strong>$${service.net_earning ? service.net_earning : '0.00'}</strong></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ` : '' }
+
+                                    <div class="col-md-4">
+                                        <div class="cp-point-box">
+                                            <div class="cp-point-text">
+                                                <!-- Mark as Complete Button -->
+                                    ${service.status == 1 ? `
+                                                    <button class="btn btn-success mark-complete" 
+                                                        data-id="${service.id}" 
+                                                        ${disableCompleteButton ? 'disabled' : ''} 
+                                                        style="margin-left: 10px;font-size:11px;">
+                                                        Mark as Complete
+                                                    </button>` : ''}
+                                                ${disableCompleteButton && service.status == 1 ? `
+                                                    <small class="text-muted d-block mt-1">${disableReason}</small>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                
+
                                 </div>
                             </div>
                         </div>
-
-
-                       
-
-                    </div>
-                </div>
-            </div>
-        </div>`;
+                    </div>`;
 
                 recordsList.appendChild(listItem);
             });

@@ -106,7 +106,7 @@
                     </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-6">
+                <div class="col-md-6 col-lg-6 d-none">
                     <div class="iq-card">
                         <div class="iq-card-header d-flex justify-content-between">
                            <div class="iq-header-title">

@@ -14,6 +14,7 @@
                                 <div class="dz-message">
                                     <i class="ri-upload-cloud-line" style="font-size: 2rem;"></i>
                                     <p>Drag & Drop or Click to Upload Logo</p>
+                                    <p>Dimension: 568 x 236</p>
                                 </div>
                             </form>
                             
@@ -58,7 +59,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 <script>
-   Dropzone.autoDiscover = false;
+  Dropzone.autoDiscover = false;
 
 var myDropzone = new Dropzone("#logoUploadForm", {
     paramName: "file",
@@ -70,7 +71,6 @@ var myDropzone = new Dropzone("#logoUploadForm", {
     init: function () {
         var dropzoneInstance = this;
 
-        // When upload button is clicked, submit the form
         document.getElementById("submitLogo").addEventListener("click", function (e) {
             e.preventDefault();
             if (dropzoneInstance.getQueuedFiles().length > 0) {
@@ -80,10 +80,32 @@ var myDropzone = new Dropzone("#logoUploadForm", {
             }
         });
 
+        this.on("addedfile", function (file) {
+            var _this = this;
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onload = function (event) {
+                var image = new Image();
+                image.src = event.target.result;
+
+                image.onload = function () {
+                    var width = this.width;
+                    var height = this.height;
+
+                    // ✅ Set your required dimensions here
+                    if (width !== 568 || height !== 236) {
+                        _this.removeFile(file); // Remove file from Dropzone
+                        toastr.error("Invalid image dimensions. Required: 568x236 px.");
+                    }
+                };
+            };
+        });
+
         this.on("success", function (file, response) {
             if (response.file_path) {
                 $('#logoPreview').attr('src', response.file_path).removeClass('d-none');
-                $("#deleteLogo").show(); // Show delete icon
+                $("#deleteLogo").show();
                 toastr.success(response.message || "Logo uploaded successfully!");
                 window.location.reload();
             } else {

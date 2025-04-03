@@ -485,14 +485,14 @@ class AjaxController extends Controller
         $authUserId = Auth::id(); // Get the logged-in user ID
         $search = $request->input('search');
         $selectedDate = $request->input('date'); // Get selected date
-        $adminFeePercent = config('constant.admin_fee', 11);
+        $adminFeePercent = 11;
 
         // Fetch job schedules where user_id matches the logged-in user
         $query = JobSchedule::with([
             'service:id,name',
-            'subCategory:id,category_id,sub_category', // Add this to fetch subcategory
+            'subCategory:id,category_id,sub_category',
             'customer:id,name',
-            'userService:id,service_id,price_per_hour'
+            'userService:id,service_id,price_per_hour',
         ])
             ->where('user_id', $authUserId)
             ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date', 'status','sub_category_id');
@@ -541,6 +541,7 @@ class AjaxController extends Controller
                 $totalEarning = $hoursWorked * $ratePerHour;
                 $adminFee = ($totalEarning * $adminFeePercent) / 100;
                 $netEarning = $totalEarning - $adminFee;
+                // return $hoursWorked;
 
                 // Assign calculated values
                 $job->total_hours = $hoursWorked;

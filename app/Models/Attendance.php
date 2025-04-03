@@ -21,4 +21,6 @@ class Attendance extends Model
     {
         return $this->hasMany(AttendanceBreak::class, 'attendance_id');
     }
+
+    
 }

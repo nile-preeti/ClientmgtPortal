@@ -184,6 +184,15 @@
                                     </div>
                                 </div>
 
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="name">Location *</label>
+                                        <input type="text" placeholder="Job Location"  @if (isset($job_schedule)) value="{{ $job_schedule->location }}" @endif
+                                            required name="location" class="form-control" required>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="name">Status</label>

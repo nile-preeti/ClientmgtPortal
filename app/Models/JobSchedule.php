@@ -10,6 +10,8 @@ class JobSchedule extends Model
 {
     use HasFactory;
 
+    protected $table = 'job_schedules';
+
     public function user(){
         return $this->belongsTo(User::class);
     }
@@ -29,5 +31,12 @@ class JobSchedule extends Model
     public function subCategory()
     {
         return $this->belongsTo(ServiceSubCategory::class, 'sub_category_id');
+    }
+
+
+    public function attendance()
+    {
+        return $this->hasOne(Attendance::class, 'user_id', 'user_id')
+            ->whereRaw('attendances.date = job_schedules.start_date');
     }
 }
