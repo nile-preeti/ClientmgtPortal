@@ -354,6 +354,13 @@ class UserController extends Controller
 
         // Check if the user exists
         if ($user) {
+
+            if ($user->status == 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Your account has been deactivated by the admin.',
+                ]);
+            }
             // If it's a user (role_id != 1)
             if ($user->role_id != 1) {
                 // Attempt to log in as a regular user

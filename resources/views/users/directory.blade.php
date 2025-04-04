@@ -171,6 +171,15 @@
                 border-radius: 5px;
             }
 
+            button.mark-complete:disabled {
+                border: 1px solid #dbd8d8 !important;
+                color: grey !important;
+                margin-left: 10px;
+                font-size: 11px;
+                background-color: #f9f9f9 !important;
+                cursor: not-allowed;
+            }
+
 
     </style>
 </head>
@@ -410,6 +419,19 @@
                                         </div>
                                     </div>
 
+
+                                    <div class="col-md-4">
+                                        <div class="cp-point-box">
+                                            <div class="cp-point-icon">
+                                                <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
+                                            </div>
+                                            <div class="cp-point-text">
+                                                <h4>Location:</h4>
+                                                <p>${service.location || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="col-md-4">
                                         <div class="cp-point-box">
                                             <div class="cp-point-icon">
@@ -474,7 +496,7 @@
                                                         Mark as Complete
                                                     </button>` : ''}
                                                 ${disableCompleteButton && service.status == 1 ? `
-                                                    <small class="text-muted d-block mt-1">${disableReason}</small>` : ''}
+                                                    <small class="text-muted d-block mt-1" style="color:red!important;">${disableReason}</small>` : ''}
                                             </div>
                                         </div>
                                     </div>

@@ -82,7 +82,7 @@ Route::prefix('user')->as("user.")->group(function () {
     Route::get('/', [UserController::class, 'login'])->name('login'); // Route for storing attendance
     Route::post('/login', [UserController::class, 'login_post'])->name('login_post'); // Route for storing attendance
 
-    Route::middleware("auth")->group(function () {
+    Route::middleware(['auth', 'check.user.status'])->group(function () {
         Route::get("dashboard", [UserController::class, 'dashboard'])->name("dashboard");
         Route::get("attendance", [UserController::class, 'attendance'])->name('attendance');
         Route::get("profile", [UserController::class, 'profile'])->name("profile");

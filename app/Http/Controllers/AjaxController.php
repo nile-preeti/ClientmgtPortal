@@ -495,7 +495,7 @@ class AjaxController extends Controller
             'userService:id,service_id,price_per_hour',
         ])
             ->where('user_id', $authUserId)
-            ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date', 'status','sub_category_id');
+            ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date', 'status','sub_category_id','location');
 
         // Apply search filter
         if (!empty($search)) {
