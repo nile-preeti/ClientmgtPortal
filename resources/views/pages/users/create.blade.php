@@ -1,4 +1,47 @@
 @extends('layouts.app')
+@push('css')
+<style>
+    .dz-box {
+    border: 2px dashed #ccc !important;
+    padding: 20px;
+    text-align: center;
+    height: 150px;
+    background-color: #f9f9f9;
+    position: relative;
+    overflow-y: hidden; /* allow scroll if too tall */
+}
+
+.dz-box .dz-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    pointer-events: none;
+}
+
+.dz-box .dz-preview {
+    position: relative !important;
+    top: 10px;
+    left: 0;
+    right: 0;
+    margin: auto;
+    max-width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+}
+
+.dz-box .dz-preview .dz-image img {
+    max-width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+</style>
+@endpush
 @section('content')
     <!-- Page Content  -->
     <div id="content-page" class="content-page">
@@ -91,8 +134,9 @@
                                     <div class="col-md-4">
                                         <label for="">Profile Image</label>
                                         <input type="hidden" name="image" id="create_image" class="form-control">
+
                                         <div class="form-group">
-                                            <div class="dropzone form-control" id="myDropzone"></div>
+                                            <div id="myDropzone" class="dropzone dz-box"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -123,34 +167,25 @@
                                                         </select>
                                                     </div>
                                                 </div>
-
+                                                
                                                 <!-- Subcategory Dropdown -->
                                                 <div class="col-md-3">
                                                     <div class="form-group service-box">
-                                                        <select name="old_sub_category[]" class="form-control sub-category">
-                                                            <option value="">Select Sub Category</option>
-                                                            @php
-                                                                $service = $services->where('id', $item->service_id)->first();
-                                                                $allSubCategories = $services->flatMap->subCategories; // Get all subcategories
-                                                            @endphp
+                                                    <select name="old_sub_category[]" class="form-control sub-category">
+                                                        <option value="">Select Sub Category</option>
 
-                                                            @if ($service && $service->subCategories->isNotEmpty())
-                                                                @foreach ($service->subCategories as $subcategory)
-                                                                    <option value="{{ $subcategory->id }}" 
-                                                                        @selected($item->service_sub_category == $subcategory->id)>
-                                                                        {{ $subcategory->sub_category }}
-                                                                    </option>
-                                                                @endforeach
-                                                            @else
-                                                                <!-- Show all subcategories if no specific service is selected -->
-                                                                @foreach ($allSubCategories as $subcategory)
-                                                                    <option value="{{ $subcategory->id }}" 
-                                                                        @selected($item->service_sub_category == $subcategory->id)>
-                                                                        {{ $subcategory->sub_category }}
-                                                                    </option>
-                                                                @endforeach
-                                                            @endif
-                                                        </select>
+                                                        @php
+                                                            $selectedService = $services->where('id', $item->service_id)->first();
+                                                            $subcategories = $selectedService ? $selectedService->subCategories : collect();
+                                                        @endphp
+
+                                                        @foreach ($subcategories as $subcategory)
+                                                            <option value="{{ $subcategory->id }}" 
+                                                                @selected($item->service_sub_category == $subcategory->id)>
+                                                                {{ $subcategory->sub_category }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                     </div>
                                                 </div>
 
@@ -501,86 +536,93 @@
 });
     </script>
 
-    <script type="text/javascript">
-        Dropzone.autoDiscover = false;
+<script type="text/javascript">
+    Dropzone.autoDiscover = false;
 
-        function initializeDropzone(dropzoneId, uploadUrl, existingImageUrl = null, edit = false) {
-            const myDropzone = new Dropzone(`#${dropzoneId}`, {
-                dictDefaultMessage: '<img src="{{ asset('upload.png') }}" style="height:40px" alt="Drop an image here">',
-                maxFilesize: 1, // Maximum file size in MB
-                maxFiles: 1, // Allow only one file
-                renameFile: function(file) {
-                    const dt = new Date();
-                    return dt.getTime() + file.name;
-                },
-                acceptedFiles: ".jpeg,.jpg,.png,.mp3", // Allowed file types
-                timeout: 5000,
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                url: "{{ route('image-upload') }}", // Set dynamic upload URL
-                addRemoveLinks: true,
-                removedfile: function(file) {
-                    const name = file.upload ? file.upload.filename : file.name; // Handle manually added files
-                    $.ajax({
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        type: 'POST',
-                        url: "{{ route('image-delete') }}", // URL for file removal
-                        data: {
-                            filename: name
-                        },
-                        success: function() {
-                            console.log("File removed successfully");
-                        },
-                        error: function(e) {
-                            console.error(e);
-                        }
-                    });
-
-                    if (file.previewElement) {
-                        file.previewElement.parentNode.removeChild(file.previewElement);
+    function initializeDropzone(dropzoneId, uploadUrl, existingImageUrl = null, edit = false) {
+        const myDropzone = new Dropzone(`#${dropzoneId}`, {
+            dictDefaultMessage: `
+                <div class="dz-message">
+                    <img src="{{ asset('upload.png') }}" style="height:40px" alt="Upload Image">
+                    <p>Drop image here or click to upload</p>
+                </div>`,
+            maxFilesize: 1, // in MB
+            maxFiles: 1,
+            acceptedFiles: ".jpeg,.jpg,.png,.mp3",
+            timeout: 5000,
+            addRemoveLinks: true,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            url: "{{ route('image-upload') }}",
+            renameFile: function(file) {
+                const dt = new Date();
+                return dt.getTime() + '_' + file.name;
+            },
+            removedfile: function(file) {
+                const name = file.upload ? file.upload.filename : file.name;
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    type: 'POST',
+                    url: "{{ route('image-delete') }}",
+                    data: { filename: name },
+                    success: function() {
+                        console.log("File removed successfully");
+                    },
+                    error: function(e) {
+                        console.error(e);
                     }
-                },
-                success: function(file, response) {
-                    if (edit) {
-                        $("#edit_image").val(response);
-                    } else {
-                        $("#create_image").val(response);
+                });
 
-                    }
-                    console.log("File uploaded successfully:", response);
-                },
-                error: function(file, response) {
-                    console.error("File upload error:", response);
-                },
-                init: function() {
-                    this.on("addedfile", function(file) {
-                        if (this.files.length > 1) {
-                            this.removeFile(file);
-                            alert("Only one file can be uploaded at a time!");
-                        }
-                    });
-
-                    // If there's an existing image, display it in Dropzone
-                    if (existingImageUrl) {
-                        const mockFile = {
-                            name: "Existing Image",
-                            size: 12345,
-                            type: "image/jpeg"
-                        };
-                        this.emit("addedfile", mockFile);
-                        this.emit("thumbnail", mockFile, existingImageUrl);
-                        this.emit("complete", mockFile);
-                        this.files.push(mockFile); // Add the file to the Dropzone files array
-                    }
+                if (file.previewElement) {
+                    file.previewElement.parentNode.removeChild(file.previewElement);
                 }
-            });
+            },
+            success: function(file, response) {
+                if (edit) {
+                    $("#edit_image").val(response);
+                } else {
+                    $("#create_image").val(response);
+                }
+                console.log("File uploaded successfully:", response);
+            },
+            error: function(file, response) {
+                console.error("Upload error:", response);
+            },
+            init: function() {
+                this.on("addedfile", function(file) {
+                    if (this.files.length > 1) {
+                        this.removeFile(file);
+                        alert("Only one file can be uploaded at a time!");
+                    }
+                });
 
-            return myDropzone;
-        }
-    </script>
+                // If there's an existing image (edit form), display it
+                if (existingImageUrl) {
+                    const mockFile = {
+                        name: "Existing Image",
+                        size: 12345,
+                        type: "image/jpeg"
+                    };
+                    this.emit("addedfile", mockFile);
+                    this.emit("thumbnail", mockFile, existingImageUrl);
+                    this.emit("complete", mockFile);
+                    this.files.push(mockFile);
+                }
+            }
+        });
+
+        return myDropzone;
+    }
+
+    // Initialize Dropzone (example)
+    document.addEventListener("DOMContentLoaded", function () {
+        initializeDropzone('myDropzone', "{{ route('image-upload') }}");
+    });
+</script>
+
     @if (isset($user) && $user->image)
         <script>
             initializeDropzone("myDropzone", "{{ route('image-upload') }}", "{{ asset('uploads/images/' . $user->image) }}", )
