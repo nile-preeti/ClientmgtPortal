@@ -360,11 +360,13 @@
 
     checkinBtn.addEventListener("click", async () => {
         const address = await getAddressFromCoordinates(lat, lng);
+        const serviceId = "{{ $service_id }}";
 
         if (checkinBtn.getAttribute("data-id") == "check_in") {
             const result = await saveDataToPHP("{{ route('user.attendance.store') }}", {
                 _token: csrfToken,
                 user_id: user.id,
+                job_id: serviceId,
                 check_in_full_address: address,
                 check_in_latitude: lat,
                 check_in_longitude: lng,
@@ -392,6 +394,7 @@
             const result = await saveDataToPHP("{{ route('user.attendance.break') }}", {
                 _token: csrfToken,
                 user_id: user.id,
+                job_id: serviceId,
                 type: "start"
             });
 
@@ -421,6 +424,7 @@
             const result = await saveDataToPHP("{{ route('user.attendance.break') }}", {
                 _token: csrfToken,
                 user_id: user.id,
+                job_id: serviceId,
                 type: "end"
             });
 
@@ -443,10 +447,11 @@
 
     checkoutBtn.addEventListener("click", async () => {
         const address = await getAddressFromCoordinates(lat, lng);
-
+        const serviceId = "{{ $service_id }}";
         const result = await saveDataToPHP("{{ route('user.attendance.update') }}", {
             _token: csrfToken,
             user_id: user.id,
+            job_id: serviceId,
             check_out_full_address: address,
             check_out_latitude: lat,
             check_out_longitude: lng,
@@ -508,10 +513,11 @@
             }
 
             function fetchRecords() {
-    $.get("{{ route('user.attendance.fetch.today') }}" + "?id=" + user.id, function (data) {
+                $.get("{{ route('user.attendance.fetch.today') }}" + "?id=" + user.id + "&service_id={{ $service_id }}", function (data) {
         if (data.success) {
             if (data.today) {
                 const checkinBtn = document.getElementById("checkinBtn");
+                const serviceId = "{{ $service_id }}";
 
                 if (data.today.check_in_time) {
                     $("#checkoutBtn").attr("disabled", false);
@@ -607,6 +613,7 @@
             })
 
         }
+        localStorage.setItem('visitedAttendance', 'true');
     </script>
     {{-- <script>
         let interval;

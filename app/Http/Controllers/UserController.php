@@ -326,12 +326,12 @@ class UserController extends Controller
             'back_url',
         ));
     }
-    public function attendance()
+    public function attendance(Request $request)
     {
-
         $user = Auth::user();
-        // Find today's check-in record
-        return view("users.attendance", compact('user'));
+        $service_id = $request->get('service_id'); // fetch the service_id from query param
+    
+        return view("users.attendance", compact('user', 'service_id'));
     }
 
     public function login()

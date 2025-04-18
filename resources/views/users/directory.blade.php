@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="{{ asset('plugins/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('style.css') }}">
     <link rel="stylesheet" href="{{ asset('users/attendance_records.css') }}">
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -93,94 +93,208 @@
         .profile-image {
             border: 2px solid #4183d1;
         }
-        
-        #recordsList li:first-child{margin-top: 0px !important;}
-        .swal2-confirm{
-                background-color: #ffffff !important;
-                border: 1px solid #064086 !important;
-                color: #064086 !important;
-                padding: 9px 30px;
-                border-radius: 50px;
-            } 
 
-            .swal2-confirm:hover{background: #fff !important;}
+        #recordsList li:first-child {
+            margin-top: 0px !important;
+        }
 
-            .swal2-cancel {    padding: 10px 20px;
-                font-size: 14px;
-                border: none;
-                border-radius: 50px;
-                background-color: #064086 !important;
-                color: white;
-                font-weight: 500;
-                display: inline-block;
-            }
-           
-            div#swal2-html-container {
-                color: #000;
-                font-weight: 500;
-            }
+        .swal2-confirm {
+            background-color: #ffffff !important;
+            border: 1px solid #064086 !important;
+            color: #064086 !important;
+            padding: 9px 30px;
+            border-radius: 50px;
+        }
 
-            .swal2-popup.swal2-modal.swal2-show{padding: 40px;}
+        .swal2-confirm:hover {
+            background: #fff !important;
+        }
 
+        .swal2-cancel {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 50px;
+            background-color: #064086 !important;
+            color: white;
+            font-weight: 500;
+            display: inline-block;
+        }
 
-            .attendance-records-head .form-control {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding:12px 15px 12px 15px; border: 1px solid var(--border); width: 100%; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); appearance: auto; }
+        div#swal2-html-container {
+            color: #000;
+            font-weight: 500;
+        }
 
-            .attendance-records-head .btn-search {background: #064086; white-space: nowrap; width: 100%; padding: 10px 20px; display: inline-block; font-size: 13px; color: var(--white); border-radius: 5px; font-weight: 600; text-align: center; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); border: none; }
-
-
-            .services-page-section{padding: 1rem 0; position: relative; }
-            .recordsList{list-style: none; padding: 0; margin: 0;}
-
-            .attendance-records-head {display: flex ; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-            .attendance-records-head h2 {font-size: 20px; font-weight: 600; margin: 0; padding: 0; color: var(--black); }
-            .cp-card {box-shadow: 0 0 #0000, 0 0 #0000, 0px 12px 28px 0px rgba(36, 7, 70, .06); background: var(--white); border-radius: 10px; position: relative; }
-
-            .cp-card-head {display: flex ; align-items: center; padding: 10px; border-bottom:2px solid #f5f5fd; }
-            .cp-date {font-size: 13px; font-weight: bold; margin: 0 0 0px 0; color: #064086; padding: 0; }
-            .cp-card-body{padding: 10px;}
-            .cp-point-box {display: flex ; gap: 10px; align-items: center; margin-bottom: 10px; }
-            .cp-point-icon{background: #fafafa; padding: 10px; border-radius:5px; }
-
-            .cp-point-text h4 {font-size: 13px; font-weight: bold; margin: 0 0 5px 0; color: #064086; padding: 0; } 
-            .cp-point-text p {    font-size: 13px; font-weight: 400; margin: 0 0 0px 0; color:#000; padding: 0; line-height: 22px; }
-            .cp-action-btn a {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding: 8px; border: 1px solid var(--border); background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); margin-left: 10px; display: inline-block; }
-
-            .badge {
-                padding: .3em .6em;
-                line-height: 1.3;
-                text-transform: capitalize;
-            }
-
-            .iq-bg-primary {
-                background: rgb(224 243 255);
-                color: var(--iq-primary) !important;
-                border: 1px solid #a6dcff;
-            }
-
-            .iq-bg-success {
-                background-color: #28a745 !important; /* Green */
-                color: white !important;
-                padding: 5px 10px;
-                border-radius: 5px;
-            }
-
-            .iq-bg-warning {
-                background-color: #ffc107 !important; /* Yellow */
-                color: black !important;
-                padding: 5px 10px;
-                border-radius: 5px;
-            }
-
-            button.mark-complete:disabled {
-                border: 1px solid #dbd8d8 !important;
-                color: grey !important;
-                margin-left: 10px;
-                font-size: 11px;
-                background-color: #f9f9f9 !important;
-                cursor: not-allowed;
-            }
+        .swal2-popup.swal2-modal.swal2-show {
+            padding: 40px;
+        }
 
 
+        .attendance-records-head .form-control {
+            position: relative;
+            color: var(--gray);
+            border-radius: 5px;
+            font-weight: 400;
+            font-size: 13px;
+            box-sizing: border-box;
+            padding: 12px 15px 12px 15px;
+            border: 1px solid var(--border);
+            width: 100%;
+            background: #FFF;
+            box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);
+            appearance: auto;
+        }
+
+        .attendance-records-head .btn-search {
+            background: #064086;
+            white-space: nowrap;
+            width: 100%;
+            padding: 10px 20px;
+            display: inline-block;
+            font-size: 13px;
+            color: var(--white);
+            border-radius: 5px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);
+            border: none;
+        }
+
+
+        .services-page-section {
+            padding: 1rem 0;
+            position: relative;
+        }
+
+        .recordsList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .attendance-records-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .attendance-records-head h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            padding: 0;
+            color: var(--black);
+        }
+
+        .cp-card {
+            box-shadow: 0 0 #0000, 0 0 #0000, 0px 12px 28px 0px rgba(36, 7, 70, .06);
+            background: var(--white);
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .cp-card-head {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 2px solid #f5f5fd;
+        }
+
+        .cp-date {
+            font-size: 13px;
+            font-weight: bold;
+            margin: 0 0 0px 0;
+            color: #064086;
+            padding: 0;
+        }
+
+        .cp-card-body {
+            padding: 10px;
+        }
+
+        .cp-point-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .cp-point-icon {
+            background: #fafafa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .cp-point-text h4 {
+            font-size: 13px;
+            font-weight: bold;
+            margin: 0 0 5px 0;
+            color: #064086;
+            padding: 0;
+        }
+
+        .cp-point-text p {
+            font-size: 13px;
+            font-weight: 400;
+            margin: 0 0 0px 0;
+            color: #000;
+            padding: 0;
+            line-height: 22px;
+        }
+
+        .cp-action-btn a {
+            position: relative;
+            color: var(--gray);
+            border-radius: 5px;
+            font-weight: 400;
+            font-size: 13px;
+            box-sizing: border-box;
+            padding: 8px;
+            border: 1px solid var(--border);
+            background: #FFF;
+            box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);
+            margin-left: 10px;
+            display: inline-block;
+        }
+
+        .badge {
+            padding: .3em .6em;
+            line-height: 1.3;
+            text-transform: capitalize;
+        }
+
+        .iq-bg-primary {
+            background: rgb(224 243 255);
+            color: var(--iq-primary) !important;
+            border: 1px solid #a6dcff;
+        }
+
+        .iq-bg-success {
+            background-color: #28a745 !important;
+            /* Green */
+            color: white !important;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .iq-bg-warning {
+            background-color: #ffc107 !important;
+            /* Yellow */
+            color: black !important;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        button.mark-complete:disabled {
+            border: 1px solid #dbd8d8 !important;
+            color: grey !important;
+            margin-left: 10px;
+            font-size: 11px;
+            background-color: #f9f9f9 !important;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -188,10 +302,10 @@
     <header class="header py-2">
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
-            @php
+                @php
                 $logo = \App\Models\Logo::first();
-            @endphp
-            <a href="#"> <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
+                @endphp
+                <a href="#"> <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
 
 
 
@@ -224,16 +338,16 @@
                             <div class="form-group">
                                 <form class="">
                                     <input type="search" class="form-control" name="search"
-                                            placeholder="Search" aria-controls="user-list-table" value="">
+                                        placeholder="Search" aria-controls="user-list-table" value="">
                                 </form>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                               <form id="filterForm">
-                                <input type="date" name="date" class="form-control" id="datePicker">
-                            </form>
+                                <form id="filterForm">
+                                    <input type="date" name="date" class="form-control" id="datePicker">
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -241,7 +355,7 @@
             </div>
             <div class="attendance-records-body">
                 <div class="attendance-records-content">
-                    <div id="recordsList"  class="recordsList">
+                    <div id="recordsList" class="recordsList">
                     </div>
 
                     <div id="pagination-controls" class="d-flex justify-content-end">
@@ -269,28 +383,67 @@
 
             if (services.length === 0) {
                 // Show "No Records Found" when there is no data
-                recordsList.innerHTML = `
-                <li class="text-center mt-2">
-                    <h5 class="text-danger">No Records Found</h5>
-                </li>`;
-                        return; // Do nothing if no records exist
+                recordsList.innerHTML =
+                    `<li class="text-center mt-2">
+            <h5 class="text-danger">No Records Found</h5>
+        </li>`;
+                return; // Do nothing if no records exist
             }
 
             const currentDateTime = new Date(); // Get the current date and time
+            const currentDateString = new Date().toDateString();
+
+            // Find if user is currently checked in to any job (has check-in but no check-out)
+            let isCurrentlyCheckedIn = false;
+            let checkedInJobId = null;
+            let isOnBreak = false;
+
+            services.forEach(service => {
+                if (service.attendance) {
+                    const todayAttendance = service.attendance.find(att =>
+                        new Date(att.date).toDateString() === currentDateString
+                    );
+
+                    if (todayAttendance) {
+                        if (todayAttendance.check_in_time && !todayAttendance.check_out_time) {
+                            isCurrentlyCheckedIn = true;
+                            checkedInJobId = service.id;
+                            // Check if this service has an ongoing break
+                            if (service.is_on_break) {
+                                isOnBreak = true;
+                            }
+                        }
+                    }
+                }
+            });
 
             services.forEach((service) => {
                 const jobEndDateTime = new Date(`${service.end_date}T${service.end_time}`);
-                const hasCheckedIn = service.attendance && service.attendance.some(att => 
-                    new Date(att.date).toDateString() === new Date(service.start_date).toDateString() && 
+                const hasCheckedIn = service.attendance && service.attendance.some(att =>
+                    new Date(att.date).toDateString() === new Date(service.start_date).toDateString() &&
                     att.check_in_time !== null
                 );
 
-                const hasCheckedOut = service.attendance && service.attendance.some(att => 
-                    new Date(att.date).toDateString() === new Date(service.start_date).toDateString() && 
+                const hasCheckedOut = service.attendance && service.attendance.some(att =>
+                    new Date(att.date).toDateString() === new Date(service.start_date).toDateString() &&
                     att.check_out_time !== null
                 );
 
-                let statusLabel, badgeClass, disableCompleteButton = false;
+
+                const hasCheckedInToday = service.attendance && service.attendance.some(att =>
+                    new Date(att.date).toDateString() === currentDateString &&
+                    att.check_in_time !== null
+                );
+
+                const hasCheckedOutToday = service.attendance && service.attendance.some(att =>
+                    new Date(att.date).toDateString() === currentDateString &&
+                    att.check_out_time !== null
+                );
+
+                let statusLabel, badgeClass, disableCompleteButton = false,
+                    disableCheckInButton = false;
+                let disableCompleteReason = "",
+                    disableCheckInReason = "";
 
                 if (service.status == 2) {
                     statusLabel = 'Completed';
@@ -302,32 +455,58 @@
                     statusLabel = service.status == 1 ? 'Active' : 'Inactive';
                     badgeClass = 'iq-bg-primary';
                 }
-                let bufferMinutes = 30;
-                let bufferTime = new Date(jobEndDateTime.getTime() + bufferMinutes * 60000);
 
-                if (service.status == 1) {
-                    if (currentDateTime < jobEndDateTime) {
-                        disableCompleteButton = true;
-                        disableReason = "Cannot complete before job end time";
-                    } else if (currentDateTime >= bufferTime) {
-                        disableCompleteButton = true;
-                        disableReason = "Cannot complete this job as time as been exceeded";
-                    }else {
-                        // Calculate working hours to prevent zero earning
-                        const start = new Date(`${service.start_date}T${service.start_time}`);
-                        const end = new Date(`${service.end_date}T${service.end_time}`);
-                        const diffMs = end - start;
-                        const hoursWorked = diffMs / (1000 * 60 * 60);
-                        
-                        if (hoursWorked <= 0) {
-                            disableCompleteButton = true;
-                            disableReason = "Cannot complete with zero working hours";
-                        } else {
-                            disableCompleteButton = false;
-                        }
-                    }
+                let bufferMinutes = 30; // 30-minute buffer
+                let bufferTime = new Date(jobEndDateTime.getTime() + bufferMinutes * 60000); // Buffer time calculation
+
+                // Check if the job is within the buffer window (30 minutes after the end time)
+                if (currentDateTime > jobEndDateTime && currentDateTime <= bufferTime) {
+                    // Allow "Complete" button during the buffer period (30 minutes after job end time)
+                    disableCompleteButton = false; // Allow completion within the 30-minute buffer
+                } else if (currentDateTime > bufferTime) {
+                    // Disable "Complete" button after the buffer time has passed
+                    disableCompleteButton = true;
+                    disableCompleteReason = "Cannot complete this job as time has been exceeded"; // Reason after buffer
+                } else {
+                    // If the job hasn't ended or the buffer hasn't started, disable the button
+                    disableCompleteButton = true;
+                    disableCompleteReason = "Cannot complete before job end time";
                 }
 
+                // Check if check-in should be disabled due to job end time
+                if (currentDateTime > jobEndDateTime) {
+                    disableCheckInButton = true;
+                    disableCheckInReason = "Cannot check in after job end time";
+                }
+
+                // Determine if check-in button should be disabled due to already being checked in elsewhere
+                const disableCheckInDueToAttendance = isCurrentlyCheckedIn && checkedInJobId !== service.id;
+                const checkInDisabledReason = disableCheckInButton ?
+                    disableCheckInReason :
+                    (disableCheckInDueToAttendance ? "You must check out from your current job first" : "");
+
+                // Final check-in button disabled state
+                const checkInButtonDisabled = disableCheckInButton || disableCheckInDueToAttendance;
+
+                // Determine if this is the job user is checked into
+                const isCurrentJob = checkedInJobId === service.id && isCurrentlyCheckedIn;
+
+                // Determine button text and action
+                let buttonText = "Click here to check in";
+                let buttonClass = "btn-success";
+
+                if (hasCheckedInToday && hasCheckedOutToday) {
+                    buttonText = "Already Checked-In/Checked-Out";
+                    buttonClass = "btn-secondary";
+                } else if (isCurrentJob) {
+                    if (service.is_on_break) {
+                        buttonText = "Click here to end break/checkout";
+                        buttonClass = "btn-warning";
+                    } else {
+                        buttonText = "Click here to start break/checkout";
+                        buttonClass = "btn-info";
+                    }
+                }
 
                 const listItem = document.createElement("li");
                 listItem.classList.add("mt-2");
@@ -447,7 +626,7 @@
                                     <div class="col-md-4">
                                         <div class="cp-point-box">
                                             <div class="cp-point-icon">
-                                                <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
+                                                <img src="https://nileprojects.in/client-portal/public/assets/images/ic-sub-category.svg">
                                             </div>
                                             <div class="cp-point-text">
                                                 <h4>Sub Category:</h4>
@@ -462,7 +641,7 @@
                                         <div class="col-md-4">
                                             <div class="cp-point-box">
                                                 <div class="cp-point-icon">
-                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/money.svg">
+                                                     <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
                                                 </div>
                                                 <div class="cp-point-text">
                                                     <h4>Total Earnings:</h4>
@@ -474,7 +653,7 @@
                                         <div class="col-md-4">
                                             <div class="cp-point-box">
                                                 <div class="cp-point-icon">
-                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/money.svg">
+                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
                                                 </div>
                                                 <div class="cp-point-text">
                                                     <h4>Net Earning:</h4>
@@ -484,30 +663,48 @@
                                         </div>
                                     ` : '' }
 
-                                    <div class="col-md-4">
-                                        <div class="cp-point-box">
-                                            <div class="cp-point-text">
-                                                <!-- Mark as Complete Button -->
-                                    ${service.status == 1 ? `
-                                                    <button class="btn btn-success mark-complete" 
-                                                        data-id="${service.id}" 
-                                                        ${disableCompleteButton ? 'disabled' : ''} 
-                                                        style="margin-left: 10px;font-size:11px;">
-                                                        Mark as Complete
-                                                    </button>` : ''}
-                                                ${disableCompleteButton && service.status == 1 ? `
-                                                    <small class="text-muted d-block mt-1" style="color:red!important;">${disableReason}</small>` : ''}
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                
-
-                                </div>
+                    <div class="col-md-4">
+                        <div class="cp-point-box">
+                            <div class="cp-point-text">
+                                ${service.status == 1 ? `
+                                    <button class="btn btn-success mark-complete" 
+                                        data-id="${service.id}" 
+                                        ${disableCompleteButton ? 'disabled' : ''} 
+                                        style="margin-left: 10px;font-size:11px;">
+                                        Mark as Complete
+                                    </button>
+                                    ${disableCompleteButton ? `
+                                        <small class="text-muted d-block mt-1" style="color:red!important;">
+                                            ${disableCompleteReason}
+                                        </small>` : ''}
+                                ` : ''}
                             </div>
                         </div>
-                    </div>`;
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="cp-point-box">
+                            <div class="cp-point-text">
+                                ${service.status == 1 ? `
+                                    <button class="btn ${buttonClass} check_in" 
+                                        data-id="${service.id}" 
+                                        ${checkInButtonDisabled ? 'disabled' : ''} 
+                                        style="font-size:11px;">
+                                        ${buttonText}
+                                    </button>
+                                    ${checkInButtonDisabled ? `
+                                        <small class="text-muted d-block mt-1" style="color:red!important;">
+                                            ${checkInDisabledReason}
+                                        </small>` : ''}
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
 
                 recordsList.appendChild(listItem);
             });
@@ -694,7 +891,18 @@
 
         }
     </script>
-
+    <script>
+        $(document).on('click', '.check_in', function() {
+            var serviceId = $(this).data('id');
+            window.location.href = '/user/attendance?service_id=' + serviceId;
+        });
+        // document.addEventListener("visibilitychange", function() {
+        //     if (document.visibilityState === "visible") {
+        //         // Page is visible again (user has returned to the service page)
+        //         location.reload(); // Reload the page
+        //     }
+        // });
+    </script>
 </body>
 
 </html>

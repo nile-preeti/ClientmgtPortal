@@ -294,7 +294,7 @@
                           </div>
                         </div>
                     </div> -->
-                    <div class="col-sm-6 col-md-6 col-lg-4 mb-3">
+                    <div class="col-sm-6 col-md-6 col-lg-4 mb-3 d-none">
                         <div class="mark-attendance-sec">
                         <a href="{{ route('user.attendance')}}">
                             <div class="bg-gradient-danger card card-img-holder">

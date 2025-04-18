@@ -49,10 +49,12 @@ class AjaxController extends Controller
             'check_in_full_address' => 'required|string',
             'check_in_latitude' => 'required|string',
             'check_in_longitude' => 'required|string',
-            'user_id' => "required"
+            'user_id' => "required",
+            'job_id' => "required"
         ]);
 
         $userId = $request->user_id;
+        $job_id = $request->job_id;
         $today = Carbon::today();
         $todayDate = $today->toDateString();
         $dayOfWeek = $today->format('l'); // Get the full day name (e.g., "Saturday", "Sunday")
@@ -76,6 +78,7 @@ class AjaxController extends Controller
 
         // Check if the user has already checked in today
         $existingAttendance = Attendance::where('user_id', $userId)
+        ->where('job_id',$job_id)
             ->where('date', $todayDate)
             ->first();
 
@@ -93,6 +96,7 @@ class AjaxController extends Controller
         $attendance->check_in_full_address = $request->check_in_full_address;
         $attendance->check_in_latitude = $request->check_in_latitude;
         $attendance->check_in_longitude = $request->check_in_longitude;
+        $attendance->job_id = $request->job_id;
         $attendance->check_in_time = Carbon::now()->format('H:i:s');
         $attendance->status = "Present";
         $attendance->save();
@@ -117,12 +121,14 @@ class AjaxController extends Controller
             'check_out_latitude' => 'required|string',
             'check_out_longitude' => 'required|string',
             'user_id' => 'required|string',
+            'job_id' => 'required|',
         ]);
         $userId = $request->user_id;
         $today = Carbon::today()->toDateString();
         // Find today's attendance record
         $attendance = Attendance::where('user_id', $userId)
             ->where('date', $today)
+            ->where('job_id',$request->job_id)
             ->first();
         if (!$attendance) {
             return response()->json([
@@ -188,12 +194,14 @@ class AjaxController extends Controller
     function handleBreak(Request $request)
     {
         $user_id = $request->user_id;
+        $job_id = $request->job_id;
         $today = now()->toDateString();
         $currentTime = now()->format('H:i:s');
 
         // Get user's attendance for today
         $attendance = Attendance::where('user_id', $user_id)
             ->where('date', $today)
+            ->where('job_id',$job_id)
             ->first();
 
         if (!$attendance) {
@@ -241,6 +249,7 @@ class AjaxController extends Controller
                 'end_break' => null, // Setting end_break as null since the break just started
                 'date' => $today,
                 'user_id' => $user_id,
+                'job_id'=>$job_id,
             ]);
 
             return response()->json(['message' => 'Break started successfully.', 'success' => true, 'start_break' =>  date("H:i", strtotime($currentTime))], 200);
@@ -405,14 +414,15 @@ class AjaxController extends Controller
     {
         if ($request->has("id")) {
             $id = $request->id;
+            $job_id = $request->service_id;
             $user = User::find($id);
             if ($user) {
-                $records = Attendance::where("user_id", $id)->orderBy("id", "desc")->get();
+                $records = Attendance::where("user_id", $id)->where('job_id',$job_id)->orderBy("id", "desc")->get();
                 foreach ($records as $item) {
                     $item->check_in_time = date("H:i", strtotime($item->check_in_time));
                     $item->check_out_time = date("H:i", strtotime($item->check_out_time));
                 }
-                $today = Attendance::where("user_id", $id)->whereDate("date", now())->orderBy("id", "desc")->first();
+                $today = Attendance::where("user_id", $id)->where('job_id',$job_id)->whereDate("date", now())->orderBy("id", "desc")->first();
                 if ($today) {
                     $today->check_in_time = !empty($today->check_in_time)
                         ? date("H:i", strtotime($today->check_in_time))
@@ -423,7 +433,7 @@ class AjaxController extends Controller
                         : 'N/A';
                 }
 
-                $breaks = AttendanceBreak::where("user_id", $id)->whereDate("date", now())->orderBy("id", "asc")->get();
+                $breaks = AttendanceBreak::where("user_id", $id)->where('job_id',$job_id)->whereDate("date", now())->orderBy("id", "asc")->get();
                 foreach ($breaks as $key => $break) {
                     if ($break) {
                         $break->break_start = !empty($break->start_break)
@@ -480,24 +490,29 @@ class AjaxController extends Controller
 
     public function userServices(Request $request)
     {
-        $perPage = 10; // Number of records per page
+        $perPage = 10;
         $page = $request->input('page', 1);
-        $authUserId = Auth::id(); // Get the logged-in user ID
+        $authUserId = Auth::id();
         $search = $request->input('search');
-        $selectedDate = $request->input('date'); // Get selected date
         $adminFeePercent = 11;
-
-        // Fetch job schedules where user_id matches the logged-in user
+        $today = now()->format('Y-m-d');
+        
         $query = JobSchedule::with([
             'service:id,name',
             'subCategory:id,category_id,sub_category',
             'customer:id,name',
             'userService:id,service_id,price_per_hour',
+            'attendance' => function($q) use ($authUserId) {
+                $q->where('user_id', $authUserId)
+                    ->with(['attendanceBreaks' => function($q) {
+                        $q->orderBy('created_at', 'desc'); // Get most recent breaks first
+                    }]);
+            }
         ])
-            ->where('user_id', $authUserId)
-            ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date', 'status','sub_category_id','location');
-
-        // Apply search filter
+        ->where('user_id', $authUserId)
+        ->select('id', 'service_id', 'customer_id', 'start_time', 'end_time', 'description', 'start_date', 'end_date', 'status', 'sub_category_id', 'location')
+        ->orderby('id', 'desc');
+        
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->orWhere('description', 'LIKE', "%{$search}%")
@@ -509,62 +524,90 @@ class AjaxController extends Controller
                     });
             });
         }
-
-        // Apply date filter if a date is selected
-        if (!empty($selectedDate)) {
-            $query->where(function ($q) use ($selectedDate) {
-                $q->whereDate('start_date', $selectedDate)
-                    ->orWhereDate('end_date', $selectedDate);
-            });
-        }
-
-        // Paginate results
+        
         $jobSchedules = $query->paginate($perPage, ['*'], 'page', $page);
-
-        // Initialize total admin earnings
-        $totalAdminEarnings = 0;
-
-        // Transform each job schedule
-        $jobSchedules->transform(function ($job) use ($adminFeePercent, &$totalAdminEarnings) {
-            $job->total_hours = null;
-            $job->total_earning = null;
-            $job->admin_fee = null;
-            $job->net_earning = null;
-
-            if ($job->status == 2 && $job->userService) {
-                $start = new DateTime("{$job->start_date} {$job->start_time}");
-                $end = new DateTime("{$job->end_date} {$job->end_time}");
-                $interval = $start->diff($end);
-                $hoursWorked = number_format($interval->h + ($interval->days * 24) + ($interval->i / 60), 2, '.', '');
-
-                $ratePerHour = $job->userService->price_per_hour;
-                $totalEarning = $hoursWorked * $ratePerHour;
-                $adminFee = ($totalEarning * $adminFeePercent) / 100;
-                $netEarning = $totalEarning - $adminFee;
-                // return $hoursWorked;
-
-                // Assign calculated values
-                $job->total_hours = $hoursWorked;
-                $job->total_earning = number_format($totalEarning, 2, '.', '');
-                $job->admin_fee = number_format($adminFee, 2, '.', '');
-                $job->net_earning = number_format($netEarning, 2, '.', '');
-
-                // Add to total admin earnings
-                $totalAdminEarnings += $adminFee;
+        
+        foreach ($jobSchedules as $job) {
+            $job->total_hours = 0;
+            $job->total_earning = 0;
+            $job->admin_fee = 0;
+            $job->net_earning = 0;
+            $job->is_on_break = false;
+            $job->is_checked_in = false;
+    
+            if ($job->attendance && $job->attendance->isNotEmpty()) {
+                $totalJobHours = 0;
+                
+                foreach ($job->attendance as $attendance) {
+                    // Check if currently checked in (has check_in_time but no check_out_time)
+                    if ($attendance->check_in_time && !$attendance->check_out_time) {
+                        $job->is_checked_in = true;
+                        
+                        // Check for active break (most recent break without end_break)
+                        foreach ($attendance->attendanceBreaks as $break) {
+                            if ($break->start_break && !$break->end_break) {
+                                $job->is_on_break = true;
+                                break;
+                            }
+                        }
+                    }
+    
+                    if ($attendance->check_in_time && $attendance->check_out_time) {
+                        try {
+                            $checkIn = Carbon::parse($attendance->check_in_time);
+                            $checkOut = Carbon::parse($attendance->check_out_time);
+    
+                            $totalWorkedSeconds = $checkOut->diffInSeconds($checkIn);
+    
+                            $breakSeconds = 0;
+                            foreach ($attendance->attendanceBreaks as $break) {
+                                if ($break->start_break && $break->end_break) {
+                                    $breakStart = Carbon::parse($break->start_break);
+                                    $breakEnd = Carbon::parse($break->end_break);
+                                    
+                                    // Only count breaks that happened between check-in and check-out
+                                    if ($breakStart->between($checkIn, $checkOut) && $breakEnd->between($checkIn, $checkOut)) {
+                                        $breakSeconds += $breakEnd->diffInSeconds($breakStart);
+                                    }
+                                }
+                            }
+    
+                            $netSeconds = max(0, $totalWorkedSeconds - $breakSeconds);
+                            $hours = $netSeconds / 3600;
+                            $totalJobHours += $hours;
+                        } catch (\Exception $e) {
+                            // Log error if needed
+                        }
+                    }
+                }
+    
+                if ($job->userService) {
+                    $job->total_hours = round($totalJobHours, 2);
+                    $job->total_earning = round($job->total_hours * $job->userService->price_per_hour, 2);
+                    $job->admin_fee = round(($job->total_earning * $adminFeePercent) / 100, 2);
+                    $job->net_earning = round($job->total_earning - $job->admin_fee, 2);
+                }
             }
-
-            return $job;
-        });
-
+        }
+        
         return response()->json([
             'success' => true,
             'job_schedules' => $jobSchedules->items(),
             'current_page' => $jobSchedules->currentPage(),
             'last_page' => $jobSchedules->lastPage(),
             'total' => $jobSchedules->total(),
-            'admin_fee' => round($totalAdminEarnings, 2), // Send total admin earnings
         ]);
     }
+
+
+    
+
+    
+
+
+
+
+
 
 
 

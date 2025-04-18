@@ -36,7 +36,12 @@ class JobSchedule extends Model
 
     public function attendance()
     {
-        return $this->hasOne(Attendance::class, 'user_id', 'user_id')
-            ->whereRaw('attendances.date = job_schedules.start_date');
+        return $this->hasMany(Attendance::class, 'job_id'); // Ensuring job_id is the correct foreign key
+    }
+
+    public function attendanceBreaks()
+    {
+        // This fetches attendance breaks directly from JobSchedule through the Attendance relationship
+        return $this->hasManyThrough(AttendanceBreak::class, Attendance::class, 'job_id', 'attendance_id');
     }
 }
