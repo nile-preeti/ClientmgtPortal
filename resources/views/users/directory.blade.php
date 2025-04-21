@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="{{ asset('plugins/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('style.css') }}">
     <link rel="stylesheet" href="{{ asset('users/attendance_records.css') }}">
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -93,208 +93,130 @@
         .profile-image {
             border: 2px solid #4183d1;
         }
+        
+        #recordsList li:first-child{margin-top: 0px !important;}
+        .swal2-confirm{
+                background-color: #ffffff !important;
+                border: 1px solid #064086 !important;
+                color: #064086 !important;
+                padding: 9px 30px;
+                border-radius: 50px;
+            } 
 
-        #recordsList li:first-child {
-            margin-top: 0px !important;
-        }
+            .swal2-confirm:hover{background: #fff !important;}
 
-        .swal2-confirm {
-            background-color: #ffffff !important;
-            border: 1px solid #064086 !important;
-            color: #064086 !important;
-            padding: 9px 30px;
-            border-radius: 50px;
-        }
+            .swal2-cancel {    padding: 10px 20px;
+                font-size: 14px;
+                border: none;
+                border-radius: 50px;
+                background-color: #064086 !important;
+                color: white;
+                font-weight: 500;
+                display: inline-block;
+            }
+           
+            div#swal2-html-container {
+                color: #000;
+                font-weight: 500;
+            }
 
-        .swal2-confirm:hover {
-            background: #fff !important;
-        }
-
-        .swal2-cancel {
-            padding: 10px 20px;
-            font-size: 14px;
-            border: none;
-            border-radius: 50px;
-            background-color: #064086 !important;
-            color: white;
-            font-weight: 500;
-            display: inline-block;
-        }
-
-        div#swal2-html-container {
-            color: #000;
-            font-weight: 500;
-        }
-
-        .swal2-popup.swal2-modal.swal2-show {
-            padding: 40px;
-        }
+            .swal2-popup.swal2-modal.swal2-show{padding: 40px;}
 
 
-        .attendance-records-head .form-control {
-            position: relative;
-            color: var(--gray);
-            border-radius: 5px;
-            font-weight: 400;
-            font-size: 13px;
-            box-sizing: border-box;
-            padding: 12px 15px 12px 15px;
-            border: 1px solid var(--border);
-            width: 100%;
-            background: #FFF;
-            box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);
-            appearance: auto;
-        }
+            .attendance-records-head .form-control {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding:12px 15px 12px 15px; border: 1px solid var(--border); width: 100%; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); appearance: auto; }
 
-        .attendance-records-head .btn-search {
-            background: #064086;
-            white-space: nowrap;
-            width: 100%;
-            padding: 10px 20px;
-            display: inline-block;
-            font-size: 13px;
-            color: var(--white);
-            border-radius: 5px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);
-            border: none;
-        }
+            .attendance-records-head .btn-search {background: #064086; white-space: nowrap; width: 100%; padding: 10px 20px; display: inline-block; font-size: 13px; color: var(--white); border-radius: 5px; font-weight: 600; text-align: center; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); border: none; }
 
 
-        .services-page-section {
-            padding: 1rem 0;
-            position: relative;
-        }
+            .services-page-section{padding: 1rem 0; position: relative; }
+            .recordsList{list-style: none; padding: 0; margin: 0;}
 
-        .recordsList {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+            .attendance-records-head {display: flex ; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+            .attendance-records-head h2 {font-size: 20px; font-weight: 600; margin: 0; padding: 0; color: var(--black); }
+            .cp-card {box-shadow: 0 0 #0000, 0 0 #0000, 0px 12px 28px 0px rgba(36, 7, 70, .06); background: var(--white); border-radius: 10px; position: relative; }
 
-        .attendance-records-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
+            .cp-card-head {display: flex ; align-items: center; padding: 10px; border-bottom:2px solid #f5f5fd; }
+            .cp-date {font-size: 13px; font-weight: bold; margin: 0 0 0px 0; color: #064086; padding: 0; }
+            .cp-card-body{padding: 10px;}
+            .cp-point-box {display: flex ; gap: 10px; align-items: center; margin-bottom: 10px; }
+            .cp-point-icon{background: #fafafa; padding: 10px; border-radius:5px; }
 
-        .attendance-records-head h2 {
-            font-size: 20px;
-            font-weight: 600;
-            margin: 0;
-            padding: 0;
-            color: var(--black);
-        }
+            .cp-point-text h4 {font-size: 13px; font-weight: bold; margin: 0 0 5px 0; color: #064086; padding: 0; } 
+            .cp-point-text p {    font-size: 13px; font-weight: 400; margin: 0 0 0px 0; color:#000; padding: 0; line-height: 22px; }
+            .cp-action-btn a {position: relative; color: var(--gray); border-radius: 5px; font-weight: 400; font-size: 13px; box-sizing: border-box; padding: 8px; border: 1px solid var(--border); background: #FFF; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); margin-left: 10px; display: inline-block; }
 
-        .cp-card {
-            box-shadow: 0 0 #0000, 0 0 #0000, 0px 12px 28px 0px rgba(36, 7, 70, .06);
-            background: var(--white);
-            border-radius: 10px;
-            position: relative;
-        }
+            .badge {
+                padding: .3em .6em;
+                line-height: 1.3;
+                text-transform: capitalize;
+            }
 
-        .cp-card-head {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 2px solid #f5f5fd;
-        }
+            .iq-bg-primary {
+                background: rgb(224 243 255);
+                color: var(--iq-primary) !important;
+                border: 1px solid #a6dcff;
+            }
 
-        .cp-date {
-            font-size: 13px;
-            font-weight: bold;
-            margin: 0 0 0px 0;
-            color: #064086;
-            padding: 0;
-        }
+            .iq-bg-success {
+                background-color: #28a745 !important; /* Green */
+                color: white !important;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
 
-        .cp-card-body {
-            padding: 10px;
-        }
+            .iq-bg-warning {
+                background-color: #ffc107 !important; /* Yellow */
+                color: black !important;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
 
-        .cp-point-box {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-        }
+            button.mark-complete:disabled {
+                border: 1px solid #dbd8d8 !important;
+                color: grey !important;
+                font-size: 12px;
+                background-color: #f9f9f9 !important;
+                cursor: not-allowed;
+            }
 
-        .cp-point-icon {
-            background: #fafafa;
-            padding: 10px;
-            border-radius: 5px;
-        }
+            button.check_in:disabled {
+                border: 1px solid #dbd8d8 !important;
+                color: grey !important;
+/*                margin-left: 10px;*/
+                font-size: 12px;
+                background-color: #f9f9f9 !important;
+                cursor: not-allowed;
+            }
 
-        .cp-point-text h4 {
-            font-size: 13px;
-            font-weight: bold;
-            margin: 0 0 5px 0;
-            color: #064086;
-            padding: 0;
-        }
+            button.check_in {
+                padding: 6px 20px;
+                font-size: 12px;
+                border: none;
+                border-radius: 5px;
+                background-color: #064086;
+                color: white;
+                font-weight: 500;
+                display: inline-block;
+                width: 100%;
+                position: relative;
+                box-shadow: 0 0 10px hwb(0deg 0% 100% / 5%);
+            }
 
-        .cp-point-text p {
-            font-size: 13px;
-            font-weight: 400;
-            margin: 0 0 0px 0;
-            color: #000;
-            padding: 0;
-            line-height: 22px;
-        }
+            .mark-complete{
+                padding: 6px 20px;
+                font-size: 14px;
+                border: none;
+                border-radius: 5px;
+                background-color: #ffc107;
+                color: white;
+                font-weight: 500;
+                display: inline-block;
+                width: 100%;
+                position: relative;
+                box-shadow: 0 0 10px hwb(0deg 0% 100% / 5%);
+            }
 
-        .cp-action-btn a {
-            position: relative;
-            color: var(--gray);
-            border-radius: 5px;
-            font-weight: 400;
-            font-size: 13px;
-            box-sizing: border-box;
-            padding: 8px;
-            border: 1px solid var(--border);
-            background: #FFF;
-            box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);
-            margin-left: 10px;
-            display: inline-block;
-        }
 
-        .badge {
-            padding: .3em .6em;
-            line-height: 1.3;
-            text-transform: capitalize;
-        }
-
-        .iq-bg-primary {
-            background: rgb(224 243 255);
-            color: var(--iq-primary) !important;
-            border: 1px solid #a6dcff;
-        }
-
-        .iq-bg-success {
-            background-color: #28a745 !important;
-            /* Green */
-            color: white !important;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
-        .iq-bg-warning {
-            background-color: #ffc107 !important;
-            /* Yellow */
-            color: black !important;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
-        button.mark-complete:disabled {
-            border: 1px solid #dbd8d8 !important;
-            color: grey !important;
-            margin-left: 10px;
-            font-size: 11px;
-            background-color: #f9f9f9 !important;
-            cursor: not-allowed;
-        }
     </style>
 </head>
 
@@ -302,10 +224,10 @@
     <header class="header py-2">
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
-                @php
+            @php
                 $logo = \App\Models\Logo::first();
-                @endphp
-                <a href="#"> <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
+            @endphp
+            <a href="#"> <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
 
 
 
@@ -338,16 +260,16 @@
                             <div class="form-group">
                                 <form class="">
                                     <input type="search" class="form-control" name="search"
-                                        placeholder="Search" aria-controls="user-list-table" value="">
+                                            placeholder="Search" aria-controls="user-list-table" value="">
                                 </form>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <form id="filterForm">
-                                    <input type="date" name="date" class="form-control" id="datePicker">
-                                </form>
+                               <form id="filterForm">
+                                <input type="date" name="date" class="form-control" id="datePicker">
+                            </form>
                             </div>
                         </div>
                     </div>
@@ -355,7 +277,7 @@
             </div>
             <div class="attendance-records-body">
                 <div class="attendance-records-content">
-                    <div id="recordsList" class="recordsList">
+                    <div id="recordsList"  class="recordsList">
                     </div>
 
                     <div id="pagination-controls" class="d-flex justify-content-end">
@@ -493,7 +415,7 @@
 
                 // Determine button text and action
                 let buttonText = "Click here to check in";
-                let buttonClass = "btn-success";
+                let buttonClass = "";
 
                 if (hasCheckedInToday && hasCheckedOutToday) {
                     buttonText = "Already Checked-In/Checked-Out";
@@ -641,7 +563,7 @@
                                         <div class="col-md-4">
                                             <div class="cp-point-box">
                                                 <div class="cp-point-icon">
-                                                     <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
+                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
                                                 </div>
                                                 <div class="cp-point-text">
                                                     <h4>Total Earnings:</h4>
@@ -663,42 +585,43 @@
                                         </div>
                                     ` : '' }
 
-                    <div class="col-md-4">
-                        <div class="cp-point-box">
-                            <div class="cp-point-text">
-                                ${service.status == 1 ? `
-                                    <button class="btn btn-success mark-complete" 
-                                        data-id="${service.id}" 
-                                        ${disableCompleteButton ? 'disabled' : ''} 
-                                        style="margin-left: 10px;font-size:11px;">
-                                        Mark as Complete
-                                    </button>
-                                    ${disableCompleteButton ? `
-                                        <small class="text-muted d-block mt-1" style="color:red!important;">
-                                            ${disableCompleteReason}
-                                        </small>` : ''}
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="col-md-4">
-                        <div class="cp-point-box">
-                            <div class="cp-point-text">
-                                ${service.status == 1 ? `
-                                    <button class="btn ${buttonClass} check_in" 
-                                        data-id="${service.id}" 
-                                        ${checkInButtonDisabled ? 'disabled' : ''} 
-                                        style="font-size:11px;">
-                                        ${buttonText}
-                                    </button>
-                                    ${checkInButtonDisabled ? `
-                                        <small class="text-muted d-block mt-1" style="color:red!important;">
-                                            ${checkInDisabledReason}
-                                        </small>` : ''}
-                                ` : ''}
+                    <div class="col-md-12 mt-3">
+                        <div class="d-flex justify-content-end">
+                            <div class="cp-point-box justify-content-end">
+                                <div class="cp-point-text me-3">
+                                    ${service.status == 1 ? `
+                                        <button class=" mark-complete" 
+                                            data-id="${service.id}" 
+                                            ${disableCompleteButton ? 'disabled' : ''} 
+                                            style="">
+                                            Mark as Complete
+                                        </button>
+                                        ${disableCompleteButton ? `
+                                            <small class="text-muted d-block" style="color:red!important;">
+                                                
+                                            </small>` : ''}
+                                    ` : ''}
+                                </div>
                             </div>
-                        </div>
+
+                            <div class="cp-point-box justify-content-end">
+                                <div class="cp-point-text">
+                                    ${service.status == 1 ? `
+                                        <button class=" ${buttonClass} check_in" 
+                                            data-id="${service.id}" 
+                                            ${checkInButtonDisabled ? 'disabled' : ''} 
+                                            style="">
+                                            ${buttonText}
+                                        </button>
+                                        ${checkInButtonDisabled ? `
+                                            <small class="text-muted d-block" style="color:red!important;">
+                                                
+                                            </small>` : ''}
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div
                     </div>
                 </div>
             </div>
@@ -894,7 +817,9 @@
     <script>
         $(document).on('click', '.check_in', function() {
             var serviceId = $(this).data('id');
-            window.location.href = '/user/attendance?service_id=' + serviceId;
+            const attendanceUrl = "{{ route('user.attendance') }}?service_id=" + serviceId;
+            window.location.href = attendanceUrl;
+
         });
         // document.addEventListener("visibilitychange", function() {
         //     if (document.visibilityState === "visible") {
@@ -903,6 +828,7 @@
         //     }
         // });
     </script>
+
 </body>
 
 </html>

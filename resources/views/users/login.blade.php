@@ -73,9 +73,9 @@
                     <div class="p-4 card overflow-hidden col-lg-5 col-sm-12">
                         <div class="sign-in-from">
                             <div class="text-white" >
-                            @php
-                                $logo = \App\Models\Logo::first();
-                            @endphp
+                                @php
+                                    $logo = \App\Models\Logo::first();
+                                @endphp
 
                                 <img class="rounded-pill logo-res" src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" height="90px"  alt="" />
                             </div>

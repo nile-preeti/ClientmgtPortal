@@ -123,18 +123,18 @@ class PayoutController extends Controller
     
         $adminFeePercent = config('constant.admin_fee', 11);
         $weeklyData = [];
-
+    
         // Get the year the user was created, to avoid calculating before that year.
         $userCreatedYear = Carbon::parse($user->created_at)->year;
-
+    
         // Get filter values from request, defaulting to current month/year.
         $selectedMonth = $request->input('month', Carbon::now()->month);
         $selectedYear = $request->input('year', Carbon::now()->year);
-
+    
         // Determine the start and end dates for the selected month (extending to full weeks)
         $start_date = Carbon::create($selectedYear, $selectedMonth, 1)->startOfMonth()->startOfWeek();
         $end_date = Carbon::create($selectedYear, $selectedMonth, 1)->endOfMonth()->endOfWeek();
-
+    
         // Loop week by week
         while ($start_date <= $end_date) {
             $year = $start_date->year;
@@ -142,83 +142,93 @@ class PayoutController extends Controller
                 $start_date->addWeek();
                 continue;
             }
-
+    
             $weekKey = $start_date->format('Y-W');
             $weekNumber = $start_date->weekOfYear;
-
+    
             $totalEarnings = 0;
             $totalAdminEarnings = 0;
             $totalUserEarnings = 0;
             $dailyEarnings = [];
-
+    
             // Loop over 7 days of the week
             for ($i = 0; $i < 7; $i++) {
                 $currentDate = $start_date->copy()->addDays($i);
-
+    
                 if ($currentDate->month != $selectedMonth) {
                     continue; // Skip days outside the selected month.
                 }
-
-                // Fetch attendances for the current day.
-                // Here, we assume that a record exists if the user was present.
+    
+                // Fetch attendances for the current day based on job_id (both attendance and attendance_breaks)
                 $attendances = Attendance::where("user_id", $user->id)
                     ->whereDate('date', $currentDate)
                     ->whereNotNull('check_in_time') // Ensures user is present.
+                    ->whereNotNull('check_out_time') // Ensures checkout is present.
                     ->with('attendanceBreaks')
                     ->get();
-
+    
                 $dayEarnings = 0;
-
+    
                 foreach ($attendances as $attendance) {
-                    // Find a job schedule for this day that is marked completed (status=2)
-                    $job = JobSchedule::where('user_id', $user->id)
+                    // Fetch the job_id from the attendance record
+                    $job_id = $attendance->job_id;
+    
+                    // Calculate the total worked hours based on check-in and check-out times
+                    $checkInTime = Carbon::parse($attendance->check_in_time);
+                    $checkOutTime = Carbon::parse($attendance->check_out_time);
+                    $totalWorkedHours = $checkInTime->diffInSeconds($checkOutTime) / 3600; // Calculate total hours worked
+                    
+                    // Sum break hours recorded during the attendance for the specific job_id
+                    // dd($attendance);
+                    $breakHours = $attendance->attendanceBreaks->sum(function ($break) {
+                        // dd($break);  // Debug the break data
+                        if (!$break->start_break || !$break->end_break) {
+                            return 0;  // Return 0 if either break start or end is missing
+                        }
+                    
+                        // Parse break start and end times
+                        $breakStart = Carbon::parse($break->start_break);
+                        $breakEnd = Carbon::parse($break->end_break);
+                    
+                        // Calculate the break duration in hours
+                        return $breakStart->diffInSeconds($breakEnd) / 3600;  // Convert seconds to hours
+                    });
+                    
+                    
+                    // Adjust worked hours by subtracting break hours
+                    $actualWorkedHours = max(round($totalWorkedHours - $breakHours, 2), 0);
+                     
+    
+                    // Now calculate the earnings for this attendance based on the actual worked hours
+                    $jobs = JobSchedule::where('user_id', $user->id)
+                        ->where('id', $job_id) // Match the specific job_id
                         ->whereDate('start_date', '<=', $attendance->date)
                         ->whereDate('end_date', '>=', $attendance->date)
                         ->where('status', 2)
-                        ->first();
-
-                    if (!$job) continue;
-
-                    // Get the rate for the service assigned to the job.
-                    $serviceRate = UserService::where('user_id', $user->id)
-                        ->where('service_id', $job->service_id)
-                        ->value('price_per_hour');
-
-                    if (!$serviceRate) continue;
-
-                    // Calculate the expected working period based on the job_schedule start_time and end_time.
-                    // We use the attendance's date to construct the DateTime.
-                    $jobStart = Carbon::parse($attendance->date . ' ' . $job->start_time);
-                    $jobEnd   = Carbon::parse($attendance->date . ' ' . $job->end_time);
-                    $totalHoursWorked = number_format($jobStart->diffInSeconds($jobEnd) / 3600, 2, '.', '');
-
-                    // Sum break hours recorded during that attendance.
-                    $breakHours = $attendance->attendanceBreaks->sum(function ($break) use ($jobStart, $jobEnd) {
-                        $breakStart = Carbon::parse($break->start_break);
-                        $breakEnd   = Carbon::parse($break->end_break);
+                        ->get();
     
-                        if ($breakStart->between($jobStart, $jobEnd) && $breakEnd->between($jobStart, $jobEnd)) {
-                            return $breakStart->diffInSeconds($breakEnd) / 3600;
-                        }
+                    foreach ($jobs as $job) {
+                        // Get the rate for the job based on the service_id
+                        $serviceRate = UserService::where('user_id', $user->id)
+                            ->where('service_id', $job->service_id)
+                            ->value('price_per_hour');
     
-                        return 0;
-                    });
-
-                    $actualWorkedHours = max(round($totalHoursWorked - $breakHours, 2), 0);
-                   
-                    // Calculate earnings for this attendance record.
-                    $dayEarnings = number_format(($actualWorkedHours * $serviceRate * 100) / 100, 2, '.', '');
-                    // dd($dayEarnings);
+                        if (!$serviceRate) continue;
+    
+                        // Calculate earnings based on the worked hours
+                        $jobEarning = number_format(($actualWorkedHours * $serviceRate * 100) / 100, 2, '.', '');
+                        $dayEarnings += $jobEarning;
+                    }
                 }
-
-                // Compute admin fee (in dollars) and the user's net earnings.
+    
+                // Compute admin fee (in dollars) and the user's net earnings for the day.
                 $adminEarnings = number_format(($dayEarnings * $adminFeePercent) / 100, 2, '.', '');
                 $userEarnings  = number_format($dayEarnings - $adminEarnings, 2, '.', '');
-
+    
                 $totalEarnings       += $dayEarnings;
                 $totalAdminEarnings  += $adminEarnings;
                 $totalUserEarnings   += $userEarnings;
-
+    
                 $dailyEarnings[] = [
                     'date' => $currentDate->format('Y-m-d'),
                     'earnings' => round($dayEarnings, 2),
@@ -226,7 +236,8 @@ class PayoutController extends Controller
                     'user_earnings' => $userEarnings
                 ];
             }
-
+            // dd($dailyEarnings);
+    
             $weeklyData[] = [
                 'week_key' => $weekKey,
                 'week_label' => "Week $weekNumber/$year",
@@ -236,17 +247,17 @@ class PayoutController extends Controller
                 'daily_earnings' => $dailyEarnings,
                 'is_current_week' => ($weekNumber === Carbon::now()->weekOfYear),
             ];
-
+    
             $start_date->addWeek();
         }
-
+    
         // Sort the weeks in descending order.
         usort($weeklyData, function ($a, $b) {
             [$yearA, $weekA] = explode('-', $a['week_key']);
             [$yearB, $weekB] = explode('-', $b['week_key']);
             return ($yearB <=> $yearA) ?: ($weekB <=> $weekA);
         });
-
+    
         $paginatedData = $this->paginate($weeklyData, 3);
     
         return view("pages.payouts.details", compact("user", 'title', 'back_url', 'paginatedData', 'selectedMonth', 'selectedYear'));

@@ -63,7 +63,6 @@ class AdminController extends Controller
         }
 
         // Admin Revenue Data with Year Filter
-        $adminFeePercent = config('constant.admin_fee', 11);
         $selectedYear = $request->input('year', now()->year);
         $monthlyData = [];
 
@@ -75,50 +74,76 @@ class AdminController extends Controller
             $totalAdminEarnings = 0;
             $totalUserEarnings = 0;
 
-            $jobs = JobSchedule::whereBetween('start_date', [$start_date, $end_date])
-                ->where('status', 2)
+            // Get job schedules within the current month
+            $jobs = JobSchedule::where('status', 2)
+                ->where(function ($query) use ($start_date, $end_date) {
+                    $query->whereBetween('start_date', [$start_date, $end_date])
+                        ->orWhereBetween('end_date', [$start_date, $end_date]);
+                })
                 ->get();
 
             foreach ($jobs as $job) {
                 $user = User::find($job->user_id);
                 if (!$user) continue;
 
-                $serviceRate = UserService::where('user_id', $job->user_id)
+                $userService = UserService::where('user_id', $job->user_id)
                     ->where('service_id', $job->service_id)
-                    ->value('price_per_hour');
+                    ->first();
 
-                if (!$serviceRate) continue;
+                if (!$userService || !$userService->price_per_hour) continue;
 
-                $jobStart = Carbon::parse($job->start_date . ' ' . $job->start_time);
-                $jobEnd = Carbon::parse($job->end_date . ' ' . $job->end_time);
-                $totalHoursWorked = $jobStart->diffInSeconds($jobEnd) / 3600;
+                $serviceRate = $userService->price_per_hour;
+                $adminFeePercent = $job->admin_fee_percent ?? $userService->admin_fee_percent ?? config('constant.admin_fee', 11);
 
-                $breakHours = AttendanceBreak::where('user_id', $job->user_id)
-                    ->whereBetween('start_break', [$jobStart, $jobEnd])
-                    ->whereBetween('end_break', [$jobStart, $jobEnd])
-                    ->sum(DB::raw('TIMESTAMPDIFF(SECOND, start_break, end_break)')) / 3600;
+                // Get attendances for this job in the current month
+                $attendances = Attendance::where('job_id', $job->id)
+                    ->whereBetween('date', [$start_date, $end_date])
+                    ->whereNotNull('check_in_time')
+                    ->whereNotNull('check_out_time')
+                    ->with('attendanceBreaks')
+                    ->get();
 
-                $actualWorkedHours = max(round($totalHoursWorked - $breakHours, 2), 0);
+                foreach ($attendances as $attendance) {
+                    $checkIn = Carbon::parse($attendance->check_in_time);
+                    $checkOut = Carbon::parse($attendance->check_out_time);
+                    $workedHours = $checkOut->diffInSeconds($checkIn) / 3600;
 
-                $monthlyEarnings = round($actualWorkedHours * $serviceRate, 2);
-                $adminEarnings = round(($monthlyEarnings * $adminFeePercent) / 100, 2);
-                $userEarnings = round($monthlyEarnings - $adminEarnings, 2);
+                    // Calculate total break hours
+                    $breakHours = $attendance->attendanceBreaks->sum(function ($break) {
+                        if (!$break->start_break || !$break->end_break) return 0;
+                        return Carbon::parse($break->end_break)->diffInSeconds(Carbon::parse($break->start_break)) / 3600;
+                    });
 
-                $totalEarnings += $monthlyEarnings;
-                $totalAdminEarnings += $adminEarnings;
-                $totalUserEarnings += $userEarnings;
+                    $actualHours = max(round($workedHours - $breakHours, 2), 0);
+                    $earning = round($actualHours * $serviceRate, 2);
+                    $adminEarning = round(($earning * $adminFeePercent) / 100, 2);
+                    $userEarning = round($earning - $adminEarning, 2);
+
+                    $totalEarnings += $earning;
+                    $totalAdminEarnings += $adminEarning;
+                    $totalUserEarnings += $userEarning;
+                }
             }
 
             $monthlyData[] = [
                 'month' => $start_date->format('F'),
-                'total_earnings' => $totalEarnings,
-                'admin_earnings' => $totalAdminEarnings,
-                'user_earnings' => $totalUserEarnings,
+                'total_earnings' => round($totalEarnings, 2),
+                'admin_earnings' => round($totalAdminEarnings, 2),
+                'user_earnings' => round($totalUserEarnings, 2),
             ];
         }
 
-        return view("pages.dashboard", compact("users", 'user_jobs', 'customers', 'services', 'chartData', "monthlyData", "selectedYear"));
+        return view("pages.dashboard", compact(
+            "users",
+            'user_jobs',
+            'customers',
+            'services',
+            'chartData',
+            "monthlyData",
+            "selectedYear"
+        ));
     }
+
 
     public function signin()
     {

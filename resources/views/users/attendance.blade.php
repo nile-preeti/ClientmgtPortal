@@ -123,8 +123,7 @@
             @php
                 $logo = \App\Models\Logo::first();
             @endphp
-
-                <a href="#"> <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute"
+                <a href="#"><img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute"
                         alt="circle-image" height="50px"></a>
 
                 <div class="dropdown text-end">
@@ -451,7 +450,6 @@
         const result = await saveDataToPHP("{{ route('user.attendance.update') }}", {
             _token: csrfToken,
             user_id: user.id,
-            job_id: serviceId,
             check_out_full_address: address,
             check_out_latitude: lat,
             check_out_longitude: lng,
@@ -613,7 +611,6 @@
             })
 
         }
-        localStorage.setItem('visitedAttendance', 'true');
     </script>
     {{-- <script>
         let interval;

@@ -65,7 +65,7 @@
             }
 
             .date-time-sec h2 {color: #000 !important;}
-
+            .font-weight-bolder{font-weight: bold;}
            
            
 
@@ -80,13 +80,11 @@
         <div class="container-fluid">
           <div class="d-flex flex-wrap align-items-center justify-content-between">
             
-            <a href="#"> 
-            @php
+            <a href="#">   @php
                 $logo = \App\Models\Logo::first();
             @endphp
 
-              <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute" alt="circle-image" height="50px">
-            </a>
+              <img src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" class="logo card-img-absolute" alt="circle-image" height="50px"></a>
 
            
             <div class="dropdown text-end">
@@ -111,7 +109,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h2 class="text-dark mb-4 mt-4 pb-0 text-capitalize"> Welcome {{ auth()->user()->name }}</h2>
+                            <h4 class="text-dark mb-4 mt-4 pb-0 text-capitalize font-weight-bolder"> Welcome {{ auth()->user()->name }}</h4>
                             <!-- <a href="#" class="btn btn-primary" onclick="logout()">Logout</a> -->
                         </div>
                     </div>
@@ -299,12 +297,12 @@
                         <a href="{{ route('user.attendance')}}">
                             <div class="bg-gradient-danger card card-img-holder">
                                 <div class="card-body p-3">
-                                  <img src="../public/assets/images/circle.svg" class="profile-img card-img-absolute" alt="circle-image">
+                                  <img src="https://nileprojects.in/hrmodule/public/assets/images/circle.svg" class="profile-img card-img-absolute" alt="circle-image">
                                   <div class="row">
                                     <div class="col-8">
                                       <div class="numbers">
                                       
-                                        <p class="text-light text-sm text-uppercase fw-medium">Mark Attendance</p>
+                                        <p class="text-light text-sm text-uppercase fw-medium ">Mark Attendance</p>
                                         <h3 class="text-light font-weight-bolder pb-0"> &nbsp; </h3>
                                        
                                       </div>
@@ -327,7 +325,7 @@
                         <a href="{{ route('user.holidays')}}">
                             <div class="bg-gradient-success card card-img-holder">
                                 <div class="card-body p-3">
-                                  <img src="../public/assets/images/circle.svg" class="card-img-absolute" alt="circle-image">
+                                  <img src="https://nileprojects.in/hrmodule/public/assets/images/circle.svg" class="card-img-absolute" alt="circle-image">
                                   <div class="row">
                                     <div class="col-8">
                                       <div class="numbers">
@@ -400,7 +398,7 @@
                           <a href="{{route('user.services')}}">
                             <div class="bg-gradient-warning-1 card card-img-holder">
                                 <div class="card-body p-3">
-                                  <img src="../public/assets/images/circle.svg" class="card-img-absolute" alt="circle-image">
+                                  <img src="https://nileprojects.in/hrmodule/public/assets/images/circle.svg" class="card-img-absolute" alt="circle-image">
                                   <div class="row">
                                     <div class="col-8">
                                       <div class="numbers">

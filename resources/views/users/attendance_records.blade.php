@@ -188,8 +188,8 @@
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
 
-                <a href="#">
-                @php
+                <a href="#">  
+                    @php
                     $logo = \App\Models\Logo::first();
                 @endphp
 
