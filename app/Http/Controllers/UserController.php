@@ -411,102 +411,233 @@ class UserController extends Controller
         // dd($holidays);
         return view("users.holidays", compact('holidays'));
     }
+    // public function dashboard(Request $request)
+    // {
+    //     $title = "Dashboard";
+    //     $user = auth()->user();
+        
+    //     $adminFeePercent = config('constant.admin_fee', 11);
+        
+    //     // Get the year the user was created, to avoid calculating before that year.
+    //     $userCreatedYear = Carbon::parse($user->created_at)->year;
+        
+    //     // Get filter values from the request, default to current year.
+    //     $selectedYear = $request->input('year', Carbon::now()->year);
+        
+    //     // Determine the start and end dates for the selected year.
+    //     $start_date = Carbon::create($selectedYear, 1, 1)->startOfYear();
+    //     $end_date = Carbon::create($selectedYear, 12, 31)->endOfYear();
+        
+    //     // Initialize totals for earnings, admin earnings, and user earnings
+    //     $totalEarnings = 0;
+    //     $totalAdminEarnings = 0;
+    //     $totalUserEarnings = 0;
+    //     $grandTotalEarnings = 0; // For storing total earnings
+    //     $holidaysCount = 0; // For counting holidays
+    
+    //     // Loop through each day of the selected year to calculate earnings
+    //     for ($currentDate = $start_date; $currentDate <= $end_date; $currentDate->addDay()) {
+    //         if ($currentDate->year < $userCreatedYear) {
+    //             continue; // Skip if the year is before the user's creation year
+    //         }
+    
+    //         // Fetch attendances for the current day based on the user's attendance data
+    //         $attendances = Attendance::where("user_id", $user->id)
+    //             ->whereDate('date', $currentDate)
+    //             ->whereNotNull('check_in_time')
+    //             ->whereNotNull('check_out_time')
+    //             ->with('attendanceBreaks')
+    //             ->get();
+    
+    //         // Calculate earnings for the current day
+    //         $dayEarnings = 0;
+    
+    //         foreach ($attendances as $attendance) {
+    //             $job_id = $attendance->job_id;
+    //             $checkInTime = Carbon::parse($attendance->check_in_time);
+    //             $checkOutTime = Carbon::parse($attendance->check_out_time);
+    //             $totalWorkedHours = $checkInTime->diffInSeconds($checkOutTime) / 3600; // Total hours worked
+    
+    //             // Sum break hours recorded during the attendance
+    //             $breakHours = $attendance->attendanceBreaks->sum(function ($break) {
+    //                 if (!$break->start_break || !$break->end_break) {
+    //                     return 0;  // Return 0 if either break start or end is missing
+    //                 }
+    //                 $breakStart = Carbon::parse($break->start_break);
+    //                 $breakEnd = Carbon::parse($break->end_break);
+    //                 return $breakStart->diffInSeconds($breakEnd) / 3600;  // Break duration in hours
+    //             });
+    
+    //             // Adjust worked hours by subtracting break hours
+    //             $actualWorkedHours = max(round($totalWorkedHours - $breakHours, 2), 0);
+    
+    //             // Fetch job rate for the job
+    //             $job = JobSchedule::where('user_id', $user->id)
+    //                 ->where('id', $job_id)
+    //                 ->whereDate('start_date', '<=', $attendance->date)
+    //                 ->whereDate('end_date', '>=', $attendance->date)
+    //                 ->where('status', 2)
+    //                 ->first();
+    
+    //             if ($job) {
+    //                 $serviceRate = UserService::where('user_id', $user->id)
+    //                     ->where('service_id', $job->service_id)
+    //                     ->value('price_per_hour');
+    
+    //                 if ($serviceRate) {
+    //                     // Calculate the earnings based on the worked hours and service rate
+    //                     $dayEarnings += $actualWorkedHours * $serviceRate;
+    //                 }
+    //             }
+    //         }
+    
+    //         // Compute admin fee (in dollars) and the user's net earnings for the day
+    //         $adminEarnings = ($dayEarnings * $adminFeePercent) / 100;
+    //         $userEarnings = $dayEarnings - $adminEarnings;
+    
+    //         // Add daily earnings to the totals
+    //         $totalEarnings += $dayEarnings;
+    //         $totalAdminEarnings += $adminEarnings;
+    //         $totalUserEarnings += $userEarnings;
+    //     }
+    
+    //     // Calculate the grand total earnings and holidays count
+    //     $grandTotalEarnings = round($totalUserEarnings, 2);
+    
+    //     // Pass the calculated earnings to the dashboard view
+    //     return view('users.dashboard', compact('grandTotalEarnings', 'totalAdminEarnings', 'totalUserEarnings', 'holidaysCount', 'selectedYear'));
+    // }
+
     public function dashboard(Request $request)
-    {
-        $title = "Dashboard";
-        $user = auth()->user();
-        
-        $adminFeePercent = config('constant.admin_fee', 11);
-        
-        // Get the year the user was created, to avoid calculating before that year.
-        $userCreatedYear = Carbon::parse($user->created_at)->year;
-        
-        // Get filter values from the request, default to current year.
-        $selectedYear = $request->input('year', Carbon::now()->year);
-        
-        // Determine the start and end dates for the selected year.
-        $start_date = Carbon::create($selectedYear, 1, 1)->startOfYear();
-        $end_date = Carbon::create($selectedYear, 12, 31)->endOfYear();
-        
-        // Initialize totals for earnings, admin earnings, and user earnings
-        $totalEarnings = 0;
-        $totalAdminEarnings = 0;
-        $totalUserEarnings = 0;
-        $grandTotalEarnings = 0; // For storing total earnings
-        $holidaysCount = 0; // For counting holidays
+{
+    $user = Auth::user();
+    $authUserId = $user->id;
+    $adminFeePercentage = 11; // 11% admin fee
+
     
-        // Loop through each day of the selected year to calculate earnings
-        for ($currentDate = $start_date; $currentDate <= $end_date; $currentDate->addDay()) {
-            if ($currentDate->year < $userCreatedYear) {
-                continue; // Skip if the year is before the user's creation year
-            }
+        $year = now()->year;
+        $month = now()->month;
+        $daysInMonth = now()->daysInMonth;
+
+        $calendarDays = [];
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = \Carbon\Carbon::create($year, $month, $day);
+            $calendarDays[] = [
+                'day' => $date->format('D'),          // Mon, Tue, etc.
+                'date' => $date->format('d'),         // 01, 02, etc.
+                'full_date' => $date->toDateString()  // YYYY-MM-DD
+            ];
+        }
+
+    // Get selected date or default to today
+    $selectedDate = $request->input('selected_date');
+
+    $today = $selectedDate ? Carbon::parse($selectedDate)->toDateString()
+                           : Carbon::today()->toDateString();
+    $now = Carbon::now();
+
+    // Current jobs (status = 1)
+    $schedules = JobSchedule::with([
+        'service',
+        'customer',
+        'subCategory',
+        'userService',
+        'attendance' => function ($query) use ($today, $authUserId) {
+            $query->where('user_id', $authUserId)
+                  ->whereDate('created_at', $today);
+        }
+    ])
+    ->where('status', 1)
+    ->where('user_id', $authUserId)
+    ->whereDate('start_date', '<=', $today)
+    ->whereDate('end_date', '>=', $today)
+    ->get();
+
+    // Completed jobs (status = 2 or 1 that are ended)
+    if ($selectedDate) {
+        // Format and validate the selected date
+        try {
+            $parsedDate = Carbon::parse($selectedDate)->toDateString();
+        } catch (\Exception $e) {
+            $parsedDate = null; // fallback if invalid
+        }
+    }
+    $completedSchedulesQuery = JobSchedule::with([
+        'service',
+        'subCategory',
+        'userService',
+        'attendance' => function($query) use ($authUserId) {
+            $query->where('user_id', $authUserId)
+                  ->with('attendanceBreaks');
+        }
+    ])
+    ->whereIn('status', [1, 2])
+    ->where('user_id', $authUserId);
     
-            // Fetch attendances for the current day based on the user's attendance data
-            $attendances = Attendance::where("user_id", $user->id)
-                ->whereDate('date', $currentDate)
-                ->whereNotNull('check_in_time')
-                ->whereNotNull('check_out_time')
-                ->with('attendanceBreaks')
-                ->get();
+    // ✅ Apply exact date match if selected
+    if (!empty($parsedDate)) {
+        $completedSchedulesQuery->whereDate('end_date', '=', $parsedDate);
+    } else {
+        // ✅ Default to past dates only
+        $completedSchedulesQuery->whereDate('end_date', '<', now()->toDateString());
+    }
     
-            // Calculate earnings for the current day
-            $dayEarnings = 0;
-    
-            foreach ($attendances as $attendance) {
-                $job_id = $attendance->job_id;
-                $checkInTime = Carbon::parse($attendance->check_in_time);
-                $checkOutTime = Carbon::parse($attendance->check_out_time);
-                $totalWorkedHours = $checkInTime->diffInSeconds($checkOutTime) / 3600; // Total hours worked
-    
-                // Sum break hours recorded during the attendance
-                $breakHours = $attendance->attendanceBreaks->sum(function ($break) {
-                    if (!$break->start_break || !$break->end_break) {
-                        return 0;  // Return 0 if either break start or end is missing
+    $completedSchedules = $completedSchedulesQuery
+        ->latest('end_time')
+        ->get();
+
+    // Calculate earnings
+    foreach ($completedSchedules as $job) {
+        $totalJobHours = 0;
+
+        if ($job->attendance->isNotEmpty() && $job->userService) {
+            foreach ($job->attendance as $attendance) {
+                if ($attendance->check_in_time && $attendance->check_out_time) {
+                    $checkIn = Carbon::parse($attendance->check_in_time);
+                    $checkOut = Carbon::parse($attendance->check_out_time);
+                    $totalWorkedSeconds = $checkOut->diffInSeconds($checkIn);
+
+                    $breakSeconds = 0;
+                    foreach ($attendance->attendanceBreaks as $break) {
+                        if ($break->start_break && $break->end_break) {
+                            $breakStart = Carbon::parse($break->start_break);
+                            $breakEnd = Carbon::parse($break->end_break);
+
+                            if ($breakStart->between($checkIn, $checkOut) && $breakEnd->between($checkIn, $checkOut)) {
+                                $breakSeconds += $breakEnd->diffInSeconds($breakStart);
+                            }
+                        }
                     }
-                    $breakStart = Carbon::parse($break->start_break);
-                    $breakEnd = Carbon::parse($break->end_break);
-                    return $breakStart->diffInSeconds($breakEnd) / 3600;  // Break duration in hours
-                });
-    
-                // Adjust worked hours by subtracting break hours
-                $actualWorkedHours = max(round($totalWorkedHours - $breakHours, 2), 0);
-    
-                // Fetch job rate for the job
-                $job = JobSchedule::where('user_id', $user->id)
-                    ->where('id', $job_id)
-                    ->whereDate('start_date', '<=', $attendance->date)
-                    ->whereDate('end_date', '>=', $attendance->date)
-                    ->where('status', 2)
-                    ->first();
-    
-                if ($job) {
-                    $serviceRate = UserService::where('user_id', $user->id)
-                        ->where('service_id', $job->service_id)
-                        ->value('price_per_hour');
-    
-                    if ($serviceRate) {
-                        // Calculate the earnings based on the worked hours and service rate
-                        $dayEarnings += $actualWorkedHours * $serviceRate;
-                    }
+
+                    $netSeconds = max(0, $totalWorkedSeconds - $breakSeconds);
+                    $hours = $netSeconds / 3600;
+                    $totalJobHours += $hours;
                 }
             }
-    
-            // Compute admin fee (in dollars) and the user's net earnings for the day
-            $adminEarnings = ($dayEarnings * $adminFeePercent) / 100;
-            $userEarnings = $dayEarnings - $adminEarnings;
-    
-            // Add daily earnings to the totals
-            $totalEarnings += $dayEarnings;
-            $totalAdminEarnings += $adminEarnings;
-            $totalUserEarnings += $userEarnings;
+
+            $job->total_hours = round($totalJobHours, 2);
+            $job->total_earning = round($job->total_hours * $job->userService->price_per_hour, 2);
+            $job->admin_fee = round(($job->total_earning * $adminFeePercentage) / 100, 2);
+            $job->net_earning = round($job->total_earning - $job->admin_fee, 2);
+        } else {
+            $job->total_hours = 0;
+            $job->total_earning = 0;
+            $job->admin_fee = 0;
+            $job->net_earning = 0;
         }
-    
-        // Calculate the grand total earnings and holidays count
-        $grandTotalEarnings = round($totalUserEarnings, 2);
-    
-        // Pass the calculated earnings to the dashboard view
-        return view('users.dashboard', compact('grandTotalEarnings', 'totalAdminEarnings', 'totalUserEarnings', 'holidaysCount', 'selectedYear'));
     }
+
+    return view('users.dashboard', compact(
+        'user',
+        'calendarDays',
+        'month',
+        'year',
+        'schedules',
+        'completedSchedules'
+    ));
+}
+
+
     
 
 

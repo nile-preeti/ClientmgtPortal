@@ -352,6 +352,14 @@ function displayRecords(records) {
     const recordsList = document.querySelector("#recordsList");
     recordsList.innerHTML = ""; // Clear previous records
 
+    if (records.length === 0) {
+        const noRecordsMessage = document.createElement("li");
+        noRecordsMessage.classList.add("mt-2");
+        noRecordsMessage.textContent = "No records found";
+        recordsList.appendChild(noRecordsMessage);
+        return; // Exit the function if there are no records
+    }
+    
     records.forEach((record) => {
         const listItem = document.createElement("li");
         listItem.classList.add("mt-2");
@@ -365,54 +373,45 @@ function displayRecords(records) {
 
         const formatAddress = (address) => address || "N/A";
 
-        // Determine Status for Display
-        let statusLabel = "Present"; 
-let bgColor = "badge-success"; 
-
-if (record.status.key === "absent") {
-    statusLabel = "Absent";
-    bgColor = "badge-danger"; 
-} else if (record.status.key === "holiday") {
-    statusLabel = "Holiday";
-    bgColor = "badge-warning"; 
-} else if (record.status.key === "weekly_off") {
-    statusLabel = "Weekly Off";
-    bgColor = "badge-info"; 
-} else if (record.status.key === "na") {  
-    statusLabel = "N/A";
-    bgColor = "badge-secondary"; 
-} else if (record.status.key === "half_day") {  
-    statusLabel = "Half Day";
-    bgColor = "badge-warning"; 
-} else if (record.status.key === "present") {  
-    statusLabel = "Present";
-    bgColor = "badge-success"; 
-}
-
 
 
         listItem.innerHTML = `
         <div class="col-md-12">
 
             <div class="cp-card">
+            <div class="cp-date">
+               
+            </div>
                 <div class="cp-card-head">
                     <div class="cp-date">Date:<span> ${new Date(record.date).toLocaleDateString('en-GB')}</span></div>
-                    <div class="cp-status"><span class="badge ${bgColor}">${statusLabel}</span></div>
                     <div class="cp-action-btn">
                        <a href="javascript:void(0);" class="view-break-details" data-id="${record.id}" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    <img src="https://nileprojects.in/client-portal/public/assets/images/eye.svg"> 
-</a>
+                            <img src="https://nileprojects.in/client-portal/public/assets/images/eye.svg"> 
+                        </a>
                     </div>
                 </div> 
                 <div class="cp-card-body">
                     <div class="row">
+                    <div class="col-md-4">
+                            <div class="cp-point-box">
+                                <div class="cp-point-icon">
+                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
+                                </div>
+                                <div class="cp-point-text">
+                                    <h4>Service Name:</h4>
+                                    <p>${record.job_name ?? 'N/A'}</p>
+                                </div>
+                                
+                            </div>
+                        </div>
+
                         <div class="col-md-4">
                             <div class="cp-point-box">
                                 <div class="cp-point-icon">
                                     <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
                                 </div>
                                 <div class="cp-point-text">
-                                    <h4>Check-in Time:</h4>
+                                    <h4>Start Time:</h4>
                                     <p>${formatTime(record.status.check_in_time)}</p>
                                 </div>
                                 
@@ -425,7 +424,7 @@ if (record.status.key === "absent") {
                                     <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
                                 </div>
                                 <div class="cp-point-text">
-                                    <h4>Check-out Time:</h4>
+                                    <h4>End Time:</h4>
                                     <p>${formatTime(record.status.check_out_time)}</p>
                                 </div>
                             </div>
@@ -455,30 +454,6 @@ if (record.status.key === "absent") {
                                     <h4>Breaking  Hours:</h4>
                                     <p>${record.status.break_time}</p>
 
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/location.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Check-in Address:</h4>
-                                    <p>${formatAddress(record.status.check_in_address)}</p>
-                                </div>
-                            </div>
-                        </div>
- 
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/location.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Check-out Address:</h4>
-                                    <p>${formatAddress(record.status.check_out_address)}</p>
                                 </div>
                             </div>
                         </div>

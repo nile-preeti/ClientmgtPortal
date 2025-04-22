@@ -211,11 +211,11 @@
 
                             <div class="hrmodule-punching-item-action">
                                 <div class="punching-btn">
-                                    <button id="checkinBtn" data-id="check_in" class="checkinBtn">Check-in</button>
+                                    <button id="checkinBtn" data-id="check_in" class="checkinBtn">Start Job</button>
                                     {{-- <div class="info" id="checkinInfo"></div> --}}
                                 </div>
                                 <div class="punching-btn">
-                                    <button id="checkoutBtn" class="checkoutBtn" disabled>Check-out</button>
+                                    <button id="checkoutBtn" class="checkoutBtn" disabled>End Job</button>
                                     {{-- <div class="info" id="checkoutInfo"></div> --}}
                                 </div>
                             </div>
@@ -450,6 +450,7 @@
         const result = await saveDataToPHP("{{ route('user.attendance.update') }}", {
             _token: csrfToken,
             user_id: user.id,
+            job_id: serviceId,
             check_out_full_address: address,
             check_out_latitude: lat,
             check_out_longitude: lng,

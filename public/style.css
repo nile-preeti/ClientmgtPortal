@@ -179,6 +179,58 @@ a.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; backgroun
 
 
 
+.Ongoing-calender-item {padding: 10px; border-radius: 15px; border: 1px solid #064086; background:  #FFF; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); }
+
+.Ongoing-calender-item h3 {color: #4F5168; text-align: center; font-size: 13px; font-style: normal; font-weight: 400; line-height: 20px; margin: 0; padding: 0; }
+.Ongoing-calender-item h2 {color: #064086; text-align: center; font-size: 18px; font-style: normal; font-weight: 700; line-height: 20px; margin: 0; padding: 0; }
+.services-tabs ul li a.active {color: #fff; border-radius: 50px; background:  #064086; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); }
+.services-tabs ul li a {font-weight: 700; font-size: 14px; text-align: center; padding: 10px 15px; color: var(--gray); display: inline-block; width: 100%; border-bottom: none; border-radius: 50px; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); }
+
+.services-tabs ul li {flex: auto; }
+.services-tabs ul {display: flex; position: relative; border: none; gap: 10px; }
+
+.services-tabs {margin-bottom: 1rem; }
+
+.ongoing-services-item {border-radius: 15px; background:  #FFF; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); margin-bottom: 1rem; }
+
+.ongoing-services-item-head {padding: 10px 15px; border-bottom: 1px solid #e8ecf2; display: flex; justify-content: space-between; align-items: center; }
+
+.services-id {color: #064086; font-size: 14px; font-style: normal; font-weight: 700; line-height: 20px; letter-spacing: 0.1px; }
+.ongoing-services-item-head h2 {color: #23356F; font-size: 14px; margin: 0; padding: 0; font-style: normal; font-weight: 700; line-height: 20px; letter-spacing: 0.1px; }
+.ongoing-services-date {margin: 0; display: flex; align-items: center; gap: 10px; color: #8F93A0; text-align: center; font-size: 12px; font-style: normal; font-weight: 600; line-height: 20px; letter-spacing: 0.1px; }
+
+.ongoing-services-item-body {padding: 1rem; }
+.service-shift-card {display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+
+.service-shift-card-image {width: 40px; height: 40px; background: #f6f8fb; text-align: center; line-height: 40px; border-radius: 50%; }
+
+.service-shift-card-text h2 {color: #505667; font-size: 12px; font-style: normal; font-weight: 700; line-height: 20px; letter-spacing: 0.25px; margin: 0; padding: 0; }
+
+.service-shift-card-text p {color: #8F93A0; font-size: 12px; font-style: normal; font-weight: 500; line-height: 16px; letter-spacing: 0.4px; margin: 0; }
+
+.instructions-text {padding: 10px; background: #f4f9ff; margin-bottom: 1rem; border-radius: 5px; }
+
+
+.instructions-text h3 {color: #4F5168; font-size: 14px; font-style: normal; font-weight: 700; line-height: 20px; letter-spacing: 0.1px; padding: 0; margin: 0; }
+
+.service-shift-card {display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+
+.service-shift-card-image {width: 40px; height: 40px; background: #f6f8fb; text-align: center; line-height: 40px; border-radius: 50%; }
+
+.service-shift-card-text h2 {color: var(--gray, #505667); font-size: 12px; font-style: normal; font-weight: 700; line-height: 20px; letter-spacing: 0.25px; margin: 0; padding: 0; }
+
+.service-shift-card-text p {color: #8F93A0; font-size: 12px; font-style: normal; font-weight: 500; line-height: 16px; letter-spacing: 0.4px; margin: 0; }
+
+.ongoing-services-item-foot {padding: 1rem; border-top: 1px solid #e8ecf2; position: relative; display: flex; justify-content: space-between; }
+.loaction-address {margin: 0; display: flex; align-items: center; gap: 10px; color: #4F5168; text-align: center; font-size: 12px; font-style: normal; font-weight: 700; line-height: 20px; letter-spacing: 0.1px; }
+.ongoing-services-item {border-radius: 15px; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); margin-bottom: 1rem; } 
+.Ongoing-calender-list {margin-bottom: 1rem; }
+.owl-dots{display: none;}
+.ongoing-services-action a {color: #fff; border-radius: 50px; background: #064086; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); font-weight: 700; font-size: 12px; text-align: center; padding: 8px 15px; display: inline-block; border-bottom: none; }
+.ongoing-checkin-action a {color: var(--white); border-radius: 50px; background: #064086; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); font-weight: 700; font-size: 12px; text-align: center; padding: 8px 15px; display: inline-block; border-bottom: none; }
+.dash-card{background: #ffffff; justify-content: center; padding: 20px; width: 60%; margin: 0 auto 10px auto; border-radius: 20px; border: 1px solid #dcdceb;}
+
+
 /*
 Responsive 
 */
@@ -216,6 +268,7 @@ Responsive
 }
 @media(max-width:767px) {
     .profile-name{display: none;}
+    .dash-card{width: 100%;}
     
 }
 @media(max-width:557px) {
@@ -226,4 +279,5 @@ Responsive
 }
 
 @media(max-width:359px) { }
+
 

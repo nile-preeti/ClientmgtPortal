@@ -284,7 +284,7 @@ a:hover { text-decoration: none; }
 
 .sign-in-from { padding: 0 0px; }
 
-.sign-in-from::after{background: #f1efe7; content: "rea"; border-radius: 100%; height: 400px; width: 420px; left: -80px; display: inline; top: -254px; position: absolute; z-index: -1; box-shadow: #d6d6d6 6px 4px 12px 0px; border: 2px solid #d9d9d9; }
+/*.sign-in-from::after{background: #f1efe7; content: "rea"; border-radius: 100%; height: 400px; width: 420px; left: -80px; display: inline; top: -254px; position: absolute; z-index: -1; box-shadow: #d6d6d6 6px 4px 12px 0px; border: 2px solid #d9d9d9; }*/
 
 #signin_form input:-internal-autofill-selected {background-color: #fff !important;}
 
@@ -404,7 +404,7 @@ button.btn-signin{color: #fff; width: 100%; white-space: nowrap; background: #00
 
 .iq-sidebar-menu .iq-menu li .iq-submenu li a:hover, .iq-sidebar-menu .iq-menu li.active .iq-submenu li>a { background: transparent;  }
 
-.iq-sidebar-menu .iq-menu li.active .iq-submenu li.active>a { background: var(--iq-light-primary); color: var(--iq-primary); border-radius: 0; }
+.iq-sidebar-menu .iq-menu li.active .iq-submenu li.active>a { color: var(--iq-primary); border-radius: 0; background: #dcf1ff; }
 
 .iq-sidebar-menu .iq-menu li .iq-submenu li>a::before { display: none; }
 
@@ -510,7 +510,7 @@ body.sidebar-main .iq-sidebar:hover .iq-sidebar-menu .iq-menu li ul.iq-submenu-d
 
 .navbar-list li>a.language-title { font-size: 16px; }
 
-.navbar-list li>a { font-size: 18px; padding: 0 15px; line-height: 73px; color: var(--iq-primary); display: block; min-height: 75px; }
+.navbar-list li>a { font-size: 18px; padding: 0 15px; line-height: 73px; color: var(--iq-primary); display: block; min-height: 60px; }
 
 .navbar-list li:last-child>a { padding-right: 20px; }
 
@@ -2284,3 +2284,9 @@ a.btnSubmit {color: #fff; white-space: nowrap; background:#0069ac; box-shadow: 0
 
 
 div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm) {border: 0; border-radius: .25em; background: initial; background-color: #0069ac !important; color: #fff; font-size: 1em; }
+
+#logoUploadForm{
+  border-radius: 10px;
+  width: 400px;
+}
+

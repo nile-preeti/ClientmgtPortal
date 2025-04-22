@@ -262,139 +262,80 @@ class AjaxController extends Controller
             $id = $request->id;
             $user_id = Auth::user()->id;
             $user = User::find($user_id);
-
+    
             if ($user) {
                 $selectedMonth = $request->input('month', now()->format('m'));
                 $selectedYear = $request->input('year', now()->format('Y'));
-
-                $selectedDate = Carbon::createFromDate($selectedYear, $selectedMonth, 1);
-                $daysInMonth = $selectedDate->daysInMonth;
                 $today = now()->format('Y-m-d');
-
-                // Get holidays for the selected month
-                $holidays = Holiday::whereYear('date', $selectedYear)
-                    ->whereMonth('date', $selectedMonth)
-                    ->pluck('date')
-                    ->toArray();
-
-                // Fetch user attendance for the selected month
+    
+                // Fetch only present attendance records with pagination
                 $attendances = Attendance::where("user_id", $user_id)
                     ->whereYear("date", $selectedYear)
                     ->whereMonth("date", $selectedMonth)
+                    ->whereNotNull("check_in_time") // Ensure check-in exists
+                    ->whereNotNull("check_out_time") // Optional: Ensure full presence
+                    ->whereNotNull("job_id")
                     ->orderBy("date", "asc")
-                    ->with('attendanceBreaks')
-                    ->get()
-                    ->keyBy('date');
-
+                    ->with(['attendanceBreaks', 'jobSchedule.service'])
+                    ->paginate(10); // Adjust pagination size here (10 per page)
+    
                 $records = [];
-
-                for ($day = 1; $day <= $daysInMonth; $day++) {
-                    $date = $selectedYear . '-' . str_pad($selectedMonth, 2, '0', STR_PAD_LEFT) . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                    $dayOfWeek = date('N', strtotime($date));
-
-                    // Default status
-                    $status = [
-                        "key" => "absent",
-                        "label" => "Absent",
-                        "working_hours" => "N/A",
-                        "break_time" => "00:00",
-                        "check_in_time" => "N/A",
-                        "check_out_time" => "N/A",
-                        "check_in_address" => "N/A",
-                        "check_out_address" => "N/A"
-                    ];
-
-                    if (in_array($date, $holidays)) {
-                        $status = ["key" => "holiday", "label" => "Holiday", "working_hours" => "N/A", "break_time" => "00:00"];
-                    } elseif ($date > $today) {
-                        $status = ["key" => "na", "label" => "N/A", "working_hours" => "N/A", "break_time" => "00:00"];
-                    } elseif ($dayOfWeek == 6 || $dayOfWeek == 7) {
-                        $status = ["key" => "weekly_off", "label" => "Weekly Off", "working_hours" => "N/A", "break_time" => "00:00"];
-                    } elseif (isset($attendances[$date])) {
-                        $attendance = $attendances[$date];
-
-                        if (empty($attendance->check_in_time)) {
-                            $status = ["key" => "absent", "label" => "Absent", "working_hours" => "N/A", "break_time" => "00:00"];
-                        } else {
-                            $workedHours = "N/A";
-                            $checkInTime = $attendance->check_in_time ? Carbon::parse($attendance->check_in_time) : null;
-                            $checkOutTime = $attendance->check_out_time ? Carbon::parse($attendance->check_out_time) : null;
-
-                            if ($checkInTime && $checkOutTime) {
-                                $workedHours = $checkInTime->diff($checkOutTime)->format('%h hours %i minutes');
-                            }
-
-                            if ($date == $today) {
-                                $status = ["key" => "present", "label" => "Present"];
-                            } elseif ($date < $today && is_null($checkOutTime)) {
-                                $status = ["key" => "absent", "label" => "Absent"];
-                            } elseif ($checkInTime && $checkOutTime) {
-                                $totalHours = $checkInTime->diffInHours($checkOutTime);
-                                if ($totalHours < 4.5) {
-                                    $status = ["key" => "absent", "label" => "Absent"];
-                                } elseif ($totalHours >= 4.5 && $totalHours < 9) {
-                                    $status = ["key" => "half_day", "label" => "Half Day"];
-                                } else {
-                                    $status = ["key" => "present", "label" => "Present"];
-                                }
-                            }
-
-                            // Assign check-in, check-out, address, and working hours
-                            $status["check_in_time"] = $checkInTime ? $checkInTime->format("H:i") : "N/A";
-                            $status["check_out_time"] = $checkOutTime ? $checkOutTime->format("H:i") : "N/A";
-                            $status["check_in_address"] = !empty($attendance->check_in_full_address) ? $attendance->check_in_full_address : "N/A";
-                            $status["check_out_address"] = !empty($attendance->check_out_full_address) ? $attendance->check_out_full_address : "N/A";
-                            $status["working_hours"] = $workedHours;
-
-                            // Calculate total break time
-                            $totalBreakSeconds = 0;
-                            if ($attendance->attendanceBreaks) {
-                                foreach ($attendance->attendanceBreaks as $break) {
-                                    if ($break->start_break && $break->end_break) {
-                                        $startBreak = Carbon::parse($break->start_break);
-                                        $endBreak = Carbon::parse($break->end_break);
-                                        $totalBreakSeconds += $startBreak->diffInSeconds($endBreak);
-                                    }
-                                }
-                            }
-
-                            // Convert seconds to HH:MM format
-                            $breakHours = gmdate("H:i", $totalBreakSeconds);
-
-                            // Assign break time to status
-                            $status["break_time"] = $totalBreakSeconds > 0 ? $breakHours : "00:00";
+    
+                foreach ($attendances as $attendance) {
+                    $checkInTime = $attendance->check_in_time ? Carbon::parse($attendance->check_in_time) : null;
+                    $checkOutTime = $attendance->check_out_time ? Carbon::parse($attendance->check_out_time) : null;
+    
+                    $workedHours = $checkInTime && $checkOutTime
+                        ? $checkInTime->diff($checkOutTime)->format('%h hours %i minutes')
+                        : "N/A";
+    
+                    // Calculate break time
+                    $totalBreakSeconds = 0;
+                    foreach ($attendance->attendanceBreaks as $break) {
+                        if ($break->start_break && $break->end_break) {
+                            $start = Carbon::parse($break->start_break);
+                            $end = Carbon::parse($break->end_break);
+                            $totalBreakSeconds += $start->diffInSeconds($end);
                         }
                     }
+    
+                    $breakTime = $totalBreakSeconds > 0 ? gmdate("H:i", $totalBreakSeconds) : "00:00";
+    
+                    $jobName = $attendance->jobSchedule && $attendance->jobSchedule->service
+                        ? $attendance->jobSchedule->service->name
+                        : "N/A";
+    
                     $records[] = [
-                        "date" => $date,
-                        "status" => $status,
-                        'id' => isset($attendances[$date]) ? $attendances[$date]->id : null,
+                        "id" => $attendance->id,
+                        "date" => $attendance->date,
+                        "status" => [
+                            "key" => "present",
+                            "label" => "Present",
+                            "check_in_time" => $checkInTime ? $checkInTime->format("H:i") : "N/A",
+                            "check_out_time" => $checkOutTime ? $checkOutTime->format("H:i") : "N/A",
+                            "check_in_address" => $attendance->check_in_full_address ?? "N/A",
+                            "check_out_address" => $attendance->check_out_full_address ?? "N/A",
+                            "working_hours" => $workedHours,
+                            "break_time" => $breakTime,
+                        ],
+                        "job_name" => $jobName,
                     ];
                 }
-
-                // **Pagination**
-                $perPage = 15;
-                $page = $request->input('page', 1);
-                $offset = ($page - 1) * $perPage;
-                $paginatedRecords = new LengthAwarePaginator(
-                    array_slice($records, $offset, $perPage),
-                    count($records),
-                    $perPage,
-                    $page
-                );
-
+    
                 return response()->json([
                     'success' => true,
-                    'records' => $paginatedRecords->items(),
-                    'current_page' => $paginatedRecords->currentPage(),
-                    'last_page' => $paginatedRecords->lastPage(),
-                    'total' => $paginatedRecords->total(),
+                    'records' => $records,
+                    'total' => $attendances->total(), // Return the total number of records for pagination
+                    'current_page' => $attendances->currentPage(), // Current page number
+                    'last_page' => $attendances->lastPage(), // Total number of pages
                 ]);
             }
         }
-
+    
         return response()->json(['success' => false, 'message' => 'User does not exist']);
     }
+    
+
 
 
 
