@@ -180,6 +180,84 @@
             .cp-action-btn img{height: 20px;}
 
 
+
+            .info-card.member-info{padding: 1rem;}
+
+            .info-card p {
+                color: var(--gray, #505667);
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: 20px;
+                letter-spacing: 0.25px;
+                padding: 0;
+                margin: 0;
+            }
+
+            .name-info p {
+                font-size: 16px;
+            }
+
+            .info-card h6 {
+                color: var(--gray1, #8F93A0);
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 16px;
+                letter-spacing: 0.4px;
+                margin: 0;
+                padding: 0;
+            }
+            .info-card .account-status svg {
+                color: var(--green, #7BC043);
+            }
+
+            .week-number, .hours-worked {
+                font-size: 13px;
+                margin: 0;
+                padding: 0;
+                line-height: normal;
+                color: var(--blue);
+                font-weight: 700;
+            }
+
+            .day-details {
+                border-radius: 10px;
+                border: 1px solid #d9e2ee;
+            }
+
+            .date-info {
+                color: var(--gray, #505667);
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: 20px;
+                letter-spacing: 0.25px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .info-card h3 {
+                color: var(--gray, #505667);
+                font-size: 12px;
+                font-style: normal;
+                line-height: 20px;
+                letter-spacing: 0.25px;
+                margin: 0;
+                padding: 0;
+            }
+
+            
+
+            .week-number, .hours-worked {
+                font-size: 13px;
+                margin: 0;
+                padding: 0;
+                line-height: normal;
+                color: #23356f;
+                font-weight: 700;
+            }
+
     </style>
 </head>
 
@@ -216,7 +294,7 @@
         <div class="container">
             <div class="attendance-records-head">
                 <h2>
-                    <a href="javascript:history.back()"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Attendance Record
+                    <a href="javascript:history.back()"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Timesheet Details
                 </h2>
                 <div class="Search-filter">
                     <div class="row">
@@ -224,19 +302,10 @@
                             <div class="form-group">
                                 <!-- <label for="month">Select Month:</label> -->
                                 <select id="month" class="form-control">
-                                    <option value="01">Select Month</option>
-                                    <option value="01">January</option>
-                                    <option value="02">February</option>
-                                    <option value="03">March</option>
-                                    <option value="04">April</option>
-                                    <option value="05">May</option>
-                                    <option value="06">June</option>
-                                    <option value="07">July</option>
-                                    <option value="08">August</option>
-                                    <option value="09">September</option>
-                                    <option value="10">October</option>
-                                    <option value="11">November</option>
-                                    <option value="12">December</option>
+                                    <option value="">Select Month</option>
+                                    @foreach(['01' => 'January', '02' => 'February', '03' => 'March', '04' => 'April', '05' => 'May', '06' => 'June', '07' => 'July', '08' => 'August', '09' => 'September', '10' => 'October', '11' => 'November', '12' => 'December'] as $key => $monthName)
+                                        <option value="{{ $key }}" {{ ($currentMonth == $key) ? 'selected' : '' }}>{{ $monthName }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -244,13 +313,13 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <!-- <label for="year">Select Year:</label> -->
-                                <input type="number" id="year" class="form-control" min="2000" max="2050" placeholder="Select Year">
+                                <input type="number" id="year" class="form-control" min="2000" max="2050" placeholder="Select Year" value="{{ $currentYear }}">
                             </div>
                         </div>
 
                         <div class="col-md-4">
                             <div class="form-group">
-                                <button class="btn-search" onclick="fetchAttendance(1)">Search</button>
+                                <button class="btn-search" onclick="fetchAttendance()">Search</button>
                             </div>
                         </div>
                     </div>
@@ -258,14 +327,129 @@
             </div>
             <div class="attendance-records-body">
                 <div class="attendance-records-content">
-                    <div id="recordsList" class="recordsList">
+                    <!-- <div id="recordsList" class="recordsList">
+                    </div> -->
+
+                    <div class="recordsList">
+                        <div class="col-md-12">
+
+                            <div class="cp-card">
+                                <div class="info-card">
+                                   
+                                    <div class="info-card member-info">
+                                       
+                                        <div class="time-card-head d-flex align-items-center ">
+                                            <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/working-hour.png" alt="image" class="img-fluid me-2" style="width: 25px; height: auto;border-radius: 0!important;">
+                                            <h4 class="hours-worked">
+                                            Total Hours worked: 
+                                                {{ $totalHours }} hour{{ $totalHours != 1 ? 's' : '' }} 
+                                                @if ($remainingMinutes > 0)
+                                                    {{ $remainingMinutes }} minute{{ $remainingMinutes != 1 ? 's' : '' }}
+                                                @endif
+                                            </h4>
+                                        </div>
+                                        <hr>
+                                        <div class="week-details">
+                                            <div class="row">
+                                                @if($attendanceRecords->isNotEmpty())
+                                                    @foreach($attendanceRecords as $record)
+                                                        <div class="col-md-4">
+                                                            <div class="day-details px-4 py-2 mt-4">
+                                                                
+                                                            <div class="d-flex justify-content-between">
+                                                            <div>
+                                                            <h5 class="date-info">Date: {{ $record->date }}</h5>
+                                                            <h5 class="date-info">Service Name: {{ $record->jobSchedule->service->name ?? 'N/A' }}</h5>
+                                                            </div>
+                                                                <div class="cp-action-btn">
+                                                                <a href="javascript:void(0);" class="view-break-details" data-bs-toggle="modal" data-bs-target="#breakModal{{ $record->id }}">
+                                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/eye.svg">
+                                                                </a>
+                                                                </div>
+                                                            </div>
+                                                                
+
+                                                                <div class="time-details">
+                                                                    <div class="d-flex align-items-center card-time-detail-info mt-3">
+                                                                        <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/end-time-icon.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
+                                                                        <h3 class="time-sub-head">Start Time: {{ $record->check_in_time }}</h3>
+                                                                    </div>
+                                                                    <div class="d-flex align-items-center card-time-detail-info mt-2">
+                                                                        <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/start-time-icon.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
+                                                                        <h3>End Time: {{ $record->check_out_time ?? 'Not checked out' }}</h3>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="d-flex card-time-detail-info mt-2">
+                                                                    <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/total-work-hours.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
+                                                                    <h3>Total Hours Worked on Day:
+                                                                        @if($record->check_out_time)
+                                                                        @php
+                                                                            $start = \Carbon\Carbon::parse($record->check_in_time);
+                                                                            $end = \Carbon\Carbon::parse($record->check_out_time);
+                                                                            $totalMinutes = $end->diffInMinutes($start);
+
+                                                                            foreach($record->attendanceBreaks as $break) {
+                                                                                if($break->start_break && $break->end_break) {
+                                                                                    $totalMinutes -= \Carbon\Carbon::parse($break->end_break)->diffInMinutes(\Carbon\Carbon::parse($break->start_break));
+                                                                                }
+                                                                            }
+                                                                            $totalHoursDecimal = number_format($totalMinutes / 60, 2);
+                                                                        @endphp
+                                                                        {{ $totalHoursDecimal }} hours &nbsp; &nbsp; &nbsp;
+                                                                        @else
+                                                                            Absent
+                                                                        @endif
+                                                                    </h3>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal fade" id="breakModal{{ $record->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $record->id }}" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h1 class="modal-title fs-5" id="modalLabel{{ $record->id }}">Break Details</h1>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        @if($record->attendanceBreaks->isNotEmpty())
+                                                                            @foreach($record->attendanceBreaks as $break)
+                                                                                <p><strong>Break Start-End:</strong> {{ \Carbon\Carbon::parse($break->start_break)->format('h:i A') }} -
+                                                                                {{ \Carbon\Carbon::parse($break->end_break)->format('h:i A') }}</p>
+                                                                            @endforeach
+                                                                        @else
+                                                                            <p>No breaks recorded.</p>
+                                                                        @endif
+                                                                    </div>
+                                                                    <div class="modal-footer d-none">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <div class="col-12">
+                                                        <div class="alert alert-warning text-center">
+                                                            No attendance records found for the selected month and year.
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div id="pagination-controls" class="d-flex justify-content-end mb-4">
+                    <!-- <div id="pagination-controls" class="d-flex justify-content-end mb-4">
                         <button id="prev-page" onclick="changePage('prev')" disabled>Previous</button>
                         <span id="page-info"></span>
                         <button id="next-page" onclick="changePage('next')">Next</button>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="col-md-12 attendance-record-data-tbl">
                     <!-- <div class=" table-responsive ">
@@ -342,190 +526,7 @@
 
         </div>
     </div>
-    <script>
-     let currentPage = 1;
-let lastPage = 1;
-
-// Function to display records
-function displayRecords(records) {
-    console.log(records);
-    const recordsList = document.querySelector("#recordsList");
-    recordsList.innerHTML = ""; // Clear previous records
-
-    if (records.length === 0) {
-        const noRecordsMessage = document.createElement("li");
-        noRecordsMessage.classList.add("mt-2");
-        noRecordsMessage.textContent = "No records found";
-        recordsList.appendChild(noRecordsMessage);
-        return; // Exit the function if there are no records
-    }
     
-    records.forEach((record) => {
-        const listItem = document.createElement("li");
-        listItem.classList.add("mt-2");
-
-        const formatTime = (time) => {
-            return time && time !== "N/A" ? new Date(`1970-01-01T${time}`).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit'
-            }) : "N/A";
-        };
-
-        const formatAddress = (address) => address || "N/A";
-
-
-
-        listItem.innerHTML = `
-        <div class="col-md-12">
-
-            <div class="cp-card">
-            <div class="cp-date">
-               
-            </div>
-                <div class="cp-card-head">
-                    <div class="cp-date">Date:<span> ${new Date(record.date).toLocaleDateString('en-GB')}</span></div>
-                    <div class="cp-action-btn">
-                       <a href="javascript:void(0);" class="view-break-details" data-id="${record.id}" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                            <img src="https://nileprojects.in/client-portal/public/assets/images/eye.svg"> 
-                        </a>
-                    </div>
-                </div> 
-                <div class="cp-card-body">
-                    <div class="row">
-                    <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Service Name:</h4>
-                                    <p>${record.job_name ?? 'N/A'}</p>
-                                </div>
-                                
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Start Time:</h4>
-                                    <p>${formatTime(record.status.check_in_time)}</p>
-                                </div>
-                                
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>End Time:</h4>
-                                    <p>${formatTime(record.status.check_out_time)}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Working Hours</h4>
-                                     <p>${record.status.working_hours}</p>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="cp-point-box">
-                                <div class="cp-point-icon">
-                                    <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                </div>
-                                <div class="cp-point-text">
-                                    <h4>Breaking  Hours:</h4>
-                                    <p>${record.status.break_time}</p>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-
-        recordsList.appendChild(listItem);
-    });
-}
-
-
-// Function to update pagination controls
-// Function to update pagination controls
-function updatePaginationControls() {
-    const paginationControls = document.getElementById("pagination-controls");
-    const pageInfo = document.getElementById("page-info");
-    const prevButton = document.getElementById("prev-page");
-    const nextButton = document.getElementById("next-page");
-
-    pageInfo.textContent = `Page ${currentPage} of ${lastPage}`;
-
-    prevButton.disabled = currentPage <= 1;
-    nextButton.disabled = currentPage >= lastPage;
-
-    if (lastPage <= 1) {
-        paginationControls.style.cssText = "display: none !important;"; // Force hide
-    } else {
-        paginationControls.style.cssText = "display: flex !important;"; // Force show
-    }
-}
-
-
-// Function to change the page
-function changePage(direction) {
-    if (direction === 'prev' && currentPage > 1) {
-        currentPage--;
-    } else if (direction === 'next' && currentPage < lastPage) {
-        currentPage++;
-    }
-
-    fetchRecords(currentPage);
-}
-
-// Function to fetch attendance records for a specific page
-function fetchRecords(page = 1) {
-    $.get("{{ route('user.attendance.fetch') }}", {
-        id: user.id,
-        page: page
-    }, function(data) {
-        if (data.success) {
-            if (data.records) {
-                displayRecords(data.records); // Display the records
-                currentPage = data.current_page; // Update current page
-                lastPage = data.last_page; // Update last page
-                updatePaginationControls(); // Update pagination controls
-            }
-        }
-    });
-}
-
-// Check if user is logged in and fetch records
-var user = @json($user);
-console.log(user);
-if (user) {
-    fetchRecords(); // Fetch records for the first page
-    $("#name").text(user.name); // Display user name
-} else {
-    window.location = "{{ route('user.dashboard') }}";
-}
-    </script>
 <script>
        function logout() {
 
@@ -566,136 +567,16 @@ Swal.fire({
 
 }
     </script>
-    <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let today = new Date();
-        let currentMonth = String(today.getMonth() + 1).padStart(2, '0'); // Get month (01-12)
-        let currentYear = today.getFullYear();
-
-        // Set current month
-        document.getElementById("month").value = currentMonth;
-
-        // Populate year dropdown (from 2020 to current year + 5)
-        let yearSelect = document.getElementById("year");
-        let startYear = 2020;
-        let endYear = currentYear + 5;
-        
-        for (let year = startYear; year <= endYear; year++) {
-            let option = document.createElement("option");
-            option.value = year;
-            option.textContent = year;
-            if (year === currentYear) {
-                option.selected = true; // Select current year
-            }
-            yearSelect.appendChild(option);
-        }
-    });
-</script>
    <script>
-    $(document).ready(function () {
-        let currentYear = new Date().getFullYear();
-        let yearDropdown = $("#year");
 
-        // Populate year dropdown (5 years back to 2 years ahead)
-        for (let i = currentYear - 5; i <= currentYear + 2; i++) {
-            yearDropdown.append(`<option value="${i}" ${i === currentYear ? 'selected' : ''}>${i}</option>`);
-        }
+    function fetchAttendance() {
+        const month = document.getElementById('month').value;
+        const year = document.getElementById('year').value;
 
-        // Auto-fetch attendance for current month & year
-        fetchAttendance(1);
-    });
-
-    function fetchAttendance(page = 1) {
-    let userId = 1; // Replace with actual user ID
-    let selectedMonth = $("#month").val();
-    let selectedYear = $("#year").val();
-
-    $.ajax({
-        url: "{{ route('user.attendance.fetch') }}",
-        type: "GET",
-        data: {
-            id: userId,
-            month: selectedMonth,
-            year: selectedYear,
-            page: page
-        },
-        success: function (response) {
-            if (response.success) {
-                displayRecords(response.records); // Use the displayRecords function
-
-                $("#page-info").text(`Page ${response.current_page} of ${response.last_page}`);
-                $("#prev-page").prop("disabled", response.current_page === 1);
-                $("#next-page").prop("disabled", response.current_page === response.last_page);
-
-                currentPage = response.current_page;
-                lastPage = response.last_page; // Ensure lastPage is updated
-                updatePaginationControls(); // Keep pagination controls updated
-            } else {
-                alert(response.message);
-            }
-        }
-    });
-}
-
-    function changePage(direction) {
-        if (direction === "next") {
-            fetchAttendance(currentPage + 1);
-        } else if (direction === "prev" && currentPage > 1) {
-            fetchAttendance(currentPage - 1);
-        }
+        const url = "{{ url('user/attendance_records') }}?month=" + month + "&year=" + year;
+        window.location.href = url;
     }
 </script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let currentYear = new Date().getFullYear();
-        document.getElementById("year").value = currentYear;
-    });
-
-    $(document).on("click", ".view-break-details", function () {
-        let attendanceId = $(this).data("id");
-
-        $.ajax({
-            url: "{{ route('user.fetch.break.details') }}", // Update the route accordingly
-            type: "POST",
-            data: {
-                id: attendanceId,
-                _token: $('meta[name="csrf-token"]').attr("content") // CSRF token
-            },
-            success: function (response) {
-                if (response.success && response.breaks.length > 0) {
-                    let breakDetails = response.breaks.map((breakItem, index) => `
-                        <p><strong>${index + 1}. Break Start - End:</strong> ${breakItem.start_break} - ${breakItem.end_break}</p>
-                    `).join("");
-
-                    $("#exampleModal .modal-body").html(breakDetails);
-                } else {
-                    $("#exampleModal .modal-body").html("<p>No break records found.</p>");
-                }
-            },
-            error: function () {
-                $("#exampleModal .modal-body").html("<p>Error fetching data.</p>");
-            }
-        });
-    });
-</script>
-
-<!-- Modal -->
-   <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Break Details</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-      </div>
-      <div class="modal-footer d-none">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 </body>
 

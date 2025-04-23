@@ -79,6 +79,37 @@
     background-color: #e0f0ff;
     border-radius: 10px;
 }
+    .start-checkin-btn.disabled {
+        color: #6c757d; /* Muted grey text */
+        background-color: #f8f9fa; /* Light grey background */
+        pointer-events: none; /* Disable interaction */
+        border: 1px solid #ddd; /* Light grey border */
+    }
+
+    /* Optional: Add some styling for the hover state when disabled */
+    .start-checkin-btn.disabled:hover {
+        color: #6c757d; /* Ensure the color stays muted */
+        background-color: #f8f9fa;
+    }
+    .ongoing-checkin-action button{
+      color: var(--white);
+      border-radius: 50px;
+      background: #064086;
+      box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);
+      font-weight: 700;
+      font-size: 12px;
+      text-align: center;
+      padding: 8px 15px;
+      display: inline-block;
+      border-bottom: none;
+  }
+  .ongoing-checkin-action button:disabled {
+    color: #b0b0b0 !important;  /* Muted text color */
+    background: #d3d3d3;  /* Light grey background */
+    cursor: not-allowed;  /* Change the cursor to indicate the button is disabled */
+    box-shadow: none;  /* Remove the shadow */
+    border: 2px solid #b0b0b0 !important; /* Muted border color when disabled */
+}
   </style>
 
 </head>
@@ -128,14 +159,19 @@
           <div class="row">
             <div class="col-md-12">
               <div class="services-tabs">
+
                 <ul class="nav nav-tabs" role="tablist">
                   <li><a class="active" href="#OngoingServices" data-bs-toggle="tab" aria-selected="true" role="tab">Ongoing Services</a></li>
+                  <li><a href="#AssignedServices" data-bs-toggle="tab" aria-selected="false" role="tab" class="" tabindex="-1"><i class="las la-eye-slash"></i> Assigned Services</a>
+                  </li>
                   <li><a href="#UnAssignedServices" data-bs-toggle="tab" aria-selected="false" role="tab" class="" tabindex="-1"><i class="las la-eye-slash"></i> Completed Services</a>
                   </li>
-                </ul>
-                <button class="btn btn-sm btn-outline-secondary" id="refreshFilters">
-                    <i class="las la-sync-alt"></i> Refresh
+                  
+                  <button class="btn btn-md" style="border: 1px solid #064086; border-radius: 30px; background: #064086;" id="refreshFilters">
+                    <img src="https://nileprojects.in/client-portal/public/ic-reset.svg" alt="">
                 </button>
+                </ul>
+                
               </div>
               <div class="Ongoing-calender-list">
               <form method="GET" id="calendarForm" action="{{ route('user.dashboard') }}">
@@ -157,7 +193,7 @@
               <div class="tasks-content-info tab-content">
               <div class="tab-pane active show" id="OngoingServices" role="tabpanel">
                   <div class="ongoing-services-list">
-                    @forelse($schedules as $schedule)
+                    @forelse($ongoingSchedules as $schedule)
                       @php $service = $schedule->service; @endphp
 
                       <div class="ongoing-services-item">
@@ -165,15 +201,29 @@
                           <div class="ongoing-services-item-title">
                             <h2> {{ $service->name ?? 'No Title' }}</h2>
                           </div>
-                          <div class="ongoing-checkin-action">
-                          <a 
-                              class="px-4 start-checkin-btn" 
-                              href="javascript:void(0);" 
-                              data-id="{{ $schedule->id }}"
-                            >
-                              {{ $schedule->attendance->isNotEmpty() ? 'Break/End' : 'Start' }}
-                            </a>
-                          </div>
+                          @php
+                          $bufferedEndTime = \Carbon\Carbon::parse($schedule->end_time)->addMinutes(30);
+                          $canMarkComplete = now()->greaterThanOrEqualTo($bufferedEndTime);
+                          @endphp
+                          <div class="ongoing-checkin-action d-flex gap-2">
+                                <!-- Start/Break/End button -->
+                                <a 
+                                    class="px-4 start-checkin-btn" 
+                                    href="javascript:void(0);" 
+                                    data-id="{{ $schedule->id }}"
+                                >
+                                    {{ $schedule->attendance->isNotEmpty() ? 'Break/End' : 'Start' }}
+                                </a>
+
+                                <!-- Mark as Complete button -->
+                                <button
+                                    class="px-4 mark-complete-btn" 
+                                    data-job-id="{{ $schedule->id }}" 
+                                    {{ $canMarkComplete ? '' : 'disabled' }}
+                                >
+                                    Mark as Complete
+                                </button>
+                            </div>
                         </div>
 
                         <div class="ongoing-services-item-body">
@@ -257,15 +307,15 @@
                 </div>
 
                 <div class="tab-pane" id="UnAssignedServices" role="tabpanel">
-                <div class="ongoing-services-list">
-                      @forelse($completedSchedules as $job)
-                          <div class="ongoing-services-item">
-                              <div class="ongoing-services-item-head">
-                                  <div class="ongoing-services-item-title">
-                                      <h2>Service: {{ $job->service->name }}</h2>
-                                  </div>
+                  <div class="ongoing-services-list">
+                  @forelse($completedSchedules as $job)
+                      <div class="ongoing-services-item">
+                          <div class="ongoing-services-item-head">
+                              <div class="ongoing-services-item-title">
+                                  <h2>Service: {{ $job->service->name }}</h2>
                               </div>
-                              <div class="ongoing-services-item-body">
+                          </div>
+                          <div class="ongoing-services-item-body">
                               <div class="row d-flex">
                                   <div class="col-lg-6 service-shift-card">
                                     <div class="service-shift-card-image">
@@ -286,84 +336,177 @@
                                         <p>{{ \Carbon\Carbon::parse($job->start_date)->format('m/d/Y') }} - {{ \Carbon\Carbon::parse($job->end_date)->format('m/d/Y') }}</p>
                                       </div>
                                   </div>
-                                  </div>
-
-                                  <div class="instructions-text">
-                                      <h3>Primary Instructions: {{ $job->description ?? 'N/A' }}</h3>
-                                  </div>
-
-                                  <div class="row">
-                                      <div class="col-md-6 col-sm-6 col-lg-4">
-                                          <div class="service-shift-card">
-                                              <div class="service-shift-card-image">
-                                                  <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
-                                              </div>
-                                              <div class="service-shift-card-text">
-                                                  <h2>Customer Name:</h2>
-                                                  <p>{{ $job->customer->name }}</p>
-                                              </div>
-                                          </div>
-                                      </div>
-
-                                      <div class="col-md-6 col-sm-6 col-lg-4">
-                                          <div class="service-shift-card">
-                                              <div class="service-shift-card-image">
-                                                  <img src="https://nileprojects.in/client-portal/public/assets/images/ic-sub-category.svg">
-                                              </div>
-                                              <div class="service-shift-card-text">
-                                                  <h2>Sub-Category</h2>
-                                                  <p>{{ $job->subCategory ? $job->subCategory->sub_category : 'N/A' }}</p>
-                                              </div>
-                                          </div>
-                                      </div>
-
-                                      <div class="col-md-6 col-sm-6 col-lg-4">
-                                          <div class="service-shift-card">
-                                              <div class="service-shift-card-image">
-                                                  <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
-                                              </div>
-                                              <div class="service-shift-card-text">
-                                                  <h2>Price</h2>
-                                                  <p>${{ $job->userService->price_per_hour ?? '0.00' }}</p>
-                                              </div>
-                                          </div>
-                                      </div>
-
-                                      <div class="col-md-6 col-sm-6 col-lg-4">
-                                          <div class="service-shift-card">
-                                              <div class="service-shift-card-image">
-                                                  <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
-                                              </div>
-                                              <div class="service-shift-card-text">
-                                                  <h2>Total Earning</h2>
-                                                  <p>${{ number_format($job->total_earning, 2) }}</p>
-                                              </div>
-                                          </div>
-                                      </div>
-
-                                      <div class="col-md-6 col-sm-6 col-lg-4">
-                                          <div class="service-shift-card">
-                                              <div class="service-shift-card-image">
-                                                  <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
-                                              </div>
-                                              <div class="service-shift-card-text">
-                                                  <h2>Net Earning</h2>
-                                                  <p>${{ number_format($job->net_earning, 2) }}</p>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
                               </div>
-                              <div class="ongoing-services-item-foot">
-                                  <div class="loaction-address"><img src="https://nileprojects.in/client-portal/public/assets/images/location.svg"> {{ $job->location ?? 'N/A' }}</div>
+
+                              <div class="instructions-text">
+                                  <h3>Primary Instructions: {{ $job->description ?? 'N/A' }}</h3>
+                              </div>
+
+                              <div class="row">
+                                  <div class="col-md-6 col-sm-6 col-lg-4">
+                                      <div class="service-shift-card">
+                                          <div class="service-shift-card-image">
+                                              <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
+                                          </div>
+                                          <div class="service-shift-card-text">
+                                              <h2>Customer Name:</h2>
+                                              <p>{{ $job->customer->name }}</p>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <div class="col-md-6 col-sm-6 col-lg-4">
+                                      <div class="service-shift-card">
+                                          <div class="service-shift-card-image">
+                                              <img src="https://nileprojects.in/client-portal/public/assets/images/ic-sub-category.svg">
+                                          </div>
+                                          <div class="service-shift-card-text">
+                                              <h2>Sub-Category</h2>
+                                              <p>{{ $job->subCategory ? $job->subCategory->sub_category : 'N/A' }}</p>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <div class="col-md-6 col-sm-6 col-lg-4">
+                                      <div class="service-shift-card">
+                                          <div class="service-shift-card-image">
+                                              <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
+                                          </div>
+                                          <div class="service-shift-card-text">
+                                              <h2>Price</h2>
+                                              <p>${{ $job->userService->price_per_hour ?? '0.00' }}</p>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <div class="col-md-6 col-sm-6 col-lg-4">
+                                      <div class="service-shift-card">
+                                          <div class="service-shift-card-image">
+                                              <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
+                                          </div>
+                                          <div class="service-shift-card-text">
+                                              <h2>Total Earning</h2>
+                                              <p>${{ number_format($job->total_earning, 2) }}</p>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <div class="col-md-6 col-sm-6 col-lg-4">
+                                      <div class="service-shift-card">
+                                          <div class="service-shift-card-image">
+                                              <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
+                                          </div>
+                                          <div class="service-shift-card-text">
+                                              <h2>Net Earning</h2>
+                                              <p>${{ number_format($job->net_earning, 2) }}</p>
+                                          </div>
+                                      </div>
+                                  </div>
                               </div>
                           </div>
-                          @empty
+                          <div class="ongoing-services-item-foot">
+                              <div class="loaction-address"><img src="https://nileprojects.in/client-portal/public/assets/images/location.svg"> {{ $job->location ?? 'N/A' }}</div>
+                          </div>
+                      </div>
+                      @empty
                       <p class="text-center">No completed services available.</p>
-                    @endforelse
-                  </div>
-
+                      @endforelse
+                    </div>
                 </div>
+
+                <div class="tab-pane" id="AssignedServices" role="tabpanel">
+                  <div class="ongoing-services-list">
+                  @forelse($assignedSchedules as $job)
+                      <div class="ongoing-services-item">
+                          <div class="ongoing-services-item-head">
+                              <div class="ongoing-services-item-title">
+                                  <h2>Service: {{ $job->service->name }}</h2>
+                              </div>
+                              <div class="ongoing-checkin-action">
+                              <a 
+                                      class="px-4 start-checkin-btn {{ \Carbon\Carbon::parse($job->end_date)->isBefore(\Carbon\Carbon::today()) ? 'disabled' : '' }}" 
+                                      href="javascript:void(0);" 
+                                      data-id="{{ $job->id }}"
+                                  >
+                                      Start Job
+                                  </a>
+                              </div>
+                          </div>
+                          <div class="ongoing-services-item-body">
+                              <div class="row d-flex">
+                                  <div class="col-lg-6 service-shift-card">
+                                    <div class="service-shift-card-image">
+                                      <img src="{{ asset('assets/images/time.svg') }}">
+                                    </div>
+                                    <div class="service-shift-card-text">
+                                      <h2>Service Shift Timing:</h2>
+                                      <p>{{ \Carbon\Carbon::parse($job->start_time)->format('h:iA') }} - {{ \Carbon\Carbon::parse($job->end_time)->format('h:iA') }}</p>
+                                    </div>
+                                  </div>
+
+                                  <div class="col-lg-6  service-shift-card">
+                                    <div class="service-shift-card-image">
+                                      <img src="{{ asset('assets/images/time.svg') }}">
+                                    </div>
+                                    <div class="service-shift-card-text">
+                                        <h2>Service Shift Date:</h2>
+                                        <p>{{ \Carbon\Carbon::parse($job->start_date)->format('m/d/Y') }} - {{ \Carbon\Carbon::parse($job->end_date)->format('m/d/Y') }}</p>
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <div class="instructions-text">
+                                  <h3>Primary Instructions: {{ $job->description ?? 'N/A' }}</h3>
+                              </div>
+
+                              <div class="row">
+                                  <div class="col-md-6 col-sm-6 col-lg-4">
+                                      <div class="service-shift-card">
+                                          <div class="service-shift-card-image">
+                                              <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
+                                          </div>
+                                          <div class="service-shift-card-text">
+                                              <h2>Customer Name:</h2>
+                                              <p>{{ $job->customer->name }}</p>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <div class="col-md-6 col-sm-6 col-lg-4">
+                                      <div class="service-shift-card">
+                                          <div class="service-shift-card-image">
+                                              <img src="https://nileprojects.in/client-portal/public/assets/images/ic-sub-category.svg">
+                                          </div>
+                                          <div class="service-shift-card-text">
+                                              <h2>Sub-Category</h2>
+                                              <p>{{ $job->subCategory ? $job->subCategory->sub_category : 'N/A' }}</p>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                  <div class="col-md-6 col-sm-6 col-lg-4">
+                                      <div class="service-shift-card">
+                                          <div class="service-shift-card-image">
+                                              <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
+                                          </div>
+                                          <div class="service-shift-card-text">
+                                              <h2>Price</h2>
+                                              <p>${{ $job->userService->price_per_hour ?? '0.00' }}</p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="ongoing-services-item-foot">
+                              <div class="loaction-address"><img src="https://nileprojects.in/client-portal/public/assets/images/location.svg"> {{ $job->location ?? 'N/A' }}</div>
+                          </div>
+                      </div>
+                      @empty
+                      <p class="text-center">No completed services available.</p>
+                      @endforelse
+                    </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -524,6 +667,32 @@
 
         window.location.href = url.toString();
     });
+</script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- Only if jQuery isn't already included -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+  $(document).on('click', '.mark-complete-btn', function () {
+      const jobId = $(this).data('job-id');
+
+      $.ajax({
+          url: "{{ route('user.employee.markComplete') }}",
+          type: "POST",
+          data: {
+              _token: "{{ csrf_token() }}",
+              job_id: jobId,
+              status: 2
+          },
+          success: function (response) {
+              toastr.success('Job marked as complete!');
+              // Optionally, reload or update the UI
+          },
+          error: function (xhr) {
+              toastr.error('Failed to mark job as complete.');
+              console.error(xhr.responseText);
+          }
+      });
+  });
 </script>
 </body>
 

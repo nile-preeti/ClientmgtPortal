@@ -40,6 +40,8 @@
     object-fit: contain;
     border-radius: 8px;
 }
+
+
 </style>
 @endpush
 @section('content')
@@ -133,11 +135,22 @@
 
                                     <div class="col-md-4">
                                         <label for="">Profile Image</label>
-                                        <input type="hidden" name="image" id="create_image" class="form-control">
+                                        <div class="profile-img-edit">
+                                            <img 
+                                                src="{{ $user->image ? asset('uploads/images/' . $user->image) : 'https://nileprojects.in/client-portal/public/avatar-1.png' }}" 
+                                                class="rounded-circle profile-pic img-fluid rounded mr-2" 
+                                                alt="user"
+                                            />
+                                            <div class="p-image">
+                                              <i class="ri-pencil-line upload-button"></i>
+                                              <input class="file-upload" type="file" name="image" accept=".png,.jpeg,.jpg,.svg"/>
+                                           </div>
+                                         </div>
 
-                                        <div class="form-group">
+                                        <!-- <input type="hidden" name="image" id="create_image" class="form-control"> -->
+                                        <!-- <div class="form-group">
                                             <div id="myDropzone" class="dropzone dz-box"></div>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
@@ -167,7 +180,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <!-- Subcategory Dropdown -->
                                                 <div class="col-md-3">
                                                     <div class="form-group service-box">
@@ -536,93 +549,92 @@
 });
     </script>
 
-<script type="text/javascript">
-    Dropzone.autoDiscover = false;
+    <script type="text/javascript">
+        Dropzone.autoDiscover = false;
 
-    function initializeDropzone(dropzoneId, uploadUrl, existingImageUrl = null, edit = false) {
-        const myDropzone = new Dropzone(`#${dropzoneId}`, {
-            dictDefaultMessage: `
-                <div class="dz-message">
-                    <img src="{{ asset('upload.png') }}" style="height:40px" alt="Upload Image">
-                    <p>Drop image here or click to upload</p>
-                </div>`,
-            maxFilesize: 1, // in MB
-            maxFiles: 1,
-            acceptedFiles: ".jpeg,.jpg,.png,.mp3",
-            timeout: 5000,
-            addRemoveLinks: true,
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            url: "{{ route('image-upload') }}",
-            renameFile: function(file) {
-                const dt = new Date();
-                return dt.getTime() + '_' + file.name;
-            },
-            removedfile: function(file) {
-                const name = file.upload ? file.upload.filename : file.name;
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    type: 'POST',
-                    url: "{{ route('image-delete') }}",
-                    data: { filename: name },
-                    success: function() {
-                        console.log("File removed successfully");
-                    },
-                    error: function(e) {
-                        console.error(e);
+        function initializeDropzone(dropzoneId, uploadUrl, existingImageUrl = null, edit = false) {
+            const myDropzone = new Dropzone(`#${dropzoneId}`, {
+                dictDefaultMessage: `
+                    <div class="dz-message">
+                        <img src="{{ asset('upload.png') }}" style="height:40px" alt="Upload Image">
+                        <p>Drop image here or click to upload</p>
+                    </div>`,
+                maxFilesize: 1, // in MB
+                maxFiles: 1,
+                acceptedFiles: ".jpeg,.jpg,.png,.mp3",
+                timeout: 5000,
+                addRemoveLinks: true,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                url: "{{ route('image-upload') }}",
+                renameFile: function(file) {
+                    const dt = new Date();
+                    return dt.getTime() + '_' + file.name;
+                },
+                removedfile: function(file) {
+                    const name = file.upload ? file.upload.filename : file.name;
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        type: 'POST',
+                        url: "{{ route('image-delete') }}",
+                        data: { filename: name },
+                        success: function() {
+                            console.log("File removed successfully");
+                        },
+                        error: function(e) {
+                            console.error(e);
+                        }
+                    });
+
+                    if (file.previewElement) {
+                        file.previewElement.parentNode.removeChild(file.previewElement);
                     }
-                });
-
-                if (file.previewElement) {
-                    file.previewElement.parentNode.removeChild(file.previewElement);
-                }
-            },
-            success: function(file, response) {
-                if (edit) {
-                    $("#edit_image").val(response);
-                } else {
-                    $("#create_image").val(response);
-                }
-                console.log("File uploaded successfully:", response);
-            },
-            error: function(file, response) {
-                console.error("Upload error:", response);
-            },
-            init: function() {
-                this.on("addedfile", function(file) {
-                    if (this.files.length > 1) {
-                        this.removeFile(file);
-                        alert("Only one file can be uploaded at a time!");
+                },
+                success: function(file, response) {
+                    if (edit) {
+                        $("#edit_image").val(response);
+                    } else {
+                        $("#create_image").val(response);
                     }
-                });
+                    console.log("File uploaded successfully:", response);
+                },
+                error: function(file, response) {
+                    console.error("Upload error:", response);
+                },
+                init: function() {
+                    this.on("addedfile", function(file) {
+                        if (this.files.length > 1) {
+                            this.removeFile(file);
+                            alert("Only one file can be uploaded at a time!");
+                        }
+                    });
 
-                // If there's an existing image (edit form), display it
-                if (existingImageUrl) {
-                    const mockFile = {
-                        name: "Existing Image",
-                        size: 12345,
-                        type: "image/jpeg"
-                    };
-                    this.emit("addedfile", mockFile);
-                    this.emit("thumbnail", mockFile, existingImageUrl);
-                    this.emit("complete", mockFile);
-                    this.files.push(mockFile);
+                    // If there's an existing image (edit form), display it
+                    if (existingImageUrl) {
+                        const mockFile = {
+                            name: "Existing Image",
+                            size: 12345,
+                            type: "image/jpeg"
+                        };
+                        this.emit("addedfile", mockFile);
+                        this.emit("thumbnail", mockFile, existingImageUrl);
+                        this.emit("complete", mockFile);
+                        this.files.push(mockFile);
+                    }
                 }
-            }
+            });
+
+            return myDropzone;
+        }
+
+        // Initialize Dropzone (example)
+        document.addEventListener("DOMContentLoaded", function () {
+            initializeDropzone('myDropzone', "{{ route('image-upload') }}");
         });
-
-        return myDropzone;
-    }
-
-    // Initialize Dropzone (example)
-    document.addEventListener("DOMContentLoaded", function () {
-        initializeDropzone('myDropzone', "{{ route('image-upload') }}");
-    });
-</script>
-
+    </script>
     @if (isset($user) && $user->image)
         <script>
             initializeDropzone("myDropzone", "{{ route('image-upload') }}", "{{ asset('uploads/images/' . $user->image) }}", )

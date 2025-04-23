@@ -379,7 +379,7 @@
                 $("#table_container").removeClass("d-none");
                 recordsContainer.innerHTML += `
                     <div class="record-item">
-                        <span>Check In:</span> <span>${result.data.check_in_time}</span>
+                        <span>Job Started:</span> <span>${result.data.check_in_time}</span>
                     </div>`;
                 checkinBtn.setAttribute("data-id", "start_break");
 
@@ -460,7 +460,7 @@
             checkinBtn.disabled = true;
             recordsContainer.innerHTML += `
                 <div class="record-item">
-                    <span>Checkout:</span> <span>${result.data.check_out_time}</span>
+                    <span>Job Ended:</span> <span>${result.data.check_out_time}</span>
                 </div>`;
             Swal.fire("Success", result.message, "success");
         } else {
@@ -524,7 +524,7 @@
 
                     $("#recordsContainer").append(`
                         <div class="record-entry">
-                            <span class="record-label">Check In:</span>
+                            <span class="record-label">Job Started:</span>
                             <span class="record-value">${data.today.check_in_time}</span>
                         </div>
                     `);
@@ -559,7 +559,7 @@
                     $("#checkinBtn").attr("disabled", true);
                     $("#recordsContainer").append(`
                         <div class="record-entry">
-                            <span class="record-label">Checkout:</span>
+                            <span class="record-label">Job Ended:</span>
                             <span class="record-value">${data.today.check_out_time}</span>
                         </div>
                     `);

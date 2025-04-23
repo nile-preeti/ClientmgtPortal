@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -73,7 +74,13 @@ class UserController extends Controller
         $user->role_id = 2;
         $user->name = ucwords(strtolower($request->name));
         $user->email = $request->email;
-        $user->image = $request->image;
+        
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/images'), $filename); // moves to public/uploads/images
+            $user->image = 'uploads/images/' . $filename; // Save relative path
+        }
 
         $user->phone = $request->phone;
         $user->emp_id = $request->emp_id;
@@ -109,10 +116,16 @@ class UserController extends Controller
         $user =  User::find($id);
         $user->name = ucwords(strtolower($request->name));
         $user->email = $request->email;
-        $user->image = $request->image;
         $user->phone = $request->phone;
         $user->status = $request->status;
         $user->emp_id = $request->emp_id;
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/images'), $filename); // moves to public/uploads/images
+            $user->image = 'uploads/images/' . $filename; // Save relative path
+        }
 
         $user->save();
         if ($request->filled('password')) {
@@ -167,160 +180,48 @@ class UserController extends Controller
     }
     // user end routes
     public function userAttendance(Request $request, $id)
-    {
-
-        $month = request('month', date('m'));
-        $year = request('year', date('Y'));
-        $statusFilter = $request->query('status'); // Store status filter separately
-        $user = User::where('id', $id)->first();
-
-        // Fetch attendance records
-        $attendanceRecords = Attendance::where('user_id', $id)
-            ->whereMonth('date', $month)
-            ->whereYear('date', $year)
-            ->when($request->filled("date"), function ($query) {
-                return $query->whereDate("date", request('date'));
-            })
-            ->when($statusFilter, function ($query) use ($statusFilter) {
-                return $query->where('status', $statusFilter);
-            })
-            ->with('attendanceBreaks')
-            ->get()
-            ->keyBy('date'); // Store by date for quick lookup
+    { // Store status filter separately
+        $user = User::where('id', $id)->first();// Store by date for quick lookup
 
         // dd($attendanceRecords);
         $title = "Employee Attendance Records";
         $back_url = route('userss.index');
-        $holidays = Holiday::whereMonth('date', $month)->whereYear('date', $year)->pluck('date')->toArray();
 
-        $allDays = [];
-        $startDate = Carbon::createFromDate($year, $month, 1);
-        $endDate = $startDate->copy()->endOfMonth();
-        $currentDate = Carbon::now()->format('Y-m-d');
-        if ($request->has('date')) {
-            $startDate = Carbon::parse(request('date'));
-            $endDate =  Carbon::parse(request('date'));
-        }
-        for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
-            $formattedDate = $date->format('Y-m-d');
+        // Get month and year from request, fallback to current
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
 
-            if (isset($attendanceRecords[$formattedDate])) {
+        $attendanceRecords = Attendance::with(['attendanceBreaks', 'jobSchedule.service'])
+            ->where('user_id', $user->id)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->orderBy('date', 'desc')
+            ->get();
 
-                $record = $attendanceRecords[$formattedDate];
-                // dd($record);
+        $totalMinutes = 0;
+        foreach ($attendanceRecords as $record) {
+            if ($record->check_in_time && $record->check_out_time) {
+                $in = \Carbon\Carbon::parse($record->check_in_time);
+                $out = \Carbon\Carbon::parse($record->check_out_time);
+                $duration = $out->diffInMinutes($in);
 
-                $checkInTime = !empty($record->check_in_time) ? strtotime($record->check_in_time) : null;
-                $checkOutTime = !empty($record->check_out_time) ? strtotime($record->check_out_time) : null;
-                $netWorkedHours = 0;
-                // $breaks = \App\Models\AttendanceBreak::where('user_id', 9)
-                //     ->where('attendance_id', 19)
-                //         ->get();
-                if (is_null($checkInTime) || is_null($checkOutTime)) {
-                    $recordStatus = 'Absent'; // No check-in or check-out means Absent
-                } else {
-                    // Calculate total worked time (before break deduction)
-                    $workedHours = ($checkOutTime - $checkInTime) / 3600; // Convert to hours
+                $breakMinutes = $record->attendanceBreaks->sum(function ($break) {
+                    return \Carbon\Carbon::parse($break->end_break)->diffInMinutes(\Carbon\Carbon::parse($break->start_break));
+                });
 
-                    // Fetch total break time for the user on the given date
-                    $totalBreakSeconds = \App\Models\AttendanceBreak::where('user_id', $record->user_id)
-                        ->where('attendance_id', $record->id)
-                        ->whereNotNull('start_break')
-                        ->whereNotNull('end_break')
-                        ->get()
-                        ->sum(function ($break) {
-                            return strtotime($break->end_break) - strtotime($break->start_break);
-                        });
-                    // Fetch total break time for the user on the given date
-
-                    // $breaks = \App\Models\AttendanceBreak::where('user_id', 9)
-                    // ->where('attendance_id', 19)
-                    //     ->get();
-
-                    // Convert break time to hours and subtract from worked hours
-                    $totalBreakHours = $totalBreakSeconds / 3600;
-                    $netWorkedHours = $workedHours - $totalBreakHours;
-
-                    // Determine attendance status after break deduction
-                    if ($netWorkedHours < 4.5) {
-                        $recordStatus = 'Absent';
-                    } elseif ($netWorkedHours >= 4.5 && $netWorkedHours < 9) {
-                        $recordStatus = 'Half-day';
-                    } else {
-                        $recordStatus = 'Present';
-                    }
-                }
-
-                $allDays[] = [
-                    'date' => $formattedDate,
-                    'check_in_time' => $record->check_in_time,
-                    'check_in_full_address' => $record->check_in_full_address,
-                    'check_out_time' => $record->check_out_time,
-                    'check_out_full_address' => $record->check_out_full_address,
-                    'status' => $recordStatus,
-                    'working_hours' => number_format($netWorkedHours, 1),
-                    'breaks' => $record->attendanceBreaks->isNotEmpty() ? $record->attendanceBreaks : [],
-                ];
-            } else {
-                if (in_array($formattedDate, $holidays)) {
-                    $recordStatus = 'Holiday';
-                } elseif ($date->isWeekend()) {
-                    $recordStatus = 'Weekly Off';
-                } elseif ($formattedDate > $currentDate) {
-                    $recordStatus = 'N/A';
-                } else {
-                    $recordStatus = 'Absent';
-                }
-
-                $allDays[] = [
-                    'date' => $formattedDate,
-                    'check_in_time' => null,
-                    'check_in_full_address' => null,
-                    'check_out_time' => null,
-                    'check_out_full_address' => null,
-                    'status' => $recordStatus,
-                    'working_hours' => 0,
-                    'breaks' => []
-                ];
+                $totalMinutes += ($duration - $breakMinutes);
             }
         }
 
-        // Apply status filter after processing
-        if ($statusFilter) {
-            $allDays = array_filter($allDays, function ($day) use ($statusFilter) {
-                return $day['status'] === $statusFilter;
-            });
-        }
+        $totalHours = floor($totalMinutes / 60);
+        $remainingMinutes = $totalMinutes % 60;
+        
 
-        // Paginate the data
-        $perPage = 15;
-        $currentPage = request()->get('page', 1);
-        $allDaysPaginated = new LengthAwarePaginator(
-            collect($allDays)->slice(($currentPage - 1) * $perPage, $perPage)->values(),
-            count($allDays),
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-        // dd($allDaysPaginated);
-
-        // Calculate attendance summary
-        $totalWorkingDays = collect($allDays)->filter(function ($day) {
-            return !in_array($day['status'], ['Holiday', 'Weekly Off', 'N/A']);
-        })->count();
-
-        $totalPresent = collect($allDays)->sum(function ($day) {
-            return $day['status'] === 'Present' ? 1 : ($day['status'] === 'Half-day' ? 0.5 : 0);
-        });
-
-        $totalHalfDay = collect($allDays)->where('status', 'Half-day')->count();
-        $totalAbsent = $totalWorkingDays - $totalPresent;
 
         return view("pages.users.attendance", compact(
-            "allDaysPaginated",
-            "totalWorkingDays",
-            "totalPresent",
-            "totalHalfDay",
-            "totalAbsent",
+            "attendanceRecords",
+            "totalHours",
+            "remainingMinutes",
             "title",
             'user',
             'back_url',
@@ -393,11 +294,50 @@ class UserController extends Controller
         }
     }
 
-    public function attendance_records()
+    public function attendance_records(Request $request)
     {
         $user = Auth::user();
-        return view("users.attendance_records", compact('user'));
+
+        // Get month and year from request, fallback to current
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+
+        $attendanceRecords = Attendance::with(['attendanceBreaks', 'jobSchedule.service'])
+            ->where('user_id', $user->id)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->orderBy('date', 'desc')
+            ->get();
+
+        $totalMinutes = 0;
+        foreach ($attendanceRecords as $record) {
+            if ($record->check_in_time && $record->check_out_time) {
+                $in = \Carbon\Carbon::parse($record->check_in_time);
+                $out = \Carbon\Carbon::parse($record->check_out_time);
+                $duration = $out->diffInMinutes($in);
+
+                $breakMinutes = $record->attendanceBreaks->sum(function ($break) {
+                    return \Carbon\Carbon::parse($break->end_break)->diffInMinutes(\Carbon\Carbon::parse($break->start_break));
+                });
+
+                $totalMinutes += ($duration - $breakMinutes);
+            }
+        }
+
+        $totalHours = floor($totalMinutes / 60);
+        $remainingMinutes = $totalMinutes % 60;
+
+        return view("users.attendance_records", [
+            'user' => $user,
+            'attendanceRecords' => $attendanceRecords,
+            'currentMonth' => $month,
+            'currentYear' => $year,
+            'totalHours' => $totalHours,
+            'remainingMinutes' => $remainingMinutes
+        ]);
     }
+
+
 
     public function holidays()
     {
@@ -514,20 +454,19 @@ class UserController extends Controller
     $authUserId = $user->id;
     $adminFeePercentage = 11; // 11% admin fee
 
-    
-        $year = now()->year;
-        $month = now()->month;
-        $daysInMonth = now()->daysInMonth;
+    $year = now()->year;
+    $month = now()->month;
+    $daysInMonth = now()->daysInMonth;
 
-        $calendarDays = [];
-        for ($day = 1; $day <= $daysInMonth; $day++) {
-            $date = \Carbon\Carbon::create($year, $month, $day);
-            $calendarDays[] = [
-                'day' => $date->format('D'),          // Mon, Tue, etc.
-                'date' => $date->format('d'),         // 01, 02, etc.
-                'full_date' => $date->toDateString()  // YYYY-MM-DD
-            ];
-        }
+    $calendarDays = [];
+    for ($day = 1; $day <= $daysInMonth; $day++) {
+        $date = \Carbon\Carbon::create($year, $month, $day);
+        $calendarDays[] = [
+            'day' => $date->format('D'),          // Mon, Tue, etc.
+            'date' => $date->format('d'),         // 01, 02, etc.
+            'full_date' => $date->toDateString()  // YYYY-MM-DD
+        ];
+    }
 
     // Get selected date or default to today
     $selectedDate = $request->input('selected_date');
@@ -536,8 +475,8 @@ class UserController extends Controller
                            : Carbon::today()->toDateString();
     $now = Carbon::now();
 
-    // Current jobs (status = 1)
-    $schedules = JobSchedule::with([
+    // **Assigned jobs (status = 1)**
+    $assignedSchedules = JobSchedule::with([
         'service',
         'customer',
         'subCategory',
@@ -549,13 +488,47 @@ class UserController extends Controller
     ])
     ->where('status', 1)
     ->where('user_id', $authUserId)
-    ->whereDate('start_date', '<=', $today)
-    ->whereDate('end_date', '>=', $today)
+    ->where(function ($query) use ($today, $authUserId) {
+        $query->where(function ($q) use ($today, $authUserId) {
+            // Case 1: Today is within job range and attendance doesn't exist
+            $q->whereDate('start_date', '<=', $today)
+              ->whereDate('end_date', '>=', $today)
+              ->whereDoesntHave('attendance', function ($subQuery) use ($authUserId) {
+                  $subQuery->where('user_id', $authUserId)
+                           ->whereRaw('DATE(created_at) BETWEEN start_date AND end_date');
+              });
+        })->orWhere(function ($q) use ($today) {
+            // Case 2: Job has already passed (end_date < today)
+            $q->whereDate('end_date', '<', $today);
+        });
+    })
+    ->orderBy('id', 'desc')
+    ->get();
+    
+
+    // **Ongoing jobs (status = 1 and attendance exists between start and end dates)**
+    $ongoingSchedules = JobSchedule::with([
+        'service',
+        'customer',
+        'subCategory',
+        'userService',
+        'attendance' => function ($query) use ($authUserId) {
+            $query->where('user_id', $authUserId);
+        }
+    ])
+    ->where('status', 1)
+    ->where('user_id', $authUserId)
+    ->whereHas('attendance', function ($query) use ($authUserId) {
+        $query->where('user_id', $authUserId)
+              ->whereBetween('created_at', [
+                  DB::raw('start_date'),  // start_date from JobSchedule
+                  DB::raw('end_date')     // end_date from JobSchedule
+              ]);
+    })
     ->get();
 
     // Completed jobs (status = 2 or 1 that are ended)
     if ($selectedDate) {
-        // Format and validate the selected date
         try {
             $parsedDate = Carbon::parse($selectedDate)->toDateString();
         } catch (\Exception $e) {
@@ -571,20 +544,18 @@ class UserController extends Controller
                   ->with('attendanceBreaks');
         }
     ])
-    ->whereIn('status', [1, 2])
+    ->where('status', 2)
     ->where('user_id', $authUserId);
-    
-    // ✅ Apply exact date match if selected
+
+    // Apply exact date match if selected
     if (!empty($parsedDate)) {
         $completedSchedulesQuery->whereDate('end_date', '=', $parsedDate);
-    } else {
-        // ✅ Default to past dates only
-        $completedSchedulesQuery->whereDate('end_date', '<', now()->toDateString());
-    }
-    
+    } 
+
     $completedSchedules = $completedSchedulesQuery
         ->latest('end_time')
         ->get();
+    //dd($completedSchedules);
 
     // Calculate earnings
     foreach ($completedSchedules as $job) {
@@ -632,10 +603,12 @@ class UserController extends Controller
         'calendarDays',
         'month',
         'year',
-        'schedules',
-        'completedSchedules'
+        'assignedSchedules',     // Passing assigned schedules to the view
+        'ongoingSchedules',      // Passing ongoing schedules to the view
+        'completedSchedules'     // Passing completed schedules to the view
     ));
 }
+
 
 
     

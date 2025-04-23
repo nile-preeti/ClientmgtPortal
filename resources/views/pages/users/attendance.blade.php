@@ -6,7 +6,104 @@
         color: #064086 !important;
     }
     .highcharts-credits{display: none;}
+
+
+            .info-card.member-info{padding: 0rem;}
+
+            .info-card p {
+                color: var(--gray, #505667);
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: 20px;
+                letter-spacing: 0.25px;
+                padding: 0;
+                margin: 0;
+            }
+
+            .name-info p {
+                font-size: 16px;
+            }
+
+            .info-card h6 {
+                color: var(--gray1, #8F93A0);
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 16px;
+                letter-spacing: 0.4px;
+                margin: 0;
+                padding: 0;
+            }
+            .info-card .account-status svg {
+                color: var(--green, #7BC043);
+            }
+
+            .week-number, .hours-worked {
+                font-size: 13px;
+                margin: 0;
+                padding: 0;
+                line-height: normal;
+                color: var(--blue);
+                font-weight: 700;
+            }
+
+            .day-details {
+                border-radius: 10px;
+                border: 1px solid #d9e2ee;
+            }
+
+            .date-info {
+                color: #064086;
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 700;
+                line-height: 20px;
+                letter-spacing: 0.25px;
+                margin: 0;
+                padding: 0;
+            }
+
+            .info-card h3 {
+                color: var(--gray, #505667);
+                font-size: 12px;
+                font-style: normal;
+                line-height: 20px;
+                letter-spacing: 0.25px;
+                margin: 0;
+                padding: 0;
+            }
+
+            
+
+            .week-number, .hours-worked {
+                font-size: 13px;
+                margin: 0;
+                padding: 0;
+                line-height: normal;
+                color: #23356f;
+                font-weight: 700;
+            }
+
+            .cp-action-btn a {
+                position: relative;
+                color: var(--gray);
+                border-radius: 5px;
+                font-weight: 400;
+                font-size: 13px;
+                box-sizing: border-box;
+                padding: 0px 4px;
+                border: 1px solid var(--border);
+                background: #FFF;
+                box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05);
+                margin-left: 10px;
+                display: inline-block;
+            }
+            
 </style>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="{{ asset('plugins/bootstrap/js/bootstrap.min.js') }}"></script>
+<link rel="stylesheet" href="{{ asset('plugins/bootstrap/css/bootstrap.min.css') }}">
 
 @extends('layouts.app')
 @section('content')
@@ -79,36 +176,14 @@
                                         </div>
                                     </div> --}}
 
-                                    <div class="col-sm-4 col-md-4">
+
+                                    <div class="col-sm-5 col-md-5">
                                         <div class="form-group">
-                                            <select class="form-control" id="selectcountry"
-                                                onchange="changeStatus(this.value)">
-                                                <option value="">--Filter By Status--</option>
-                                                <option value="Present" @if (request()->has('status') && request('status') == 'Present') selected @endif>
-                                                    Present </option>
-
-                                                <option value="Absent" @if (request()->has('status') && request('status') == 'Absent') selected @endif>
-                                                    Absent </option>
-
-                                                <option value="Half-day" @if (request()->has('status') && request('status') == 'Half-day') selected @endif>
-                                                    Half-day </option>
-
-                                            </select>
-
-
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-sm-4 col-md-4">
-                                        <div class="form-group">
-                                            <select class="form-control" id="selectMonth"
-                                                onchange="filterByMonth(this.value)">
+                                            <select class="form-control" id="selectMonth" onchange="filterByMonthYear()">
                                                 <option value="">--Filter By Month--</option>
                                                 @for ($i = 1; $i <= 12; $i++)
                                                     @php
-                                                        $currentMonth = date('m'); // Get current month as "02", "03", etc.
-                                                        $selectedMonth = request('month', $currentMonth); // Use requested month or default to current
+                                                        $selectedMonth = request('month', date('m'));
                                                     @endphp
                                                     <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}"
                                                         {{ $selectedMonth == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
@@ -119,18 +194,22 @@
                                         </div>
                                     </div>
 
-
-
-                                    <div class="col-sm-3 col-md-3">
+                                    <div class="col-sm-5 col-md-5">
                                         <div class="form-group">
-                                            <form id="filterForm">
-                                                <input type="date" name="date" class="form-control" id="datePicker"
-                                                    value="{{ request('date') }}">
-                                            </form>
+                                            <select class="form-control" id="selectYear" onchange="filterByMonthYear()">
+                                                <option value="">--Filter By Year--</option>
+                                                @php
+                                                    $currentYear = date('Y');
+                                                    $selectedYear = request('year', $currentYear);
+                                                @endphp
+                                                @for ($y = $currentYear; $y >= ($currentYear - 10); $y--)
+                                                    <option value="{{ $y }}" {{ $selectedYear == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                                @endfor
+                                            </select>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-1">
+                                    <div class="col-md-2">
                                         <div class="form-group">
                                             <div class="btn-reload"
                                                 onclick="window.location.href = window.location.origin + window.location.pathname;"
@@ -142,144 +221,131 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="d-flex justify-content-between">
-                                    <div class="d-flex justify-content-end mt-3">
-                                        <p><b>Total Working Days: {{ $totalWorkingDays }}</b></p>
-                                    </div>
-                                    <div class="d-flex justify-content-end mt-3">
-                                        <p><b>Total Present: {{ $totalPresent }}</b></p>
-                                    </div>
-                                    <div class="d-flex justify-content-end mt-3">
-                                        <p><b>Total Absent: {{ $totalAbsent }}</b></p>
+                               
+                                <div class="recordsList">
+                                    <div class="col-md-12">
+
+                                        <div class="cp-card">
+                                            <div class="info-card">
+                                            
+                                                <div class="info-card member-info">
+                                                
+                                                    <div class="time-card-head d-flex align-items-center ">
+                                                        <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/working-hour.png" alt="image" class="img-fluid me-2" style="width: 25px; height: auto;border-radius: 0!important;">
+                                                        <h4 class="hours-worked">
+                                                        Total Hours worked: 
+                                                            {{ $totalHours }} hour{{ $totalHours != 1 ? 's' : '' }} 
+                                                            @if ($remainingMinutes > 0)
+                                                                {{ $remainingMinutes }} minute{{ $remainingMinutes != 1 ? 's' : '' }}
+                                                            @endif
+                                                        </h4>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="week-details">
+                                                        <div class="row">
+                                                            @if($attendanceRecords->isNotEmpty())
+                                                                @foreach($attendanceRecords as $record)
+                                                                    <div class="col-md-4">
+                                                                        <div class="day-details px-4 py-2 mt-4">
+                                                                            
+                                                                        <div class="d-flex justify-content-between">
+                                                                        <div>
+                                                                        <h5 class="date-info">Date: {{ $record->date }}</h5>
+                                                                        <h5 class="date-info">Service Name: {{ $record->jobSchedule->service->name ?? 'N/A' }}</h5>
+                                                                        </div>
+                                                                            <div class="cp-action-btn">
+                                                                            <a href="javascript:void(0);" class="view-break-details" data-bs-toggle="modal" data-bs-target="#breakModal{{ $record->id }}">
+                                                                                <img src="https://nileprojects.in/client-portal/public/assets/images/eye.svg">
+                                                                            </a>
+                                                                            </div>
+                                                                        </div>
+                                                                            
+
+                                                                            <div class="time-details">
+                                                                                <div class="d-flex align-items-center card-time-detail-info mt-3">
+                                                                                    <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/end-time-icon.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
+                                                                                    <h3 class="time-sub-head">Start Time: {{ $record->check_in_time }}</h3>
+                                                                                </div>
+                                                                                <div class="d-flex align-items-center card-time-detail-info mt-2">
+                                                                                    <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/start-time-icon.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
+                                                                                    <h3>End Time: {{ $record->check_out_time ?? 'Not checked out' }}</h3>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="d-flex card-time-detail-info mt-2">
+                                                                                <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/total-work-hours.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
+                                                                                <h3>Total Hours Worked on Day:
+                                                                                    @if($record->check_out_time)
+                                                                                    @php
+                                                                                        $start = \Carbon\Carbon::parse($record->check_in_time);
+                                                                                        $end = \Carbon\Carbon::parse($record->check_out_time);
+                                                                                        $totalMinutes = $end->diffInMinutes($start);
+
+                                                                                        foreach($record->attendanceBreaks as $break) {
+                                                                                            if($break->start_break && $break->end_break) {
+                                                                                                $totalMinutes -= \Carbon\Carbon::parse($break->end_break)->diffInMinutes(\Carbon\Carbon::parse($break->start_break));
+                                                                                            }
+                                                                                        }
+                                                                                        $totalHoursDecimal = number_format($totalMinutes / 60, 2);
+                                                                                    @endphp
+                                                                                    {{ $totalHoursDecimal }} hours &nbsp; &nbsp; &nbsp;
+                                                                                    @else
+                                                                                        Absent
+                                                                                    @endif
+                                                                                </h3>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="modal fade" id="breakModal{{ $record->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $record->id }}" aria-hidden="true">
+                                                                        <div class="modal-dialog">
+                                                                            <div class="modal-content">
+                                                                                <div class="modal-header">
+                                                                                    <h1 class="modal-title fs-5" id="modalLabel{{ $record->id }}">Break Details</h1>
+                                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                                </div>
+                                                                                <div class="modal-body">
+                                                                                    @if($record->attendanceBreaks->isNotEmpty())
+                                                                                        @foreach($record->attendanceBreaks as $break)
+                                                                                            <p><strong>Break Start-End:</strong> {{ \Carbon\Carbon::parse($break->start_break)->format('h:i A') }} -
+                                                                                            {{ \Carbon\Carbon::parse($break->end_break)->format('h:i A') }}</p>
+                                                                                        @endforeach
+                                                                                    @else
+                                                                                        <p>No breaks recorded.</p>
+                                                                                    @endif
+                                                                                </div>
+                                                                                <div class="modal-footer d-none">
+                                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            @else
+                                                                <div class="col-12">
+                                                                    <div class="alert alert-warning text-center">
+                                                                        No attendance records found for the selected month and year.
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <table id="user-list-table"
-                                    class="table-responsive table table-striped table-hover table-borderless mt-4">
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Check In Time</th>
-                                            <th>Check In Location</th>
-                                            <th>Check Out Time</th>
-                                            <th>Check Out Location</th>
-                                            <th>Working Hours</th>
-                                            <th>Status</th>
-                                            <th>Breaks</th>
-
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($allDaysPaginated as $item)
-                                            <tr>
-                                                <td>{{ date('Y-m-d', strtotime($item['date'])) }}</td>
-                                                <td>{{ $item['check_in_time'] ?? 'N/A' }}</td>
-                                                <td>{{ $item['check_in_full_address'] ? substr($item['check_in_full_address'], 0, 30) : 'N/A' }}
-                                                </td>
-                                                <td>{{ $item['check_out_time'] ?? 'N/A' }}</td>
-                                                <td>{{ $item['check_out_full_address'] ? substr($item['check_out_full_address'], 0, 30) : 'N/A' }}
-                                                </td>
-                                                <td>{{ $item['working_hours'] }}</td>
-                                                <td>
-                                                    <span
-                                                        class="badge 
-                                                {{ $item['status'] == 'Absent' ? 'bg-danger' : 'iq-bg-primary' }}">
-                                                        {{ is_array($item['status']) ? 'Present' : $item['status'] }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    @if (!empty($item['breaks']) && collect($item['breaks'])->some(function ($break) {
-                                                    return strtotime($break['end_break']) - strtotime($break['start_break']) >= 60; // Check if break is ≥ 1 min
-                                                    }))
-                                                    <button class="btn btn-primary" onclick='showBreaks(@json($item))'>View</button>
-                                                    @else
-                                                    N/A
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="6" align="center">No records found</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
                             </div>
 
-                            <div class="row justify-content-between mt-3">
-                                <div id="user-list-page-info" class="col-md-6">
-                                    {{-- <span>Showing 1 to 5 of 5 entries</span> --}}
-                                </div>
-                                <div class="col-md-6">
-                                    <nav aria-label="Page navigation example">
-                                        <ul class="pagination justify-content-end mb-0">
-                                            {{-- Previous Button --}}
-                                            @if ($allDaysPaginated->onFirstPage())
-                                                <li class="page-item disabled">
-                                                    <a class="page-link" href="#" tabindex="-1"
-                                                        aria-disabled="true">Previous</a>
-                                                </li>
-                                            @else
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                        href="{{ $allDaysPaginated->previousPageUrl() }}">Previous</a>
-                                                </li>
-                                            @endif
-
-                                            {{-- Page Numbers --}}
-                                            @foreach ($allDaysPaginated->links()->elements[0] ?? [] as $page => $url)
-                                                @if ($page == $allDaysPaginated->currentPage())
-                                                    <li class="page-item active"><a class="page-link"
-                                                            href="{{ $url }}">{{ $page }}</a></li>
-                                                @else
-                                                    <li class="page-item"><a class="page-link"
-                                                            href="{{ $url }}">{{ $page }}</a></li>
-                                                @endif
-                                            @endforeach
-
-                                            {{-- Next Button --}}
-                                            @if ($allDaysPaginated->hasMorePages())
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                        href="{{ $allDaysPaginated->nextPageUrl() }}">Next</a>
-                                                </li>
-                                            @else
-                                                <li class="page-item disabled">
-                                                    <a class="page-link" href="#" tabindex="-1"
-                                                        aria-disabled="true">Next</a>
-                                                </li>
-                                            @endif
-                                        </ul>
-                                    </nav>
-                                </div>
-
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div> <!-- Large Approved modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Breaks Details</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="breaks-chart-container" style="height: 400px;"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
 
-            </div>
-        </div>
-    </div>
-</div>
 
    <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/xrange.js"></script>
@@ -403,6 +469,15 @@
             url.searchParams.set('month', month);
             window.location.href = url.href;
         }
+        function filterByMonthYear() {
+            let month = document.getElementById('selectMonth').value;
+            let year = document.getElementById('selectYear').value;
+            let url = new URL(window.location.href);
+            url.searchParams.set('month', month);
+            url.searchParams.set('year', year);
+            window.location.href = url.toString();
+        }
+
     </script>
     <script>
         document.getElementById('datePicker').addEventListener('keydown', function(e) {

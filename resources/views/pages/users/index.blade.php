@@ -57,84 +57,75 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="table-responsive">
-                                    <table id="user-list-table"
-                                        class="table table-striped table-hover table-borderless mt-0" role="grid"
-                                        aria-describedby="user-list-page-info">
-                                        <thead>
-                                            <tr>
-                                                <th> Name</th>
-                                                <th>Email</th>
-                                                {{-- <th>Designation</th> --}}
-                                                <th>Phone No.</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse ($users as $item)
-                                                <tr>
-                                                    <td class="d-flex align-items-center"><img
-                                                            class="avatar-30 rounded mr-2"
-                                                            src="{{ $item->image ? asset("uploads/images/$item->image") : asset('avatar-1.png') }}"
-                                                            alt="profile"> {{ $item->name }}</td>
-
-                                                    <td>{{ $item->email }}</td>
-                                                    {{-- <td>{{ $item->designation ?? 'N/A' }}</td> --}}
-                                                    <td>{{ $item->phone ?? 'N/A' }}</td>
-                                                    <td><span
-                                                            class="badge dark-icon-light iq-bg-primary">{{ $item->status ? 'Active' : 'Inactive' }}</span>
-                                                    </td>
-
-                                                    <td>
-                                                        <div class="flex align-items-center list-user-action">
-                                                            {{-- <a  data-toggle="modal"
-                                                                data-name="{{ $item->name ?? '' }}"
-                                                                data-status="{{ $item->status ?? '' }}"
-                                                                data-email="{{ $item->email ?? '' }}"
-                                                                data-designation="{{ $item->designation }}"
-                                                                data-phone="{{ $item->phone }}"
-                                                                data-image="{{ $item->image ? asset("uploads/images/$item->image") : null }}"
-                                                                data-url="{{ route('userss.update', $item->id) }}"
-                                                                onclick="showData(this)" data-target="#EditModel"
-                                                                style="cursor: pointer"><i class="ri-pencil-fill"></i></a> --}}
-
-                                                            {{-- edit button --}}
-                                                            <a href="{{ route('userss.edit', $item->id) }}"
-                                                                class="btnedit"><i class="ri-pencil-fill"></i></a>
-                                                            {{-- delete  button --}}
-                                                            <a class="btndelete" data-id="{{ $item->id }}"
-                                                                style="cursor: pointer"
-                                                                data-url="{{ route('userss.destroy', $item->id) }}"
-                                                                onclick="deletePublic(this)"><i
-                                                                    class="ri-delete-bin-7-line"></i></a>
-                                                            <a class="btnview" data-id="{{ $item->id }}"
-                                                                style="cursor: pointer"
-                                                                href="{{ route('user.job_schedule', $item->id) }}"><i
-                                                                    class="ri-briefcase-line"></i></a>
-                                                            <a class="btnview" data-id="{{ $item->id }}"
-                                                                style="cursor: pointer"
-                                                                href="{{ route('userAttendance', $item->id) }}"><i
-                                                                    class="ri-calendar-event-fill"></i></a>
-
-
-                                                        </div>
-
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="5" align="center">No records found</td>
-                                                </tr>
-                                            @endforelse
-
-
-
-                                        </tbody>
-                                    </table>
-                                </div>
+                                
                             </div>
-                            <div class="row justify-content-between mt-3">
+                            
+                        </div>
+                        
+                    </div>
+                    @forelse ($users as $item)
+                    <div class="iq-card">
+                        <div class="iq-card-body">
+                        
+                            <div class="info-card">
+                          
+                                <div class="row align-items-center">
+                                
+                                    <div class="col-md-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="info-image">
+                                                <img src="{{ $item->image ? asset("uploads/images/$item->image") : asset('avatar-1.png') }}" alt="image" class="img-fluid">
+                                            </div>
+                                            <div class="name-info ml-3">
+                                                <p>{{ $item->name }}</p>
+                                                <h6 class="mt-2"></h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 overflow-hidden">
+                                        <h6>Email Id</h6>
+                                        <p class="mt-2">{{ $item->email }}</p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h6>Phone No.</h6>
+                                        <p class="mt-2">{{ $item->phone ?? 'N/A' }}</p>
+                                    </div>
+                                    <div class="col-md-1 account-status">
+                                        <h6>Status</h6>
+                                        <p class="mt-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-circle-fill me-2" viewBox="0 0 16 16"><circle cx="6" cy="6" r="6"></circle></svg>{{ $item->status ? 'Active' : 'Inactive' }}</p>
+                                    </div>
+                                    <div class="col-md-3 account-status">
+                                        <h6>Action</h6>
+                                        <div class="mt-2 flex align-items-center list-user-action">
+                                            <a href="{{ route('userss.edit', $item->id) }}" class="btnedit"><i class="ri-pencil-fill"></i></a>
+
+                                            <a class="btndelete" data-id="{{ $item->id }}" style="cursor: pointer" data-url="{{ route('userss.destroy', $item->id) }}" onclick="deletePublic(this)"><i class="ri-delete-bin-7-line"></i></a>
+
+                                            <a class="btnview" data-id="{{ $item->id }}" style="cursor: pointer" href="{{ route('user.job_schedule', $item->id) }}"><i class="ri-briefcase-line"></i></a>
+                                            <a class="btnview" data-id="{{ $item->id }}" style="cursor: pointer" href="{{ route('userAttendance', $item->id) }}"><i class="ri-calendar-event-fill"></i></a>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="col-md-2">
+                                        <div class="text-end">
+                                            <a href="https://nileprojects.in/clearchoice-janitorial/timesheet-requests/13" class="view-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye me-2" viewBox="0 0 16 16"><path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"></path><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"></path></svg>View</a>
+                                        </div>
+                                    </div> -->
+                                </div>
+                               
+                                
+                            </div>
+                           
+                        </div>
+                    </div>
+                    @empty
+                        <div class="row align-items-center"> <>
+                            <p>No records found</p>
+                        </div>
+                    @endforelse
+                </div>
+                
+            </div>
+            <div class="row justify-content-between mt-3">
                                 <div id="user-list-page-info" class="col-md-6">
                                     {{-- <span>Showing 1 to 5 of 5 entries</span> --}}
                                 </div>
@@ -189,10 +180,7 @@
                                 </div>
 
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div> <!-- Large Approved modal -->
 
