@@ -361,7 +361,9 @@
         const address = await getAddressFromCoordinates(lat, lng);
         const serviceId = "{{ $service_id }}";
 
-        if (checkinBtn.getAttribute("data-id") == "check_in") {
+        const state = checkinBtn.getAttribute("data-id");
+
+        if (state === "check_in") {
             const result = await saveDataToPHP("{{ route('user.attendance.store') }}", {
                 _token: csrfToken,
                 user_id: user.id,
@@ -372,24 +374,23 @@
             });
 
             if (result.status === "success") {
-                checkinBtn.textContent = `Start Break`;
+                checkinBtn.textContent = "Start Break";
+                checkinBtn.setAttribute("data-id", "start_break");
                 checkoutBtn.disabled = false;
-                Swal.fire("Success", result.message, "success");
 
+                Swal.fire("Success", result.message, "success");
                 $("#table_container").removeClass("d-none");
+
                 recordsContainer.innerHTML += `
                     <div class="record-item">
                         <span>Job Started:</span> <span>${result.data.check_in_time}</span>
                     </div>`;
-                checkinBtn.setAttribute("data-id", "start_break");
-
-                return;
             } else {
                 Swal.fire("Error", result.message, "error");
             }
         }
 
-        if (checkinBtn.getAttribute("data-id") == "start_break") {
+        else if (state === "start_break") {
             const result = await saveDataToPHP("{{ route('user.attendance.break') }}", {
                 _token: csrfToken,
                 user_id: user.id,
@@ -398,8 +399,11 @@
             });
 
             if (result.success) {
-                checkinBtn.textContent = `End Break`;
-                checkoutBtn.disabled = false;
+                checkinBtn.textContent = "End Break";
+                checkinBtn.setAttribute("data-id", "end_break");
+                checkinBtn.setAttribute("data-break-id", result.break_id);
+                checkoutBtn.disabled = true;
+
                 Swal.fire("Success", result.message, "success");
 
                 recordsContainer.innerHTML += `
@@ -407,18 +411,13 @@
                         <span>Break Start - End:</span> 
                         <span>${result.start_break} - <span id="end_${result.break_id}">-</span></span>
                     </div>`;
-
-                checkinBtn.setAttribute("data-id", "end_break");
-                checkinBtn.setAttribute("data-break-id", result.break_id); // Store break ID for updating
-
-                return;
             } else {
                 Swal.fire("Error", result.message, "error");
             }
         }
 
-        if (checkinBtn.getAttribute("data-id") == "end_break") {
-            const breakId = checkinBtn.getAttribute("data-break-id"); // Retrieve break ID
+        else if (state === "end_break") {
+            const breakId = checkinBtn.getAttribute("data-break-id");
 
             const result = await saveDataToPHP("{{ route('user.attendance.break') }}", {
                 _token: csrfToken,
@@ -428,16 +427,12 @@
             });
 
             if (result.success) {
-                checkinBtn.textContent = `Start Break`;
-                checkoutBtn.disabled = false;
-                Swal.fire("Success", result.message, "success");
-
-                // Update the same break entry instead of adding a new one
-                document.getElementById(`end_${breakId}`).textContent = result.end_break;
-
+                checkinBtn.textContent = "Start Break";
                 checkinBtn.setAttribute("data-id", "start_break");
+                checkoutBtn.disabled = false;
 
-                return;
+                Swal.fire("Success", result.message, "success");
+                document.getElementById(`end_${breakId}`).textContent = result.end_break;
             } else {
                 Swal.fire("Error", result.message, "error");
             }
@@ -445,8 +440,11 @@
     });
 
     checkoutBtn.addEventListener("click", async () => {
+        if (checkoutBtn.disabled) return; // Prevent action if still disabled
+
         const address = await getAddressFromCoordinates(lat, lng);
         const serviceId = "{{ $service_id }}";
+
         const result = await saveDataToPHP("{{ route('user.attendance.update') }}", {
             _token: csrfToken,
             user_id: user.id,
@@ -458,6 +456,8 @@
 
         if (result.status === "success") {
             checkinBtn.disabled = true;
+            checkoutBtn.disabled = true;
+
             recordsContainer.innerHTML += `
                 <div class="record-item">
                     <span>Job Ended:</span> <span>${result.data.check_out_time}</span>
@@ -468,6 +468,8 @@
         }
     });
 }
+
+
 
 
             // Fetch Address from Coordinates
@@ -513,61 +515,76 @@
 
             function fetchRecords() {
                 $.get("{{ route('user.attendance.fetch.today') }}" + "?id=" + user.id + "&service_id={{ $service_id }}", function (data) {
-        if (data.success) {
-            if (data.today) {
-                const checkinBtn = document.getElementById("checkinBtn");
-                const serviceId = "{{ $service_id }}";
+                    if (data.success) {
+                        if (data.today) {
+                            const checkinBtn = document.getElementById("checkinBtn");
+                            const checkoutBtn = document.getElementById("checkoutBtn");
+                            const serviceId = "{{ $service_id }}";
 
-                if (data.today.check_in_time) {
-                    $("#checkoutBtn").attr("disabled", false);
-                    $("#table_container").removeClass("d-none");
+                            let hasActiveBreak = false;
 
-                    $("#recordsContainer").append(`
-                        <div class="record-entry">
-                            <span class="record-label">Job Started:</span>
-                            <span class="record-value">${data.today.check_in_time}</span>
-                        </div>
-                    `);
+                            if (data.today.check_in_time) {
+                                $("#table_container").removeClass("d-none");
 
-                    checkinBtn.setAttribute("data-id", "start_break");
-                    checkinBtn.textContent = `Start Break`;
-                }
+                                $("#recordsContainer").append(`
+                                    <div class="record-entry">
+                                        <span class="record-label">Job Started:</span>
+                                        <span class="record-value">${data.today.check_in_time}</span>
+                                    </div>
+                                `);
 
-                if (data.breaks) {
-                    data.breaks.forEach((breakItem) => {
-                        let breakStart = breakItem.break_start ? breakItem.break_start : "-";
-                        let breakEnd = breakItem.break_end ? breakItem.break_end : "-";
+                                checkinBtn.setAttribute("data-id", "start_break");
+                                checkinBtn.textContent = `Start Break`;
+                            }
 
-                        $("#recordsContainer").append(`
-                            <div class="record-entry">
-                                <span class="record-label">Break Start - End:</span>
-                                <span class="record-value">${breakStart} - ${breakEnd}</span>
-                            </div>
-                        `);
+                            if (data.breaks && data.breaks.length > 0) {
+                                data.breaks.forEach((breakItem) => {
+                                    let breakStart = breakItem.break_start || "-";
+                                    let breakEnd = breakItem.break_end || "-";
 
-                        if (!breakItem.break_end) {
-                            checkinBtn.setAttribute("data-id", "end_break");
-                            checkinBtn.textContent = `End Break`;
-                        } else {
-                            checkinBtn.setAttribute("data-id", "start_break");
-                            checkinBtn.textContent = `Start Break`;
+                                    $("#recordsContainer").append(`
+                                        <div class="record-entry">
+                                            <span class="record-label">Break Start - End:</span>
+                                            <span class="record-value">${breakStart} - ${breakEnd}</span>
+                                        </div>
+                                    `);
+
+                                    if (!breakItem.break_end) {
+                                        // Active break found
+                                        hasActiveBreak = true;
+                                        checkinBtn.setAttribute("data-id", "end_break");
+                                        checkinBtn.setAttribute("data-break-id", breakItem.id); // Optional, if needed
+                                        checkinBtn.textContent = `End Break`;
+                                    }
+                                });
+
+                                // If all breaks are completed
+                                if (!hasActiveBreak) {
+                                    checkinBtn.setAttribute("data-id", "start_break");
+                                    checkinBtn.textContent = `Start Break`;
+                                }
+                            }
+
+                            // Enable/disable checkout based on active break
+                            if (data.today.check_in_time && data.today.check_out_time === "N/A") {
+                                checkoutBtn.disabled = hasActiveBreak;
+                            }
+
+                            if (data.today.check_out_time !== "N/A") {
+                                $("#checkinBtn").attr("disabled", true);
+                                $("#checkoutBtn").attr("disabled", true);
+                                $("#recordsContainer").append(`
+                                    <div class="record-entry">
+                                        <span class="record-label">Job Ended:</span>
+                                        <span class="record-value">${data.today.check_out_time}</span>
+                                    </div>
+                                `);
+                            }
                         }
-                    });
-                }
-
-                if (data.today.check_out_time != "N/A") {
-                    $("#checkinBtn").attr("disabled", true);
-                    $("#recordsContainer").append(`
-                        <div class="record-entry">
-                            <span class="record-label">Job Ended:</span>
-                            <span class="record-value">${data.today.check_out_time}</span>
-                        </div>
-                    `);
-                }
+                    }
+                });
             }
-        }
-    });
-}
+
 
 
 

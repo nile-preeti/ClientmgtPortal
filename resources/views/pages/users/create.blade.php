@@ -136,11 +136,13 @@
                                     <div class="col-md-4">
                                         <label for="">Profile Image</label>
                                         <div class="profile-img-edit">
+                                        @if(isset($user))
                                             <img 
                                                 src="{{ $user->image ? asset('uploads/images/' . $user->image) : 'https://nileprojects.in/client-portal/public/avatar-1.png' }}" 
                                                 class="rounded-circle profile-pic img-fluid rounded mr-2" 
                                                 alt="user"
                                             />
+                                        @endif
                                             <div class="p-image">
                                               <i class="ri-pencil-line upload-button"></i>
                                               <input class="file-upload" type="file" name="image" accept=".png,.jpeg,.jpg,.svg"/>

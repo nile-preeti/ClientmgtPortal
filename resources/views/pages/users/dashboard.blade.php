@@ -113,6 +113,10 @@
   .container-wrapper-main{margin-left: 270px;}
   </style>
 
+</head>
+@extends('layouts.user.app')
+<body>
+
   <!-- <header class="header py-2">
     <div class="container-fluid">
       <div class="d-flex flex-wrap align-items-center justify-content-between">

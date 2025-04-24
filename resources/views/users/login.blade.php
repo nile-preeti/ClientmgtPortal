@@ -70,38 +70,51 @@
                     </div> -->
 
 
-                    <div class="p-4 card overflow-hidden col-lg-5 col-sm-12">
-                        <div class="sign-in-from">
-                            <div class="text-white" >
-                                @php
-                                    $logo = \App\Models\Logo::first();
-                                @endphp
-
-                                <img class="rounded-pill logo-res" src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" height="90px"  alt="" />
+                <div class="p-4 card overflow-hidden" style="box-shadow: 0px 8px 13px rgb(0 0 0 / 5%); border-radius: 15px; position: relative; background-color: rgb(255 255 255 / 80%); overflow: hidden; -webkit-backdrop-filter: saturate(200%) blur(5px); backdrop-filter: saturate(200%) blur(5px);">
+                    <div class="row"> 
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="auth-content">
+                                <div class="auth-content-info text-center">
+                                    <h4 class="text-black mb-2 font-weight-bold">Secure Access Portal</h4>
+                                    <p class="mb-5 text-dark">Unlock The Power Of Seamless And Protected Interaction With Your Intuitive Admin Panel.</p>
+                                    <div class="auth-illustration">
+                                        <img class="mt-2" src="https://nileprojects.in/client-portal/public/admin-login-img.svg" alt="" width="100%">
+                                    </div>
+                                </div>
                             </div>
-                           
-                            <h3 class="mb-0 dark-signin font-weight-bold">Employee Login</h3>
-                            <p>Please enter your details to login.</p>
-                            <form class="mt-4" id="signin_form" enctype="multipart/form-data" action="{{route('user.login_post')}}" method="POST">
-                                @csrf
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1"><i class="ri-profile-line"></i> &nbsp;Employee Id</label>
-                                    <input type="text" name="emp_id" class="form-control mb-0" id="exampleInputEmail1" placeholder="Enter emp id">
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputPassword1"><i class="ri-lock-password-line"></i> &nbsp;Password</label>
-                                    <input type="password"  name="password" class="form-control mb-0" id="exampleInputPassword1" placeholder="Password">
-                                </div>
-                                <div class="d-inline-block w-100">
-                                    <button type="submit" class=" btn-primary btn-signin"> <i class="ri-login-circle-line font-weight-normal"></i> &nbsp;Sign in</button>
-                                    {{-- <a href="#" class="float-right">Forgot password?</a> --}}
-                                </div>
-                                {{-- <div class="sign-info">
-                                    <span class="dark-color d-inline-block line-height-2">Don't have an account? <a href="sign-up.html">Sign up</a></span>
-                                </div> --}}
-                            </form>
                         </div>
-                    </div>
+                        <div class="col-lg-6 col-sm-12">
+                            <div class="sign-in-from">
+                                <div class="text-white text-center" style="margin: 20px 0;" >
+                                    @php
+                                        $logo = \App\Models\Logo::first();
+                                    @endphp
+
+                                    <img class="rounded-pill logo-res" src="{{ $logo && file_exists(public_path('uploads/logo/' . $logo->name)) ? asset('uploads/logo/' . $logo->name) : asset('hrmodule.png') }}" height="90px"  alt="" />
+                                </div>
+                               
+                                <h4 class="mb-0 dark-signin font-weight-bold text-center text-white">Employee Login</h4>
+                                <p class="text-center text-white">Please enter your details to login.</p>
+                                <form class="mt-4" id="signin_form" enctype="multipart/form-data" action="{{route('user.login_post')}}" method="POST">
+                                    @csrf
+                                    <div class="form-group">
+                                        <label class="text-white" for="exampleInputEmail1"><i class="ri-profile-line"></i> &nbsp;Employee Id</label>
+                                        <input type="text" name="emp_id" class="form-control mb-0" id="exampleInputEmail1" placeholder="Enter emp id">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="text-white" for="exampleInputPassword1"><i class="ri-lock-password-line"></i> &nbsp;Password</label>
+                                        <input type="password"  name="password" class="form-control mb-0" id="exampleInputPassword1" placeholder="Password">
+                                    </div>
+                                    <div class="d-inline-block w-100">
+                                        <button type="submit" class="  btn-signin-1"> <i class="ri-login-circle-line font-weight-normal"></i> &nbsp;Sign in</button>
+                                        {{-- <a href="#" class="float-right">Forgot password?</a> --}}
+                                    </div>
+                                    {{-- <div class="sign-info">
+                                        <span class="dark-color d-inline-block line-height-2">Don't have an account? <a href="sign-up.html">Sign up</a></span>
+                                    </div> --}}
+                                </form>
+                            </div>
+                        </div>
 
                 </div>
             </div>

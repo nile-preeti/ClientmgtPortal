@@ -161,7 +161,7 @@
             .attendance-records-head .btn-search {background: #064086; white-space: nowrap; width: 100%; padding: 10px 20px; display: inline-block; font-size: 13px; color: var(--white); border-radius: 5px; font-weight: 600; text-align: center; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); border: none; }
 
 
-            .attendance-records-section {padding: 1rem 0; position: relative; }
+            .attendance-records-section {padding: 1rem 0; position: relative; margin-left:270px; }
             .recordsList{list-style: none; padding: 0; margin: 0;}
 
             .attendance-records-head {display: flex ; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
@@ -260,9 +260,9 @@
 
     </style>
 </head>
-
+@extends('layouts.user.app')
 <body>
-    <header class="header py-2">
+    <!-- <header class="header py-2">
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
 
@@ -289,10 +289,10 @@
                 </div>
             </div>
         </div>
-    </header>
-    <div class="attendance-records-section">
-        <div class="container">
-            <div class="attendance-records-head">
+    </header> -->
+    <div class="attendance-records-section mt-5">
+        <div class="container mt-5">
+            <div class="attendance-records-head mt-5">
                 <h2>
                     <a href="javascript:history.back()"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Timesheet Details
                 </h2>

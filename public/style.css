@@ -228,7 +228,7 @@ a.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; backgroun
 .owl-dots{display: none;}
 .ongoing-services-action a {color: #fff; border-radius: 50px; background: #064086; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); font-weight: 700; font-size: 12px; text-align: center; padding: 8px 15px; display: inline-block; border-bottom: none; }
 .ongoing-checkin-action a {color: var(--white); border-radius: 50px; background: #064086; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); font-weight: 700; font-size: 12px; text-align: center; padding: 8px 15px; display: inline-block; border-bottom: none; }
-.dash-card{background: #ffffff; justify-content: center; padding: 20px; width: 60%; margin: 0 auto 10px auto; border-radius: 20px; border: 1px solid #dcdceb;}
+.dash-card{background: #ffffff; justify-content: center; padding: 20px;  margin: 0 auto 10px auto; border-radius: 20px; border: 1px solid #dcdceb;}
 
 
 /*
@@ -281,3 +281,16 @@ Responsive
 @media(max-width:359px) { }
 
 
+.dropdown-menu .dropdown-item {
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: flex;
+    color: #555770;
+}
+
+.dropdown-menu{
+  position: absolute;
+    inset: 0px 0px auto auto;
+    margin: 0px;
+    transform: translate3d(0px, 42.4px, 0px);
+}

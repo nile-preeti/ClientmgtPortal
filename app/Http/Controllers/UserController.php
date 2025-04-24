@@ -449,165 +449,169 @@ class UserController extends Controller
     // }
 
     public function dashboard(Request $request)
-{
-    $user = Auth::user();
-    $authUserId = $user->id;
-    $adminFeePercentage = 11; // 11% admin fee
+    {
+        $user = Auth::user();
+        $authUserId = $user->id;
+        $adminFeePercentage = 11; // 11% admin fee
 
-    $year = now()->year;
-    $month = now()->month;
-    $daysInMonth = now()->daysInMonth;
+        $year = now()->year;
+        $month = now()->month;
+        $daysInMonth = now()->daysInMonth;
 
-    $calendarDays = [];
-    for ($day = 1; $day <= $daysInMonth; $day++) {
-        $date = \Carbon\Carbon::create($year, $month, $day);
-        $calendarDays[] = [
-            'day' => $date->format('D'),          // Mon, Tue, etc.
-            'date' => $date->format('d'),         // 01, 02, etc.
-            'full_date' => $date->toDateString()  // YYYY-MM-DD
-        ];
-    }
-
-    // Get selected date or default to today
-    $selectedDate = $request->input('selected_date');
-
-    $today = $selectedDate ? Carbon::parse($selectedDate)->toDateString()
-                           : Carbon::today()->toDateString();
-    $now = Carbon::now();
-
-    // **Assigned jobs (status = 1)**
-    $assignedSchedules = JobSchedule::with([
-        'service',
-        'customer',
-        'subCategory',
-        'userService',
-        'attendance' => function ($query) use ($today, $authUserId) {
-            $query->where('user_id', $authUserId)
-                  ->whereDate('created_at', $today);
+        $calendarDays = [];
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = \Carbon\Carbon::create($year, $month, $day);
+            $calendarDays[] = [
+                'day' => $date->format('D'),          // Mon, Tue, etc.
+                'date' => $date->format('d'),         // 01, 02, etc.
+                'full_date' => $date->toDateString()  // YYYY-MM-DD
+            ];
         }
-    ])
-    ->where('status', 1)
-    ->where('user_id', $authUserId)
-    ->where(function ($query) use ($today, $authUserId) {
-        $query->where(function ($q) use ($today, $authUserId) {
-            // Case 1: Today is within job range and attendance doesn't exist
-            $q->whereDate('start_date', '<=', $today)
-              ->whereDate('end_date', '>=', $today)
-              ->whereDoesntHave('attendance', function ($subQuery) use ($authUserId) {
-                  $subQuery->where('user_id', $authUserId)
-                           ->whereRaw('DATE(created_at) BETWEEN start_date AND end_date');
-              });
-        })->orWhere(function ($q) use ($today) {
-            // Case 2: Job has already passed (end_date < today)
-            $q->whereDate('end_date', '<', $today);
-        });
-    })
-    ->orderBy('id', 'desc')
-    ->get();
-    
 
-    // **Ongoing jobs (status = 1 and attendance exists between start and end dates)**
-    $ongoingSchedules = JobSchedule::with([
-        'service',
-        'customer',
-        'subCategory',
-        'userService',
-        'attendance' => function ($query) use ($authUserId) {
-            $query->where('user_id', $authUserId);
-        }
-    ])
-    ->where('status', 1)
-    ->where('user_id', $authUserId)
-    ->whereHas('attendance', function ($query) use ($authUserId) {
-        $query->where('user_id', $authUserId)
-              ->whereBetween('created_at', [
-                  DB::raw('start_date'),  // start_date from JobSchedule
-                  DB::raw('end_date')     // end_date from JobSchedule
-              ]);
-    })
-    ->get();
+        // Get selected date or default to today
+        $selectedDate = $request->input('selected_date');
+        // dd($selectedDate);
+        $today = $selectedDate ? Carbon::parse($selectedDate)->toDateString() : Carbon::today()->toDateString();
+        $now = Carbon::now();
 
-    // Completed jobs (status = 2 or 1 that are ended)
-    if ($selectedDate) {
-        try {
-            $parsedDate = Carbon::parse($selectedDate)->toDateString();
-        } catch (\Exception $e) {
-            $parsedDate = null; // fallback if invalid
-        }
-    }
-    $completedSchedulesQuery = JobSchedule::with([
-        'service',
-        'subCategory',
-        'userService',
-        'attendance' => function($query) use ($authUserId) {
-            $query->where('user_id', $authUserId)
-                  ->with('attendanceBreaks');
-        }
-    ])
-    ->where('status', 2)
-    ->where('user_id', $authUserId);
-
-    // Apply exact date match if selected
-    if (!empty($parsedDate)) {
-        $completedSchedulesQuery->whereDate('end_date', '=', $parsedDate);
-    } 
-
-    $completedSchedules = $completedSchedulesQuery
-        ->latest('end_time')
+        // **Assigned jobs (status = 1)**
+        $assignedSchedules = JobSchedule::with([
+            'service',
+            'customer',
+            'subCategory',
+            'userService',
+            'attendance' => function ($query) use ($today, $authUserId) {
+                $query->where('user_id', $authUserId)
+                    ->whereDate('created_at', $today);
+            }
+        ])
+        ->where('status', 1)
+        ->where('user_id', $authUserId)
+        ->where(function ($query) use ($today, $authUserId) {
+            $query->where(function ($q) use ($today, $authUserId) {
+                // Case 1: Today is within job range and attendance doesn't exist
+                $q->whereDate('start_date', '<=', $today)
+                ->whereDate('end_date', '>=', $today)
+                ->whereDoesntHave('attendance', function ($subQuery) use ($authUserId) {
+                    $subQuery->where('user_id', $authUserId)
+                            ->whereRaw('DATE(created_at) BETWEEN start_date AND end_date');
+                });
+            })->orWhere(function ($q) use ($today) {
+                // Case 2: Job has already passed (end_date < today)
+                $q->whereDate('end_date', '<', $today);
+            });
+        })
+        ->orderBy('id', 'desc')
         ->get();
-    //dd($completedSchedules);
+        
 
-    // Calculate earnings
-    foreach ($completedSchedules as $job) {
-        $totalJobHours = 0;
+        // **Ongoing jobs (status = 1 and attendance exists between start and end dates)**
+        $ongoingSchedules = JobSchedule::with([
+            'service',
+            'customer',
+            'subCategory',
+            'userService',
+            'attendance' => function ($query) use ($authUserId) {
+                $query->where('user_id', $authUserId);
+            }
+        ])
+        ->where('status', 1)
+        ->where('user_id', $authUserId)
+        ->whereHas('attendance', function ($query) use ($authUserId, $selectedDate) {
+            $query->where('user_id', $authUserId);
+            if ($selectedDate) {
+                $parsedDate = Carbon::parse($selectedDate)->toDateString();
+                $query->whereDate('created_at', $parsedDate);
+            } else {
+                $query->whereBetween('created_at', [
+                    DB::raw('start_date'),
+                    DB::raw('end_date')
+                ]);
+            }
+        })
+        ->get();
 
-        if ($job->attendance->isNotEmpty() && $job->userService) {
-            foreach ($job->attendance as $attendance) {
-                if ($attendance->check_in_time && $attendance->check_out_time) {
-                    $checkIn = Carbon::parse($attendance->check_in_time);
-                    $checkOut = Carbon::parse($attendance->check_out_time);
-                    $totalWorkedSeconds = $checkOut->diffInSeconds($checkIn);
+        // Completed jobs (status = 2 or 1 that are ended)
+        if ($selectedDate) {
+            try {
+                $parsedDate = Carbon::parse($selectedDate)->toDateString();
+            } catch (\Exception $e) {
+                $parsedDate = null; // fallback if invalid
+            }
+        }
+        $completedSchedulesQuery = JobSchedule::with([
+            'service',
+            'subCategory',
+            'userService',
+            'attendance' => function($query) use ($authUserId) {
+                $query->where('user_id', $authUserId)
+                    ->with('attendanceBreaks');
+            }
+        ])
+        ->where('status', 2)
+        ->where('user_id', $authUserId);
 
-                    $breakSeconds = 0;
-                    foreach ($attendance->attendanceBreaks as $break) {
-                        if ($break->start_break && $break->end_break) {
-                            $breakStart = Carbon::parse($break->start_break);
-                            $breakEnd = Carbon::parse($break->end_break);
+        // Apply exact date match if selected
+        if (!empty($parsedDate)) {
+            $completedSchedulesQuery->whereDate('end_date', '=', $parsedDate);
+        } 
 
-                            if ($breakStart->between($checkIn, $checkOut) && $breakEnd->between($checkIn, $checkOut)) {
-                                $breakSeconds += $breakEnd->diffInSeconds($breakStart);
+        $completedSchedules = $completedSchedulesQuery
+            ->latest('end_time')
+            ->get();
+        //dd($completedSchedules);
+
+        // Calculate earnings
+        foreach ($completedSchedules as $job) {
+            $totalJobHours = 0;
+
+            if ($job->attendance->isNotEmpty() && $job->userService) {
+                foreach ($job->attendance as $attendance) {
+                    if ($attendance->check_in_time && $attendance->check_out_time) {
+                        $checkIn = Carbon::parse($attendance->check_in_time);
+                        $checkOut = Carbon::parse($attendance->check_out_time);
+                        $totalWorkedSeconds = $checkOut->diffInSeconds($checkIn);
+
+                        $breakSeconds = 0;
+                        foreach ($attendance->attendanceBreaks as $break) {
+                            if ($break->start_break && $break->end_break) {
+                                $breakStart = Carbon::parse($break->start_break);
+                                $breakEnd = Carbon::parse($break->end_break);
+
+                                if ($breakStart->between($checkIn, $checkOut) && $breakEnd->between($checkIn, $checkOut)) {
+                                    $breakSeconds += $breakEnd->diffInSeconds($breakStart);
+                                }
                             }
                         }
+
+                        $netSeconds = max(0, $totalWorkedSeconds - $breakSeconds);
+                        $hours = $netSeconds / 3600;
+                        $totalJobHours += $hours;
                     }
-
-                    $netSeconds = max(0, $totalWorkedSeconds - $breakSeconds);
-                    $hours = $netSeconds / 3600;
-                    $totalJobHours += $hours;
                 }
+
+                $job->total_hours = round($totalJobHours, 2);
+                $job->total_earning = round($job->total_hours * $job->userService->price_per_hour, 2);
+                $job->admin_fee = round(($job->total_earning * $adminFeePercentage) / 100, 2);
+                $job->net_earning = round($job->total_earning - $job->admin_fee, 2);
+            } else {
+                $job->total_hours = 0;
+                $job->total_earning = 0;
+                $job->admin_fee = 0;
+                $job->net_earning = 0;
             }
-
-            $job->total_hours = round($totalJobHours, 2);
-            $job->total_earning = round($job->total_hours * $job->userService->price_per_hour, 2);
-            $job->admin_fee = round(($job->total_earning * $adminFeePercentage) / 100, 2);
-            $job->net_earning = round($job->total_earning - $job->admin_fee, 2);
-        } else {
-            $job->total_hours = 0;
-            $job->total_earning = 0;
-            $job->admin_fee = 0;
-            $job->net_earning = 0;
         }
-    }
 
-    return view('users.dashboard', compact(
-        'user',
-        'calendarDays',
-        'month',
-        'year',
-        'assignedSchedules',     // Passing assigned schedules to the view
-        'ongoingSchedules',      // Passing ongoing schedules to the view
-        'completedSchedules'     // Passing completed schedules to the view
-    ));
-}
+        return view('users.dashboard', compact(
+            'user',
+            'calendarDays',
+            'month',
+            'year',
+            'assignedSchedules',     // Passing assigned schedules to the view
+            'ongoingSchedules',      // Passing ongoing schedules to the view
+            'completedSchedules',     // Passing completed schedules to the view
+        ));
+    }
 
 
 
@@ -807,6 +811,7 @@ class UserController extends Controller
 
     public function directory(Request $request)
     {
+        
         return view("users.directory");
     }
 
@@ -826,7 +831,168 @@ class UserController extends Controller
 
     public function Services(Request $request)
     {
-        return view("users.directory");
+        // dd('in');
+        $user = Auth::user();
+        $authUserId = $user->id;
+        $adminFeePercentage = 11; // 11% admin fee
+
+        $year = now()->year;
+        $month = now()->month;
+        $daysInMonth = now()->daysInMonth;
+
+        $calendarDays = [];
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = \Carbon\Carbon::create($year, $month, $day);
+            $calendarDays[] = [
+                'day' => $date->format('D'),          // Mon, Tue, etc.
+                'date' => $date->format('d'),         // 01, 02, etc.
+                'full_date' => $date->toDateString()  // YYYY-MM-DD
+            ];
+        }
+
+        // Get selected date or default to today
+        $selectedDate = $request->input('selected_date');
+        // dd($selectedDate);
+        $today = $selectedDate ? Carbon::parse($selectedDate)->toDateString() : Carbon::today()->toDateString();
+        $now = Carbon::now();
+
+        // **Assigned jobs (status = 1)**
+        $assignedSchedules = JobSchedule::with([
+            'service',
+            'customer',
+            'subCategory',
+            'userService',
+            'attendance' => function ($query) use ($today, $authUserId) {
+                $query->where('user_id', $authUserId)
+                    ->whereDate('created_at', $today);
+            }
+        ])
+        ->where('status', 1)
+        ->where('user_id', $authUserId)
+        ->where(function ($query) use ($today, $authUserId) {
+            $query->where(function ($q) use ($today, $authUserId) {
+                // Case 1: Today is within job range and attendance doesn't exist
+                $q->whereDate('start_date', '<=', $today)
+                ->whereDate('end_date', '>=', $today)
+                ->whereDoesntHave('attendance', function ($subQuery) use ($authUserId) {
+                    $subQuery->where('user_id', $authUserId)
+                            ->whereRaw('DATE(created_at) BETWEEN start_date AND end_date');
+                });
+            })->orWhere(function ($q) use ($today) {
+                // Case 2: Job has already passed (end_date < today)
+                $q->whereDate('end_date', '<', $today);
+            });
+        })
+        ->orderBy('id', 'desc')
+        ->get();
+        
+
+        // **Ongoing jobs (status = 1 and attendance exists between start and end dates)**
+        $ongoingSchedules = JobSchedule::with([
+            'service',
+            'customer',
+            'subCategory',
+            'userService',
+            'attendance' => function ($query) use ($authUserId) {
+                $query->where('user_id', $authUserId);
+            }
+        ])
+        ->where('status', 1)
+        ->where('user_id', $authUserId)
+        ->whereHas('attendance', function ($query) use ($authUserId, $selectedDate) {
+            $query->where('user_id', $authUserId);
+            if ($selectedDate) {
+                $parsedDate = Carbon::parse($selectedDate)->toDateString();
+                $query->whereDate('created_at', $parsedDate);
+            } else {
+                $query->whereBetween('created_at', [
+                    DB::raw('start_date'),
+                    DB::raw('end_date')
+                ]);
+            }
+        })
+        ->get();
+
+        // Completed jobs (status = 2 or 1 that are ended)
+        if ($selectedDate) {
+            try {
+                $parsedDate = Carbon::parse($selectedDate)->toDateString();
+            } catch (\Exception $e) {
+                $parsedDate = null; // fallback if invalid
+            }
+        }
+        $completedSchedulesQuery = JobSchedule::with([
+            'service',
+            'subCategory',
+            'userService',
+            'attendance' => function($query) use ($authUserId) {
+                $query->where('user_id', $authUserId)
+                    ->with('attendanceBreaks');
+            }
+        ])
+        ->where('status', 2)
+        ->where('user_id', $authUserId);
+
+        // Apply exact date match if selected
+        if (!empty($parsedDate)) {
+            $completedSchedulesQuery->whereDate('end_date', '=', $parsedDate);
+        } 
+
+        $completedSchedules = $completedSchedulesQuery
+            ->latest('end_time')
+            ->get();
+        //dd($completedSchedules);
+
+        // Calculate earnings
+        foreach ($completedSchedules as $job) {
+            $totalJobHours = 0;
+
+            if ($job->attendance->isNotEmpty() && $job->userService) {
+                foreach ($job->attendance as $attendance) {
+                    if ($attendance->check_in_time && $attendance->check_out_time) {
+                        $checkIn = Carbon::parse($attendance->check_in_time);
+                        $checkOut = Carbon::parse($attendance->check_out_time);
+                        $totalWorkedSeconds = $checkOut->diffInSeconds($checkIn);
+
+                        $breakSeconds = 0;
+                        foreach ($attendance->attendanceBreaks as $break) {
+                            if ($break->start_break && $break->end_break) {
+                                $breakStart = Carbon::parse($break->start_break);
+                                $breakEnd = Carbon::parse($break->end_break);
+
+                                if ($breakStart->between($checkIn, $checkOut) && $breakEnd->between($checkIn, $checkOut)) {
+                                    $breakSeconds += $breakEnd->diffInSeconds($breakStart);
+                                }
+                            }
+                        }
+
+                        $netSeconds = max(0, $totalWorkedSeconds - $breakSeconds);
+                        $hours = $netSeconds / 3600;
+                        $totalJobHours += $hours;
+                    }
+                }
+
+                $job->total_hours = round($totalJobHours, 2);
+                $job->total_earning = round($job->total_hours * $job->userService->price_per_hour, 2);
+                $job->admin_fee = round(($job->total_earning * $adminFeePercentage) / 100, 2);
+                $job->net_earning = round($job->total_earning - $job->admin_fee, 2);
+            } else {
+                $job->total_hours = 0;
+                $job->total_earning = 0;
+                $job->admin_fee = 0;
+                $job->net_earning = 0;
+            }
+        }
+
+        return view('users.directory', compact(
+            'user',
+            'calendarDays',
+            'month',
+            'year',
+            'assignedSchedules',     // Passing assigned schedules to the view
+            'ongoingSchedules',      // Passing ongoing schedules to the view
+            'completedSchedules',     // Passing completed schedules to the view
+        ));
     }
 
     public function job_schedule($id)

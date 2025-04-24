@@ -128,7 +128,7 @@
             .attendance-records-head .btn-search {background: #064086; white-space: nowrap; width: 100%; padding: 10px 20px; display: inline-block; font-size: 13px; color: var(--white); border-radius: 5px; font-weight: 600; text-align: center; box-shadow: 0px 8px 13px 0px rgba(0, 0, 0, 0.05); border: none; }
 
 
-            .services-page-section{padding: 1rem 0; position: relative; }
+            .services-page-section{padding: 1rem 0; position: relative; margin-left: 270px;}
             .recordsList{list-style: none; padding: 0; margin: 0;}
 
             .attendance-records-head {display: flex ; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
@@ -216,12 +216,42 @@
                 box-shadow: 0 0 10px hwb(0deg 0% 100% / 5%);
             }
 
+            .start-checkin-btn.disabled {
+                color: #6c757d; /* Muted grey text */
+                background-color: #f8f9fa; /* Light grey background */
+                pointer-events: none; /* Disable interaction */
+                border: 1px solid #ddd; /* Light grey border */
+            }
 
+            /* Optional: Add some styling for the hover state when disabled */
+            .start-checkin-btn.disabled:hover {
+                color: #6c757d; /* Ensure the color stays muted */
+                background-color: #f8f9fa;
+            }
+            .ongoing-checkin-action button{
+            color: var(--white);
+            border-radius: 50px;
+            background: #064086;
+            box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);
+            font-weight: 700;
+            font-size: 12px;
+            text-align: center;
+            padding: 8px 15px;
+            display: inline-block;
+            border-bottom: none;
+        }
+        .ongoing-checkin-action button:disabled {
+            color: #b0b0b0 !important;  /* Muted text color */
+            background: #d3d3d3;  /* Light grey background */
+            cursor: not-allowed;  /* Change the cursor to indicate the button is disabled */
+            box-shadow: none;  /* Remove the shadow */
+            border: 2px solid #b0b0b0 !important; /* Muted border color when disabled */
+        }
     </style>
 </head>
-
+@extends('layouts.user.app')
 <body>
-    <header class="header py-2">
+    <!-- <header class="header py-2">
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
             @php
@@ -247,12 +277,12 @@
                 </div>
             </div>
         </div>
-    </header>
-    <div class="services-page-section">
-        <div class="container">
-            <div class="attendance-records-head">
+    </header> -->
+    <div class="services-page-section mt-5">
+        <div class="container mt-5">
+            <div class="attendance-records-head mt-5">
                 <h2>
-                    <a href="javascript:history.back()"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Jobs
+                    <a href="{{route('user.dashboard')}}"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Services
                 </h2>
                 <div class="Search-filter">
                     <div class="row">
@@ -277,558 +307,390 @@
             </div>
             <div class="attendance-records-body">
                 <div class="attendance-records-content">
-                    <div id="recordsList"  class="recordsList">
-                    </div>
+                <div class="services-tabs">
+                    <ul class="nav nav-tabs" role="tablist">
 
-                    <div id="pagination-controls" class="d-flex justify-content-end">
-                        <button id="prev-page" onclick="changePage('prev')" disabled>Previous</button>
-                        <span id="page-info"></span>
-                        <button id="next-page" onclick="changePage('next')">Next</button>
-                    </div>
+                    <li><a href="#AssignedServices" data-bs-toggle="tab" aria-selected="true" role="tab" class="active" tabindex="-1"><i class="las la-eye-slash"></i> Assigned</a>
+                    </li>
+                    <li><a href="#UnAssignedServices" data-bs-toggle="tab" aria-selected="false" role="tab" class="" tabindex="-1"><i class="las la-eye-slash"></i> Completed</a>
+                    </li>
+                    
+                    <button class="btn btn-md" style="border: 1px solid #064086; border-radius: 30px; background: #064086;" id="refreshFilters">
+                        <img src="https://nileprojects.in/client-portal/public/ic-reset.svg" alt="">
+                    </button>
+                    </ul>
                 </div>
-                <div class="attendance-record-data-tbl">
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        let currentPage = 1;
-        let lastPage = 1;
-        let searchQuery = '';
-        let selectedDate = '';
+                <div class="" style="width: 100%;">
+                    <div class="row">
+                        <div class="col-md-12">
+                        
+                        <div class="tasks-content-info tab-content">
 
-        // Function to display employee directory
-        function displayEmployees(services, adminFeePercent) {
-            console.log(services);
-            const recordsList = document.querySelector("#recordsList");
-            recordsList.innerHTML = ""; // Clear previous records
+                            <div class="tab-pane" id="UnAssignedServices" role="tabpanel">
+                            <div class="ongoing-services-list">
+                            @forelse($completedSchedules as $job)
+                                <div class="ongoing-services-item">
+                                    <div class="ongoing-services-item-head">
+                                        <div class="ongoing-services-item-title">
+                                            <h2>Service: {{ $job->service->name }}</h2>
+                                        </div>
+                                    </div>
+                                    <div class="ongoing-services-item-body">
+                                        <div class="row d-flex">
+                                            <div class="col-lg-6 service-shift-card">
+                                                <div class="service-shift-card-image">
+                                                <img src="{{ asset('assets/images/time.svg') }}">
+                                                </div>
+                                                <div class="service-shift-card-text">
+                                                <h2>Service Shift Timing:</h2>
+                                                <p>{{ \Carbon\Carbon::parse($job->start_time)->format('h:iA') }} - {{ \Carbon\Carbon::parse($job->end_time)->format('h:iA') }}</p>
+                                                </div>
+                                            </div>
 
-            if (services.length === 0) {
-                // Show "No Records Found" when there is no data
-                recordsList.innerHTML =
-                    `<li class="text-center mt-2">
-            <h5 class="text-danger">No Records Found</h5>
-        </li>`;
-                return; // Do nothing if no records exist
-            }
+                                            <div class="col-lg-6  service-shift-card">
+                                                <div class="service-shift-card-image">
+                                                <img src="{{ asset('assets/images/time.svg') }}">
+                                                </div>
+                                                <div class="service-shift-card-text">
+                                                    <h2>Service Shift Date:</h2>
+                                                    <p>{{ \Carbon\Carbon::parse($job->start_date)->format('m/d/Y') }} - {{ \Carbon\Carbon::parse($job->end_date)->format('m/d/Y') }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
 
-            const currentDateTime = new Date(); // Get the current date and time
-            const currentDateString = new Date().toDateString();
+                                        <div class="instructions-text">
+                                            <h3>Primary Instructions: {{ $job->description ?? 'N/A' }}</h3>
+                                        </div>
 
-            // Find if user is currently checked in to any job (has check-in but no check-out)
-            let isCurrentlyCheckedIn = false;
-            let checkedInJobId = null;
-            let isOnBreak = false;
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6 col-lg-4">
+                                                <div class="service-shift-card">
+                                                    <div class="service-shift-card-image">
+                                                        <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
+                                                    </div>
+                                                    <div class="service-shift-card-text">
+                                                        <h2>Customer Name:</h2>
+                                                        <p>{{ $job->customer->name }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-            services.forEach(service => {
-                if (service.attendance) {
-                    const todayAttendance = service.attendance.find(att =>
-                        new Date(att.date).toDateString() === currentDateString
-                    );
+                                            <div class="col-md-6 col-sm-6 col-lg-4">
+                                                <div class="service-shift-card">
+                                                    <div class="service-shift-card-image">
+                                                        <img src="https://nileprojects.in/client-portal/public/assets/images/ic-sub-category.svg">
+                                                    </div>
+                                                    <div class="service-shift-card-text">
+                                                        <h2>Sub-Category</h2>
+                                                        <p>{{ $job->subCategory ? $job->subCategory->sub_category : 'N/A' }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                    if (todayAttendance) {
-                        if (todayAttendance.check_in_time && !todayAttendance.check_out_time) {
-                            isCurrentlyCheckedIn = true;
-                            checkedInJobId = service.id;
-                            // Check if this service has an ongoing break
-                            if (service.is_on_break) {
-                                isOnBreak = true;
-                            }
-                        }
-                    }
-                }
-            });
+                                            <div class="col-md-6 col-sm-6 col-lg-4">
+                                                <div class="service-shift-card">
+                                                    <div class="service-shift-card-image">
+                                                        <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
+                                                    </div>
+                                                    <div class="service-shift-card-text">
+                                                        <h2>Price</h2>
+                                                        <p>${{ $job->userService->price_per_hour ?? '0.00' }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-            services.forEach((service) => {
-                const jobEndDateTime = new Date(`${service.end_date}T${service.end_time}`);
-                const hasCheckedIn = service.attendance && service.attendance.some(att =>
-                    new Date(att.date).toDateString() === new Date(service.start_date).toDateString() &&
-                    att.check_in_time !== null
-                );
+                                            <div class="col-md-6 col-sm-6 col-lg-4">
+                                                <div class="service-shift-card">
+                                                    <div class="service-shift-card-image">
+                                                        <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
+                                                    </div>
+                                                    <div class="service-shift-card-text">
+                                                        <h2>Total Earning</h2>
+                                                        <p>${{ number_format($job->total_earning, 2) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                const hasCheckedOut = service.attendance && service.attendance.some(att =>
-                    new Date(att.date).toDateString() === new Date(service.start_date).toDateString() &&
-                    att.check_out_time !== null
-                );
-
-
-                const hasCheckedInToday = service.attendance && service.attendance.some(att =>
-                    new Date(att.date).toDateString() === currentDateString &&
-                    att.check_in_time !== null
-                );
-
-                const hasCheckedOutToday = service.attendance && service.attendance.some(att =>
-                    new Date(att.date).toDateString() === currentDateString &&
-                    att.check_out_time !== null
-                );
-
-                let statusLabel, badgeClass, disableCompleteButton = false,
-                    disableCheckInButton = false;
-                let disableCompleteReason = "",
-                    disableCheckInReason = "";
-
-                if (service.status == 2) {
-                    statusLabel = 'Completed';
-                    badgeClass = 'iq-bg-success';
-                } else if (currentDateTime > jobEndDateTime && [0, 1].includes(parseInt(service.status))) {
-                    statusLabel = 'Pending';
-                    badgeClass = 'iq-bg-warning';
-                } else {
-                    statusLabel = service.status == 1 ? 'Active' : 'Inactive';
-                    badgeClass = 'iq-bg-primary';
-                }
-
-                let bufferMinutes = 30; // 30-minute buffer
-                let bufferTime = new Date(jobEndDateTime.getTime() + bufferMinutes * 60000); // Buffer time calculation
-
-                // Check if the job is within the buffer window (30 minutes after the end time)
-                if (currentDateTime > jobEndDateTime && currentDateTime <= bufferTime) {
-                    // Allow "Complete" button during the buffer period (30 minutes after job end time)
-                    disableCompleteButton = false; // Allow completion within the 30-minute buffer
-                } else if (currentDateTime > bufferTime) {
-                    // Disable "Complete" button after the buffer time has passed
-                    disableCompleteButton = true;
-                    disableCompleteReason = "Cannot complete this job as time has been exceeded"; // Reason after buffer
-                } else {
-                    // If the job hasn't ended or the buffer hasn't started, disable the button
-                    disableCompleteButton = true;
-                    disableCompleteReason = "Cannot complete before job end time";
-                }
-
-                // Check if check-in should be disabled due to job end time
-                if (currentDateTime > jobEndDateTime) {
-                    disableCheckInButton = true;
-                    disableCheckInReason = "Cannot check in after job end time";
-                }
-
-                // Determine if check-in button should be disabled due to already being checked in elsewhere
-                const disableCheckInDueToAttendance = isCurrentlyCheckedIn && checkedInJobId !== service.id;
-                const checkInDisabledReason = disableCheckInButton ?
-                    disableCheckInReason :
-                    (disableCheckInDueToAttendance ? "You must check out from your current job first" : "");
-
-                // Final check-in button disabled state
-                const checkInButtonDisabled = disableCheckInButton || disableCheckInDueToAttendance;
-
-                // Determine if this is the job user is checked into
-                const isCurrentJob = checkedInJobId === service.id && isCurrentlyCheckedIn;
-
-                // Determine button text and action
-                let buttonText = "Click here to check in";
-                let buttonClass = "";
-
-                if (hasCheckedInToday && hasCheckedOutToday) {
-                    buttonText = "Already Checked-In/Checked-Out";
-                    buttonClass = "btn-secondary";
-                } else if (isCurrentJob) {
-                    if (service.is_on_break) {
-                        buttonText = "Click here to end break/checkout";
-                        buttonClass = "btn-warning";
-                    } else {
-                        buttonText = "Click here to start break/checkout";
-                        buttonClass = "btn-info";
-                    }
-                }
-
-                const listItem = document.createElement("li");
-                listItem.classList.add("mt-2");
-
-                listItem.innerHTML = `
-                    <div class="col-md-12">
-                        <div class="cp-card">
-                            <div class="cp-card-head">
-                                <div class="cp-date">Job Title:<span> ${service.service ? service.service.name : 'N/A'}</span>
-                                    <span class="badge dark-icon-light ${badgeClass}" style="margin-left: 10px;">
-                                        ${statusLabel}
-                                    </span>
-
-                                
+                                            <div class="col-md-6 col-sm-6 col-lg-4">
+                                                <div class="service-shift-card">
+                                                    <div class="service-shift-card-image">
+                                                        <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
+                                                    </div>
+                                                    <div class="service-shift-card-text">
+                                                        <h2>Net Earning</h2>
+                                                        <p>${{ number_format($job->net_earning, 2) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ongoing-services-item-foot">
+                                        <div class="loaction-address"><img src="https://nileprojects.in/client-portal/public/assets/images/location.svg"> {{ $job->location ?? 'N/A' }}</div>
+                                    </div>
                                 </div>
-                            </div> 
-
-                            <div class="cp-card-body">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="cp-point-box">
-                                            <div class="cp-point-icon">
-                                                <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
-                                            </div>
-                                            <div class="cp-point-text">
-                                                <h4>Customer Name:</h4>
-                                                <p>${service.customer ? service.customer.name : 'N/A'}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="cp-point-box">
-                                            <div class="cp-point-icon">
-                                                <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
-                                            </div>
-                                            <div class="cp-point-text">
-                                                <h4>Start Date:</h4>
-                                                <p>${service.start_date || 'N/A'}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="cp-point-box">
-                                            <div class="cp-point-icon">
-                                                <img src="https://nileprojects.in/client-portal/public/assets/images/date.svg">
-                                            </div>
-                                            <div class="cp-point-text">
-                                                <h4>End Date:</h4>
-                                                <p>${service.end_date || 'N/A'}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="cp-point-box">
-                                            <div class="cp-point-icon">
-                                                <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                            </div>
-                                            <div class="cp-point-text">
-                                                <h4>Start Time:</h4>
-                                            <p>${(service?.start_time ? service.start_time.slice(0, 5) : 'N/A')}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="cp-point-box">
-                                            <div class="cp-point-icon">
-                                                <img src="https://nileprojects.in/client-portal/public/assets/images/time.svg">
-                                            </div>
-                                            <div class="cp-point-text">
-                                                <h4>End Time:</h4>
-                                                <p>${(service?.end_time ? service.end_time.slice(0, 5) : 'N/A')}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="cp-point-box">
-                                            <div class="cp-point-icon">
-                                                <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
-                                            </div>
-                                            <div class="cp-point-text">
-                                                <h4>Description:</h4>
-                                                <p>${service.description || 'N/A'}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="col-md-4">
-                                        <div class="cp-point-box">
-                                            <div class="cp-point-icon">
-                                                <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
-                                            </div>
-                                            <div class="cp-point-text">
-                                                <h4>Location:</h4>
-                                                <p>${service.location || 'N/A'}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="cp-point-box">
-                                            <div class="cp-point-icon">
-                                                <img src="https://nileprojects.in/client-portal/public/assets/images/descriptionicon.svg">
-                                            </div>
-                                            <div class="cp-point-text">
-                                                <h4>Rate Per Hour:</h4>
-                                            <p>${service.user_service ? `$${service.user_service.price_per_hour}` : 'N/A'}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="cp-point-box">
-                                            <div class="cp-point-icon">
-                                                <img src="https://nileprojects.in/client-portal/public/assets/images/ic-sub-category.svg">
-                                            </div>
-                                            <div class="cp-point-text">
-                                                <h4>Sub Category:</h4>
-                                                <p>${service.sub_category ? service.sub_category.sub_category : 'N/A'}</p>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-
-                                    ${ service.status == 2 ? `
-                                        <div class="col-md-4">
-                                            <div class="cp-point-box">
-                                                <div class="cp-point-icon">
-                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
-                                                </div>
-                                                <div class="cp-point-text">
-                                                    <h4>Total Earnings:</h4>
-                                                    <p>$${service.total_earning ? service.total_earning : '0.00'}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                            <div class="cp-point-box">
-                                                <div class="cp-point-icon">
-                                                    <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
-                                                </div>
-                                                <div class="cp-point-text">
-                                                    <h4>Net Earning:</h4>
-                                                    <p><strong>$${service.net_earning ? service.net_earning : '0.00'}</strong></p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ` : '' }
-
-
-                    <div class="col-md-12 mt-3">
-                        <div class="d-flex justify-content-end">
-                            <div class="cp-point-box justify-content-end">
-                                <div class="cp-point-text me-3">
-                                    ${service.status == 1 ? `
-                                        <button class=" mark-complete" 
-                                            data-id="${service.id}" 
-                                            ${disableCompleteButton ? 'disabled' : ''} 
-                                            style="">
-                                            Mark as Complete
-                                        </button>
-                                        ${disableCompleteButton ? `
-                                            <small class="text-muted d-block" style="color:red!important;">
-                                                
-                                            </small>` : ''}
-                                    ` : ''}
+                                @empty
+                                <p class="text-center">No completed services available.</p>
+                                @endforelse
                                 </div>
                             </div>
 
-                            <div class="cp-point-box justify-content-end">
-                                <div class="cp-point-text">
-                                    ${service.status == 1 ? `
-                                        <button class=" ${buttonClass} check_in" 
-                                            data-id="${service.id}" 
-                                            ${checkInButtonDisabled ? 'disabled' : ''} 
-                                            style="">
-                                            ${buttonText}
-                                        </button>
-                                        ${checkInButtonDisabled ? `
-                                            <small class="text-muted d-block" style="color:red!important;">
-                                                
-                                            </small>` : ''}
-                                    ` : ''}
+                            <div class="tab-pane  active show" id="AssignedServices" role="tabpanel">
+                            <div class="ongoing-services-list">
+                            @forelse($assignedSchedules as $job)
+                                <div class="ongoing-services-item">
+                                    <div class="ongoing-services-item-head">
+                                        <div class="ongoing-services-item-title">
+                                            <h2>Service: {{ $job->service->name }}</h2>
+                                        </div>
+                                        <div class="ongoing-checkin-action">
+                                        <a 
+                                                class="px-4 start-checkin-btn {{ \Carbon\Carbon::parse($job->end_date)->isBefore(\Carbon\Carbon::today()) ? 'disabled' : '' }}" 
+                                                href="javascript:void(0);" 
+                                                data-id="{{ $job->id }}"
+                                            >
+                                                Start Job
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="ongoing-services-item-body">
+                                        <div class="row d-flex">
+                                            <div class="col-lg-6 service-shift-card">
+                                                <div class="service-shift-card-image">
+                                                <img src="{{ asset('assets/images/time.svg') }}">
+                                                </div>
+                                                <div class="service-shift-card-text">
+                                                <h2>Service Shift Timing:</h2>
+                                                <p>{{ \Carbon\Carbon::parse($job->start_time)->format('h:iA') }} - {{ \Carbon\Carbon::parse($job->end_time)->format('h:iA') }}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-6  service-shift-card">
+                                                <div class="service-shift-card-image">
+                                                <img src="{{ asset('assets/images/time.svg') }}">
+                                                </div>
+                                                <div class="service-shift-card-text">
+                                                    <h2>Service Shift Date:</h2>
+                                                    <p>{{ \Carbon\Carbon::parse($job->start_date)->format('m/d/Y') }} - {{ \Carbon\Carbon::parse($job->end_date)->format('m/d/Y') }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="instructions-text">
+                                            <h3>Primary Instructions: {{ $job->description ?? 'N/A' }}</h3>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 col-sm-6 col-lg-4">
+                                                <div class="service-shift-card">
+                                                    <div class="service-shift-card-image">
+                                                        <img src="https://nileprojects.in/client-portal/public/assets/images/customer.svg">
+                                                    </div>
+                                                    <div class="service-shift-card-text">
+                                                        <h2>Customer Name:</h2>
+                                                        <p>{{ $job->customer->name }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 col-sm-6 col-lg-4">
+                                                <div class="service-shift-card">
+                                                    <div class="service-shift-card-image">
+                                                        <img src="https://nileprojects.in/client-portal/public/assets/images/ic-sub-category.svg">
+                                                    </div>
+                                                    <div class="service-shift-card-text">
+                                                        <h2>Sub-Category</h2>
+                                                        <p>{{ $job->subCategory ? $job->subCategory->sub_category : 'N/A' }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 col-sm-6 col-lg-4">
+                                                <div class="service-shift-card">
+                                                    <div class="service-shift-card-image">
+                                                        <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
+                                                    </div>
+                                                    <div class="service-shift-card-text">
+                                                        <h2>Price</h2>
+                                                        <p>${{ $job->userService->price_per_hour ?? '0.00' }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ongoing-services-item-foot">
+                                        <div class="loaction-address"><img src="https://nileprojects.in/client-portal/public/assets/images/location.svg"> {{ $job->location ?? 'N/A' }}</div>
+                                    </div>
+                                </div>
+                                @empty
+                                <p class="text-center">No completed services available.</p>
+                                @endforelse
                                 </div>
                             </div>
-                        </div
+
+                        </div>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-`;
+    <script src="{{ asset('assets/js/owl.carousel.js') }}" type="text/javascript"></script>
+<script>
+  function logout() {
 
-                recordsList.appendChild(listItem);
+    var title = ' you want to logout ?';
+    Swal.fire({
+      title: '',
+      text: title,
+      // iconHtml: '<img src="{{ asset('assets/images/question.png') }}" height="25px">',
+      customClass: {
+        icon: 'no-border'
+      },
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes'
+    }).then((result) => {
+      if (result.value) {
+
+        // localStorage.removeItem('user')
+        $.get("{{ route('user.logout') }}", function(data) {
+          if (data.success) {
+            Swal.fire("Success", "Logged out successfully", 'success').then((result) => {
+              if (result.value) {
+
+                location.replace("{{ route('user.login') }}");
+
+
+              }
             });
-        }
+          }
+        })
 
 
+      }
+
+    })
+
+  }
+</script>
+<script>
+  function logout() {
+
+    var title = 'Are you sure, you want to logout ?';
+    Swal.fire({
+      title: '',
+      text: title,
+      // iconHtml: '<img src="{{ asset('assets/images/question.png') }}" height="25px">',
+      customClass: {
+        icon: 'no-border'
+      },
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes'
+    }).then((result) => {
+      if (result.value) {
+
+        // localStorage.removeItem('user')
+        $.get("{{ route('user.logout') }}", function(data) {
+          if (data.success) {
+            Swal.fire("Success", "Logged out successfully", 'success').then((result) => {
+              if (result.value) {
+
+                location.replace("{{ route('user.login') }}");
 
 
-
-        // Function to update pagination controls
-        function updatePaginationControls() {
-            const paginationControls = document.getElementById("pagination-controls");
-            const pageInfo = document.getElementById("page-info");
-            const prevButton = document.getElementById("prev-page");
-            const nextButton = document.getElementById("next-page");
-
-            pageInfo.textContent = `Page ${currentPage} of ${lastPage}`;
-
-            prevButton.disabled = currentPage <= 1;
-            nextButton.disabled = currentPage >= lastPage;
-
-            if (lastPage <= 1) {
-                paginationControls.style.cssText = "display: none !important;"; // Force hide
-            } else {
-                paginationControls.style.cssText = "display: flex !important;"; // Force show
-            }
-        }
-
-        // Function to change the page
-        function changePage(direction) {
-            if (direction === 'prev' && currentPage > 1) {
-                currentPage--;
-            } else if (direction === 'next' && currentPage < lastPage) {
-                currentPage++;
-            }
-
-            fetchEmployees(currentPage, searchQuery, selectedDate);
-        }
-
-        // Function to fetch employees with search
-        function fetchEmployees(page = 1, search = '', date = '') {
-            $.get("{{ route('user.employee.services') }}", {
-                page: page,
-                search: search,
-                date: date
-            }, function(data) {
-                if (data.success) {
-                    displayEmployees(data.job_schedules, data.admin_fee);
-                    currentPage = data.current_page;
-                    lastPage = data.last_page;
-                    updatePaginationControls();
-                }
+              }
             });
+          }
+        })
+
+
+      }
+
+    })
+
+  }
+</script>
+<script>
+$(document).ready(function () {
+    // Initialize Owl Carousel
+    $('#Ongoingcalender').owlCarousel({
+        loop: false,
+        margin: 10,
+        nav: true,
+        responsive: {
+            0: { items: 2 },
+            600: { items: 4 },
+            1000: { items: 6 }
         }
+    });
 
-        // Search input event listener
-        document.querySelector("input[name='search']").addEventListener("input", function() {
-            searchQuery = this.value;
-            fetchEmployees(1, searchQuery);
-        });
+    // Combined click handler for date selection
+    $(document).on('click', '.selectable-date', function () {
+        let selectedDate = $(this).data('date');
 
-        document.getElementById("datePicker").addEventListener("change", function() {
-            selectedDate = this.value;
-            fetchEmployees(1, searchQuery, selectedDate);
-        });
+        // Set selected class
+        $('.selectable-date').removeClass('selected-date');
+        $(this).addClass('selected-date');
 
-        // Load employees when the page is ready
-        document.addEventListener("DOMContentLoaded", function() {
-            const searchInput = document.querySelector("input[name='search']");
-            searchQuery = searchInput.value; // Get existing search query if any
-            fetchEmployees(1, searchQuery);
-        });
+        // Set hidden input and submit form
+        $('#selectedDateInput').val(selectedDate);
+        $('#calendarForm').submit();
+    });
 
+    // Start check-in button
+    $(document).on('click', '.start-checkin-btn', function () {
+        var serviceId = $(this).data('id');
+        var attendanceUrl = "{{ route('user.attendance') }}?service_id=" + serviceId;
+        window.location.href = attendanceUrl;
+    });
+});
+</script>
 
-        $(document).on("click", ".mark-complete", function() {
-            let jobId = $(this).data("id");
+<script>
+    document.getElementById('refreshFilters').addEventListener('click', function () {
+        const url = new URL(window.location.href);
 
-            $.ajax({
-                url: "{{ route('user.employee.markComplete') }}", // Adjust this route
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    job_id: jobId,
-                    status: 2
-                },
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success("Job marked as complete!");
-                        fetchEmployees(); // Refresh list
-                    } else {
-                        toastr.error("Failed to update status.");
-                    }
-                },
-                error: function() {
-                    toastr.error("Something went wrong.");
-                }
-            });
-        });
-    </script>
+        // Clear specific filters
+        url.searchParams.delete('selected_date');
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            populateMonthFilter();
-            fetchAttendance(); // Load attendance data initially
-        });
+        // Optional: clear other query params if needed
+        // url.searchParams.delete('status');
+        // url.searchParams.delete('search');
 
-        function populateMonthFilter() {
-            const monthFilter = document.getElementById("monthFilter");
-            const currentDate = new Date();
-            const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-based
-            const currentYear = currentDate.getFullYear();
+        window.location.href = url.toString();
+    });
+</script>
 
-            for (let i = 0; i < 12; i++) {
-                const date = new Date(currentYear, currentMonth - 1 - i, 1);
-                const monthValue = date.toISOString().slice(0, 7); // Format YYYY-MM
-                const monthText = date.toLocaleString('default', {
-                    month: 'long',
-                    year: 'numeric'
-                });
+<script>
+  $(document).on('click', '.mark-complete-btn', function () {
+      const jobId = $(this).data('job-id');
 
-                const option = new Option(monthText, monthValue);
-                if (monthValue === `${currentYear}-${String(currentMonth).padStart(2, '0')}`) {
-                    option.selected = true;
-                }
-                monthFilter.appendChild(option);
-            }
-        }
-
-        function fetchAttendance(page = 1) {
-            const userId = 1; // Replace with dynamic user ID
-            const selectedMonth = document.getElementById("monthFilter").value;
-
-            fetch(`/fetch-attendance?id=${userId}&month=${selectedMonth}&page=${page}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        displayRecords(data.records);
-                        updatePagination(data.current_page, data.last_page);
-                    }
-                })
-                .catch(error => console.error("Error fetching attendance:", error));
-        }
-    </script>
-    <script>
-        function logout() {
-
-            var title = 'Are you sure, you want to logout ?';
-            Swal.fire({
-                title: '',
-                text: title,
-                // iconHtml: '<img src="{{ asset('assets/images/question.png') }}" height="25px">',
-                customClass: {
-                    icon: 'no-border'
-                },
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes'
-            }).then((result) => {
-                if (result.value) {
-
-                    // localStorage.removeItem('user')
-                    $.get("{{ route('user.logout') }}", function(data) {
-                        if (data.success) {
-                            Swal.fire({
-                                title: "",
-                                text: "Logged out successfully", // Show only the text
-                                iconHtml: "", // Removes the default success icon
-                                showConfirmButton: true,
-                                confirmButtonText: "OK"
-                            }).then((result) => {
-                                if (result.value) {
-                                    location.replace("{{ route('user.login') }}");
-                                }
-                            });
-                        }
-                    })
-
-
-                }
-
-            })
-
-        }
-    </script>
-    <script>
-        $(document).on('click', '.check_in', function() {
-            var serviceId = $(this).data('id');
-            const attendanceUrl = "{{ route('user.attendance') }}?service_id=" + serviceId;
-            window.location.href = attendanceUrl;
-
-        });
-        // document.addEventListener("visibilitychange", function() {
-        //     if (document.visibilityState === "visible") {
-        //         // Page is visible again (user has returned to the service page)
-        //         location.reload(); // Reload the page
-        //     }
-        // });
-    </script>
-
+      $.ajax({
+          url: "{{ route('user.employee.markComplete') }}",
+          type: "POST",
+          data: {
+              _token: "{{ csrf_token() }}",
+              job_id: jobId,
+              status: 2
+          },
+          success: function (response) {
+              toastr.success('Job marked as complete!');
+              window.location.reload();
+              // Optionally, reload or update the UI
+          },
+          error: function (xhr) {
+              toastr.error('Failed to mark job as complete.');
+              console.error(xhr.responseText);
+          }
+      });
+  });
+</script>
 </body>
 
 </html>

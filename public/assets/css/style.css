@@ -267,7 +267,7 @@ a:hover { text-decoration: none; }
 
 -----------------------------------------------------------------------*/
 
-.sign-in-detail { color: var(--iq-white); background-image: url('https://nileprojects.in/client-portal/public/waves-bg.svg'), linear-gradient(to right, #7c96f4, #4b4ef8); background-size: cover;}
+.sign-in-detail { color: var(--iq-white); background: linear-gradient(rgb(0 0 0 / 60%), rgb(0 0 0 / 60%)), url(https://nileprojects.in/client-portal/public/login-bg-main.jpg); background-size: cover;}
 
 
 .sign-in-page { height: 100vh; }
@@ -280,9 +280,9 @@ a:hover { text-decoration: none; }
 
 .sign-in-from p{color: #7f7f7f;}
 
-.logo-res{margin-bottom: 70px;}
+.logo-res{margin-bottom: 0px;}
 
-.sign-in-from { padding: 0 0px; }
+.sign-in-from {border-radius: 10px; background: #0069ac; padding: 20px; }
 
 /*.sign-in-from::after{background: #f1efe7; content: "rea"; border-radius: 100%; height: 400px; width: 420px; left: -80px; display: inline; top: -254px; position: absolute; z-index: -1; box-shadow: #d6d6d6 6px 4px 12px 0px; border: 2px solid #d9d9d9; }*/
 
@@ -302,6 +302,7 @@ a:hover { text-decoration: none; }
 
 
 button.btn-signin{color: #fff; width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 5px; font-size: 16px; font-weight: 600; padding: 10px 20px; border: none; margin-top: 20px;}
+button.btn-signin-1{color: #fff; width: 100%; white-space: nowrap; background: transparent; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: flex; justify-content: center; align-items: center; text-align: center; border-radius: 10px; font-size: 16px; font-weight: 600; padding: 10px 20px; border: 1px solid #fff; margin-top: 20px;}
 
 
 /*---------------------------------------------------------------------
@@ -346,7 +347,7 @@ button.btn-signin{color: #fff; width: 100%; white-space: nowrap; background: #00
 
 -----------------------------------------------------------------------*/
 
-.iq-sidebar { position: fixed; z-index: 999; top: 0; width: 260px; height: 100%; background: #0069ac; transition: all 0.3s ease-in-out; transition: all 0.3s ease-in-out; -moz-transition: all 0.3s ease-in-out; -ms-transition: all 0.3s ease-in-out; -o-transition: all 0.3s ease-in-out; -webkit-transition: all 0.3s ease-in-out; -webkit-box-shadow: 0px 0px 25px 0px rgba(45, 69, 95, 0.1); -moz-box-shadow: 0px 0px 25px 0px rgba(45, 69, 95, 0.1); box-shadow: 0px 0px 25px 0px rgba(45, 69, 95, 0.1); }
+.iq-sidebar { position: fixed; z-index: 999; top: 0; width: 260px; height: 100%; background: #064086; transition: all 0.3s ease-in-out; transition: all 0.3s ease-in-out; -moz-transition: all 0.3s ease-in-out; -ms-transition: all 0.3s ease-in-out; -o-transition: all 0.3s ease-in-out; -webkit-transition: all 0.3s ease-in-out; -webkit-box-shadow: 0px 0px 25px 0px rgba(45, 69, 95, 0.1); -moz-box-shadow: 0px 0px 25px 0px rgba(45, 69, 95, 0.1); box-shadow: 0px 0px 25px 0px rgba(45, 69, 95, 0.1); }
 
 .iq-sidebar .iq-sidebar-logo { float: none; width: 100%; }
 
@@ -482,7 +483,7 @@ body.sidebar-main .iq-sidebar:hover .iq-sidebar-menu .iq-menu li ul.iq-submenu-d
 
 .iq-top-navbar .iq-navbar-custom .iq-menu-bt { display: none; }
 
-.iq-top-navbar { padding: 0; min-height: 73px; position: fixed; top: 0; left: auto; right: 30px; width: calc(100% - 319px); display: inline-block; z-index: 99;  margin: 0; transition: all 0.45s ease 0s; border-radius: 0 0 15px 15px; }
+.iq-top-navbar { padding: 0 0 0 10px;  min-height: 73px; position: fixed; top: 0; left: auto; right: 30px; width: calc(100% - 319px); display: inline-block; z-index: 99;  margin: 0; transition: all 0.45s ease 0s; border-radius: 0 0 15px 15px; }
 
 .iq-navbar-custom { background: var(--iq-card-bg); border-radius: 8px; margin: 20px 0 0; -webkit-box-shadow:0px 2px 8px rgb(40 41 42 / 7%); -moz-box-shadow:0px 2px 8px rgb(40 41 42 / 7%);  box-shadow: 0px 2px 8px rgb(40 41 42 / 7%);}
 
@@ -564,7 +565,7 @@ div#lottie-beil svg path, div#lottie-mail svg path, div#lottie-fullscreen svg pa
 
 .topnav-toolbar ul li { list-style: none; padding: 13px 0; }
 
-.navbar-list li > .dropdown { line-height: 73px; cursor: pointer; }
+.navbar-list li > .dropdown { line-height: 73px; cursor: pointer; padding:10px; background:#064086; border-radius:0 10px 10px 0 }
 
 .iq-search-bar { padding: 0 15px; }
 
@@ -1709,11 +1710,11 @@ Profile Edit
 
 .profile-pic { max-width: 100%; display: block; border-radius: 50%; -webkit-border-radius: 50%; }
 
-.profile-img-edit { position: relative; display: inline-block; height: 150px; width: 150px; }
+.profile-img-edit { position: relative; display: block; height: 100px; width: 100px; }
 
 .file-upload { display: none; }
 
-.p-image { position: absolute; top: auto; right: 8px; bottom: 10px; transition: all .3s cubic-bezier(.175, .885, .32, 1.275); background: var(--iq-primary); color: var(--iq-white); border-radius: 50%; height: 30px; width: 30px; line-height: 28px; text-align: center; font-size: 12px; cursor: pointer; }
+.p-image { position: absolute; top: auto; right: 0px; bottom: 0px; transition: all .3s cubic-bezier(.175, .885, .32, 1.275); background: var(--iq-primary); color: var(--iq-white); border-radius: 50%; height: 30px; width: 30px; line-height: 28px; text-align: center; font-size: 12px; cursor: pointer; }
 
 .upload-button { font-size: 1.5em; }
 
@@ -2290,3 +2291,60 @@ div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm) {b
   width: 400px;
 }
 
+.info-card p {
+    color: var(--gray, #505667);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    padding: 0;
+    margin: 0;
+}
+
+.info-card h6 {
+    color: var(--gray1, #8F93A0);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    margin: 0;
+    padding: 0;
+}
+
+.info-card p {
+    color: var(--gray, #505667);
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 20px;
+    letter-spacing: 0.25px;
+    padding: 0;
+    margin: 0;
+}
+
+.info-card .account-status svg {
+    color: #f2a44e;
+}
+
+.info-card img {
+    height: 60px;
+    width: 60px;
+    border-radius: 7px;
+    object-fit: contain;
+}
+
+.dropdown-menu .dropdown-item {
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: flex;
+    color: #555770;
+}
+
+.dropdown-menu{
+  position: absolute;
+    inset: 0px 0px auto auto;
+    margin: 0px;
+    transform: translate3d(0px, 42.4px, 0px);
+}
