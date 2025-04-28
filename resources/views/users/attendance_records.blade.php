@@ -342,9 +342,9 @@
                                             <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/working-hour.png" alt="image" class="img-fluid me-2" style="width: 25px; height: auto;border-radius: 0!important;">
                                             <h4 class="hours-worked">
                                             Total Hours worked: 
-                                                {{ $totalHours }} hour{{ $totalHours != 1 ? 's' : '' }} 
+                                                {{ $totalHours }} hr{{ $totalHours != 1 ? 's' : '' }} 
                                                 @if ($remainingMinutes > 0)
-                                                    {{ $remainingMinutes }} minute{{ $remainingMinutes != 1 ? 's' : '' }}
+                                                    {{ $remainingMinutes }} min{{ $remainingMinutes != 1 ? 's' : '' }}
                                                 @endif
                                             </h4>
                                         </div>
@@ -396,7 +396,7 @@
                                                                             }
                                                                             $totalHoursDecimal = number_format($totalMinutes / 60, 2);
                                                                         @endphp
-                                                                        {{ $totalHoursDecimal }} hours &nbsp; &nbsp; &nbsp;
+                                                                        {{ $totalHoursDecimal }} hrs &nbsp; &nbsp; &nbsp;
                                                                         @else
                                                                             Absent
                                                                         @endif

@@ -78,25 +78,25 @@
             <div id="sidebar-scrollbar">
             <nav class="iq-sidebar-menu">
                     <ul id="iq-sidebar-toggle" class="iq-menu">
-                        <li  class="active">
+                        <li @if (Route::is('user.dashboard')) class="active" @endif>
                             <a href="{{route('user.dashboard')}}" class="iq-waves-effect"><i class="ri-home-4-line"></i>
                                 <span>Dashboard</span></a>
                         </li>
 
-                        <li class="">
+                        <li @if (Route::is('user.services')) class="active" @endif>
                             <a href="{{route('user.services')}}" class="iq-waves-effect">
                                 <i class="ri-user-settings-line"></i><span>Services</span></a>
                         </li>
-                        <li>
+                        <li @if (Route::is('user.attendance_records')) class="active" @endif>
                             <a href="{{route('user.attendance_records')}}" class="iq-waves-effect">
                                 <i class="ri-user-3-line"></i><span>Attendance</span></a>
                         </li>
-                        <li>
+                        <li @if (Route::is('user.payout')) class="active" @endif>
                             <a href="{{route('user.payout')}}" class="iq-waves-effect">
                                 <i class="ri-calendar-event-line"></i><span>Payout</span></a>
                         </li>
                         <li>
-                            <a href="" class="iq-waves-effect">
+                            <a href="#" class="iq-waves-effect" onclick="logout()">
                                 <i class="ri-list-check-2"></i><span>Sign Out</span></a>
                         </li>
                     </ul>
@@ -132,19 +132,12 @@
 
                     </div>
                     <ul class="navbar-list">
-                        <li>
+                        <li href="{{route('user.profile')}}">
                             <div class="dropdown text-end">
-                                  <a href="#" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <a href="{{route('user.profile')}}" class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle">
                                     <img src="https://nileprojects.in/hrmodule/public/assets/images/image.png" alt="mdo" width="40" height="40" class="rounded-circle profile-image">
                                     <h6 class="m-0 p-0 text-light profile-name"> &nbsp; Profile</h6>
                                   </a>
-                                  <ul class="dropdown-menu text-small" style="">
-                                    <li><a class="dropdown-item" href="https://nileprojects.in/client-portal/user/profile">Profile</a></li>
-                                    <li>
-                                      <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item" href="#" onclick="logout()">Sign out</a></li>
-                                  </ul>
                                 </div>
                                 <!-- <img src="{{ asset('avatar.png') }}" class="img-fluid rounded mr-2"
                                     alt="user">
@@ -226,26 +219,42 @@
     <!-- Custom JavaScript -->
     <script src="{{ asset('assets/js/custom.js') }}"></script>
     <script>
-        function askLogout() {
-            var title = ' you want to logout ?';
-            Swal.fire({
-                title: '',
-                text: title,
-                customClass: {
-                    icon: 'no-border'
-                },
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes'
-            }).then((result) => {
+        function logout() {
+
+        var title = 'Are you sure, you want to logout ?';
+        Swal.fire({
+        title: '',
+        text: title,
+        // iconHtml: '<img src="{{ asset('assets/images/question.png') }}" height="25px">',
+        customClass: {
+            icon: 'no-border'
+        },
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes'
+        }).then((result) => {
+        if (result.value) {
+
+            // localStorage.removeItem('user')
+            $.get("{{ route('user.logout') }}", function(data) {
+            if (data.success) {
+                Swal.fire("Success", "Logged out successfully", 'success').then((result) => {
                 if (result.value) {
-                    window.location = "{{ route('logout') }}";
+
+                    location.replace("{{ route('user.login') }}");
+
 
                 }
-
+                });
+            }
             })
+
+
+        }
+
+        })
 
         }
     </script>

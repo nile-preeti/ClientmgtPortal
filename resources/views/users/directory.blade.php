@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Check-in/Check-out with Map</title>
+@extends('layouts.user.app')
+@section('content')
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -13,10 +8,6 @@
     <link rel="stylesheet" href="{{ asset('plugins/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('style.css') }}">
     <link rel="stylesheet" href="{{ asset('users/attendance_records.css') }}">
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <style>
         body {
@@ -247,10 +238,96 @@
             box-shadow: none;  /* Remove the shadow */
             border: 2px solid #b0b0b0 !important; /* Muted border color when disabled */
         }
+
+        body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #map {
+      flex: 1;
+    }
+    .owl-nav {
+      display: none;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .info {
+      text-align: center;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .nav .nav-item button.active {
+      background-color: #8e8efe;
+      width: 100%;
+      text-align: left;
+      border-radius: 0;
+      padding: 18px;
+      font-size: 16px;
+      border-bottom: 1px solid #bbbbff;
+    }
+
+    .nav .nav-item button.active::after {
+      content: "";
+      border-right: 6px solid #bbbbff;
+      height: 100%;
+      position: absolute;
+      right: -1px;
+      top: 0;
+    }
+
+    .date-time-sec h2 {
+      color: #000 !important;
+    }
+
+    .font-weight-bolder {
+      font-weight: bold;
+    }
+    .selected-date {
+    border: 2px solid #007bff;
+    background-color: #e0f0ff;
+    border-radius: 10px;
+}
+    .start-checkin-btn.disabled {
+        color: #6c757d; /* Muted grey text */
+        background-color: #f8f9fa; /* Light grey background */
+        pointer-events: none; /* Disable interaction */
+        border: 1px solid #ddd; /* Light grey border */
+    }
+
+    /* Optional: Add some styling for the hover state when disabled */
+    .start-checkin-btn.disabled:hover {
+        color: #6c757d; /* Ensure the color stays muted */
+        background-color: #f8f9fa;
+    }
+    .ongoing-checkin-action button{
+      color: var(--white);
+      border-radius: 50px;
+      background: #064086;
+      box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12);
+      font-weight: 700;
+      font-size: 12px;
+      text-align: center;
+      padding: 8px 15px;
+      display: inline-block;
+      border-bottom: none;
+  }
+  .ongoing-checkin-action button:disabled {
+    color: #b0b0b0 !important;  /* Muted text color */
+    background: #d3d3d3;  /* Light grey background */
+    cursor: not-allowed;  /* Change the cursor to indicate the button is disabled */
+    box-shadow: none;  /* Remove the shadow */
+    border: 2px solid #b0b0b0 !important; /* Muted border color when disabled */
+} 
+  .container-wrapper-main{margin-left: 270px;}
     </style>
-</head>
-@extends('layouts.user.app')
-<body>
     <!-- <header class="header py-2">
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-between">
@@ -284,26 +361,6 @@
                 <h2>
                     <a href="{{route('user.dashboard')}}"><img src="https://nileprojects.in/hrmodule/public/assets/images/arrow-left.svg" class="ic-arrow-left"> </a>Services
                 </h2>
-                <div class="Search-filter">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <form class="">
-                                    <input type="search" class="form-control" name="search"
-                                            placeholder="Search" aria-controls="user-list-table" value="">
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                               <form id="filterForm">
-                                <input type="date" name="date" class="form-control" id="datePicker">
-                            </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="attendance-records-body">
                 <div class="attendance-records-content">
@@ -323,7 +380,30 @@
                 <div class="" style="width: 100%;">
                     <div class="row">
                         <div class="col-md-12">
-                        
+                        <div class="Ongoing-calender-list">
+                        @php
+                            $today = \Carbon\Carbon::today()->toDateString();
+                            $selected = request('selected_date') ?? $today;
+                        @endphp
+                        <form method="GET" id="calendarForm" action="{{ route('user.services') }}">
+                            <input type="hidden" name="selected_date" id="selectedDateInput"  value="{{ $selected }}">
+                            
+                            <div id="Ongoingcalender" class="owl-carousel owl-theme">
+                            @foreach($calendarDays as $day)
+                                <div class="item">
+                                    <div
+                                        class="Ongoing-calender-item selectable-date {{ $selected == $day['full_date'] ? 'selected-date' : '' }}"
+                                        data-date="{{ $day['full_date'] }}"
+                                        @if($selected == $day['full_date']) id="selectedCalendarItem" @endif
+                                    >
+                                        <h3>{{ $day['day'] }}</h3>
+                                        <h2>{{ $day['date'] }}</h2>
+                                    </div>
+                                </div>
+                            @endforeach
+                            </div>
+                        </form>
+                        </div>
                         <div class="tasks-content-info tab-content">
 
                             <div class="tab-pane" id="UnAssignedServices" role="tabpanel">
@@ -522,7 +602,7 @@
                                     </div>
                                 </div>
                                 @empty
-                                <p class="text-center">No completed services available.</p>
+                                <p class="text-center">No Assigned services available.</p>
                                 @endforelse
                                 </div>
                             </div>
@@ -536,86 +616,7 @@
         </div>
     </div>
     <script src="{{ asset('assets/js/owl.carousel.js') }}" type="text/javascript"></script>
-<script>
-  function logout() {
-
-    var title = ' you want to logout ?';
-    Swal.fire({
-      title: '',
-      text: title,
-      // iconHtml: '<img src="{{ asset('assets/images/question.png') }}" height="25px">',
-      customClass: {
-        icon: 'no-border'
-      },
-      type: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes'
-    }).then((result) => {
-      if (result.value) {
-
-        // localStorage.removeItem('user')
-        $.get("{{ route('user.logout') }}", function(data) {
-          if (data.success) {
-            Swal.fire("Success", "Logged out successfully", 'success').then((result) => {
-              if (result.value) {
-
-                location.replace("{{ route('user.login') }}");
-
-
-              }
-            });
-          }
-        })
-
-
-      }
-
-    })
-
-  }
-</script>
-<script>
-  function logout() {
-
-    var title = 'Are you sure, you want to logout ?';
-    Swal.fire({
-      title: '',
-      text: title,
-      // iconHtml: '<img src="{{ asset('assets/images/question.png') }}" height="25px">',
-      customClass: {
-        icon: 'no-border'
-      },
-      type: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes'
-    }).then((result) => {
-      if (result.value) {
-
-        // localStorage.removeItem('user')
-        $.get("{{ route('user.logout') }}", function(data) {
-          if (data.success) {
-            Swal.fire("Success", "Logged out successfully", 'success').then((result) => {
-              if (result.value) {
-
-                location.replace("{{ route('user.login') }}");
-
-
-              }
-            });
-          }
-        })
-
-
-      }
-
-    })
-
-  }
-</script>
+<script src="{{ asset('assets/js/owl.carousel.js') }}" type="text/javascript"></script>
 <script>
 $(document).ready(function () {
     // Initialize Owl Carousel
@@ -630,6 +631,20 @@ $(document).ready(function () {
         }
     });
 
+    let owl = $('#Ongoingcalender');
+    owl.owlCarousel({
+        items: 5,
+        margin: 10,
+        loop: false,
+        nav: true,
+        dots: false,
+    });
+
+    // Scroll to selected date on load
+    let selectedIndex = $('#selectedCalendarItem').closest('.owl-item').index();
+    if (selectedIndex >= 0) {
+        owl.trigger('to.owl.carousel', [selectedIndex, 300]);
+    }
     // Combined click handler for date selection
     $(document).on('click', '.selectable-date', function () {
         let selectedDate = $(this).data('date');
@@ -666,31 +681,4 @@ $(document).ready(function () {
         window.location.href = url.toString();
     });
 </script>
-
-<script>
-  $(document).on('click', '.mark-complete-btn', function () {
-      const jobId = $(this).data('job-id');
-
-      $.ajax({
-          url: "{{ route('user.employee.markComplete') }}",
-          type: "POST",
-          data: {
-              _token: "{{ csrf_token() }}",
-              job_id: jobId,
-              status: 2
-          },
-          success: function (response) {
-              toastr.success('Job marked as complete!');
-              window.location.reload();
-              // Optionally, reload or update the UI
-          },
-          error: function (xhr) {
-              toastr.error('Failed to mark job as complete.');
-              console.error(xhr.responseText);
-          }
-      });
-  });
-</script>
-</body>
-
-</html>
+@endsection

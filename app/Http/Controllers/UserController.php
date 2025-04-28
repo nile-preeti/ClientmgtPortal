@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\View\ViewServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -42,21 +43,21 @@ class UserController extends Controller
     public function create(Request $request)
     {
         $title = "Create Employee";
+        $back_url = route('users.index');
         $services = Service::with('subCategories')->get();
-        return view("pages.users.create", compact('services', 'title'));
+        return view("pages.users.create", compact('services', 'title','back_url'));
     }
     public function edit(Request $request, $id)
     {
         $title = "Edit Employee";
-        $back_url = route('userss.index');
-
+        $back_url = route('users.index');
         $user = User::find($id);
         if (!$user) {
             return back()->with("error", 'User does not exists');
         }
         $services = Service::all();
 
-        return view("pages.users.create", compact('user', 'services', 'title', 'back_url'));
+        return view("pages.users.create", compact('user', 'services', 'title','back_url'));
     }
     public function store(Request $request)
     {
@@ -74,12 +75,11 @@ class UserController extends Controller
         $user->role_id = 2;
         $user->name = ucwords(strtolower($request->name));
         $user->email = $request->email;
-        
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/images'), $filename); // moves to public/uploads/images
-            $user->image = 'uploads/images/' . $filename; // Save relative path
+            $user->image =  $filename; // Save relative path
         }
 
         $user->phone = $request->phone;
@@ -88,6 +88,7 @@ class UserController extends Controller
         $user->status = $request->status;
 
         $user->password = Hash::make($request->password);
+
         if ($request->has("services") && is_array($request->services)) {
             foreach ($request->services as $i => $is_) {
                 $service = new UserService();
@@ -100,9 +101,8 @@ class UserController extends Controller
         }
         $user->save();
 
-        return response()->json(['success' => true, 'message' => "User Created Successfully", 'redirect' => true, 'route' => route('users.index')]);
+        return response()->json(['success' => true, 'message' => "User Created Successfully", 'redirect' => true,'route' => route('users.index')]);
     }
-
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -116,16 +116,15 @@ class UserController extends Controller
         $user =  User::find($id);
         $user->name = ucwords(strtolower($request->name));
         $user->email = $request->email;
-        $user->phone = $request->phone;
-        $user->status = $request->status;
-        $user->emp_id = $request->emp_id;
-
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('uploads/images'), $filename); // moves to public/uploads/images
-            $user->image = 'uploads/images/' . $filename; // Save relative path
+            $user->image =  $filename; // Save relative path
         }
+        $user->phone = $request->phone;
+        $user->status = $request->status;
+        $user->emp_id = $request->emp_id;
 
         $user->save();
         if ($request->filled('password')) {
@@ -165,7 +164,7 @@ class UserController extends Controller
             'success' => true,
             'message' => "User Updated Successfully",
             'redirect' => true,
-            'route' => route('userss.index') // Returning route for frontend redirection
+            'route' => route('users.index') // Returning route for frontend redirection
         ]);
     }
 
@@ -185,7 +184,7 @@ class UserController extends Controller
 
         // dd($attendanceRecords);
         $title = "Employee Attendance Records";
-        $back_url = route('userss.index');
+        $back_url = route('users.index');
 
         // Get month and year from request, fallback to current
         $month = $request->input('month', now()->month);
@@ -337,8 +336,6 @@ class UserController extends Controller
         ]);
     }
 
-
-
     public function holidays()
     {
 
@@ -448,6 +445,7 @@ class UserController extends Controller
     //     return view('users.dashboard', compact('grandTotalEarnings', 'totalAdminEarnings', 'totalUserEarnings', 'holidaysCount', 'selectedYear'));
     // }
 
+
     public function dashboard(Request $request)
     {
         $user = Auth::user();
@@ -470,8 +468,9 @@ class UserController extends Controller
 
         // Get selected date or default to today
         $selectedDate = $request->input('selected_date');
-        // dd($selectedDate);
-        $today = $selectedDate ? Carbon::parse($selectedDate)->toDateString() : Carbon::today()->toDateString();
+
+        $today = $selectedDate ? Carbon::parse($selectedDate)->toDateString()
+                            : Carbon::today()->toDateString();
         $now = Carbon::now();
 
         // **Assigned jobs (status = 1)**
@@ -482,29 +481,37 @@ class UserController extends Controller
             'userService',
             'attendance' => function ($query) use ($today, $authUserId) {
                 $query->where('user_id', $authUserId)
-                    ->whereDate('created_at', $today);
+                      ->whereDate('created_at', $today);
             }
         ])
         ->where('status', 1)
         ->where('user_id', $authUserId)
-        ->where(function ($query) use ($today, $authUserId) {
-            $query->where(function ($q) use ($today, $authUserId) {
-                // Case 1: Today is within job range and attendance doesn't exist
-                $q->whereDate('start_date', '<=', $today)
-                ->whereDate('end_date', '>=', $today)
-                ->whereDoesntHave('attendance', function ($subQuery) use ($authUserId) {
-                    $subQuery->where('user_id', $authUserId)
-                            ->whereRaw('DATE(created_at) BETWEEN start_date AND end_date');
+        ->where(function ($query) use ($today, $selectedDate, $authUserId) {
+            if ($selectedDate) {
+                // If selected date exists, strictly filter by start_date and end_date range
+                $query->whereDate('start_date', '<=', $today)
+                      ->whereDate('end_date', '>=', $today);
+            } else {
+                // Else, keep the existing two-case logic
+                $query->where(function ($q) use ($today, $authUserId) {
+                    // Case 1: Today is within job range and attendance doesn't exist
+                    $q->whereDate('start_date', '<=', $today)
+                      ->whereDate('end_date', '>=', $today)
+                      ->whereDoesntHave('attendance', function ($subQuery) use ($authUserId) {
+                          $subQuery->where('user_id', $authUserId)
+                                   ->whereRaw('DATE(created_at) BETWEEN start_date AND end_date');
+                      });
+                })->orWhere(function ($q) use ($today) {
+                    // Case 2: Job has already passed
+                    $q->whereDate('end_date', '<', $today);
                 });
-            })->orWhere(function ($q) use ($today) {
-                // Case 2: Job has already passed (end_date < today)
-                $q->whereDate('end_date', '<', $today);
-            });
+            }
         })
         ->orderBy('id', 'desc')
         ->get();
         
 
+        // **Ongoing jobs (status = 1 and attendance exists between start and end dates)**
         // **Ongoing jobs (status = 1 and attendance exists between start and end dates)**
         $ongoingSchedules = JobSchedule::with([
             'service',
@@ -519,17 +526,20 @@ class UserController extends Controller
         ->where('user_id', $authUserId)
         ->whereHas('attendance', function ($query) use ($authUserId, $selectedDate) {
             $query->where('user_id', $authUserId);
+    
             if ($selectedDate) {
                 $parsedDate = Carbon::parse($selectedDate)->toDateString();
-                $query->whereDate('created_at', $parsedDate);
-            } else {
-                $query->whereBetween('created_at', [
-                    DB::raw('start_date'),
-                    DB::raw('end_date')
-                ]);
+    
+                $query->whereDate(DB::raw("'$parsedDate'"), '>=', DB::raw('DATE(start_date)'))
+                      ->whereDate(DB::raw("'$parsedDate'"), '<=', DB::raw('DATE(end_date)'));
             }
+    
+            // Exclude records where end_date is before today
+            $query->whereDate('end_date', '>=', now()->toDateString());
         })
+        ->orderBy('id','desc')
         ->get();
+    
 
         // Completed jobs (status = 2 or 1 that are ended)
         if ($selectedDate) {
@@ -609,14 +619,9 @@ class UserController extends Controller
             'year',
             'assignedSchedules',     // Passing assigned schedules to the view
             'ongoingSchedules',      // Passing ongoing schedules to the view
-            'completedSchedules',     // Passing completed schedules to the view
+            'completedSchedules'     // Passing completed schedules to the view
         ));
     }
-
-
-
-    
-
 
     public function logout(Request $request)
     {
@@ -631,8 +636,8 @@ class UserController extends Controller
         $services = UserService::where('user_id', $user->id)
         ->with(['service', 'subCategory']) // Correct relationship
         ->get();
-        //dd($services);
-        return view("users.profile", compact('user', 'services'));
+        // dd($services);
+        return view("users.profile", compact('user','services'));
     }
 
 
@@ -784,21 +789,17 @@ class UserController extends Controller
         return view('users.payout', compact('paginatedData', 'selectedMonth', 'selectedYear'));
     }
     
-
     
-
-
-
-
-
-
-    // Pagination function
-    private function paginate($items, $perPage)
+        
+    
+        
+        // Pagination function
+        private function paginate($items, $perPage)
     {
         $currentPage = Paginator::resolveCurrentPage();
         $collection = new Collection($items);
         $currentPageItems = $collection->slice(($currentPage - 1) * $perPage, $perPage)->all();
-
+    
         return new LengthAwarePaginator(
             $currentPageItems,
             count($collection),
@@ -807,11 +808,9 @@ class UserController extends Controller
             ['path' => request()->url(), 'query' => request()->query()]
         );
     }
-
-
+    
     public function directory(Request $request)
     {
-        
         return view("users.directory");
     }
 
@@ -864,24 +863,31 @@ class UserController extends Controller
             'userService',
             'attendance' => function ($query) use ($today, $authUserId) {
                 $query->where('user_id', $authUserId)
-                    ->whereDate('created_at', $today);
+                      ->whereDate('created_at', $today);
             }
         ])
         ->where('status', 1)
         ->where('user_id', $authUserId)
-        ->where(function ($query) use ($today, $authUserId) {
-            $query->where(function ($q) use ($today, $authUserId) {
-                // Case 1: Today is within job range and attendance doesn't exist
-                $q->whereDate('start_date', '<=', $today)
-                ->whereDate('end_date', '>=', $today)
-                ->whereDoesntHave('attendance', function ($subQuery) use ($authUserId) {
-                    $subQuery->where('user_id', $authUserId)
-                            ->whereRaw('DATE(created_at) BETWEEN start_date AND end_date');
+        ->where(function ($query) use ($today, $selectedDate, $authUserId) {
+            if ($selectedDate) {
+                // If selected date exists, strictly filter by start_date and end_date range
+                $query->whereDate('start_date', '<=', $today)
+                      ->whereDate('end_date', '>=', $today);
+            } else {
+                // Else, keep the existing two-case logic
+                $query->where(function ($q) use ($today, $authUserId) {
+                    // Case 1: Today is within job range and attendance doesn't exist
+                    $q->whereDate('start_date', '<=', $today)
+                      ->whereDate('end_date', '>=', $today)
+                      ->whereDoesntHave('attendance', function ($subQuery) use ($authUserId) {
+                          $subQuery->where('user_id', $authUserId)
+                                   ->whereRaw('DATE(created_at) BETWEEN start_date AND end_date');
+                      });
+                })->orWhere(function ($q) use ($today) {
+                    // Case 2: Job has already passed
+                    $q->whereDate('end_date', '<', $today);
                 });
-            })->orWhere(function ($q) use ($today) {
-                // Case 2: Job has already passed (end_date < today)
-                $q->whereDate('end_date', '<', $today);
-            });
+            }
         })
         ->orderBy('id', 'desc')
         ->get();
@@ -997,8 +1003,8 @@ class UserController extends Controller
 
     public function job_schedule($id)
     {
-        $title = "Scheduled Jobs";
-        $back_url = route('userss.index');
+        $title ="Scheduled Jobs";
+        $back_url = route('users.index');
         $job_schedules = JobSchedule::where("user_id", $id)->get();
         foreach ($job_schedules as $key => $value) {
             $charge = UserService::where("user_id", $value->user_id)->where("service_id", $value->service_id)->first();
@@ -1009,6 +1015,6 @@ class UserController extends Controller
             }
         }
         $user = User::find($id);
-        return view("pages.users.job_schedule", compact("job_schedules", 'user', 'title', 'back_url'));
+        return view("pages.users.job_schedule", compact("job_schedules", 'user','title','back_url'));
     }
 }

@@ -168,9 +168,9 @@
 
 
     </head>
-
+    @extends('layouts.user.app')
     <body>
-    <header class="header py-2">
+    <!-- <header class="header py-2">
         <div class="container-fluid">
           <div class="d-flex flex-wrap align-items-center justify-content-between">
             
@@ -197,7 +197,7 @@
             </div>
           </div>
         </div>
-    </header>
+    </header> -->
     <div class="profile-page-section">
         <div class="container">
             <div class="profile-head">
