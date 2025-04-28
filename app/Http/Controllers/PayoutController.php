@@ -33,7 +33,7 @@ class PayoutController extends Controller
                     ? $query->where("status",  request("status"))
                     : $query->whereNull("status")->orWhere("status", "Inactive");
             })
-            ->orderBy("id", 'desc')
+            ->orderby('name','asc')
             ->paginate(request()->has('search') ? 100 : 10);
 
         foreach ($users as $user) {

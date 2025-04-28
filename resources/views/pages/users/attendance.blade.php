@@ -234,10 +234,10 @@
                                                         <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/working-hour.png" alt="image" class="img-fluid me-2" style="width: 25px; height: auto;border-radius: 0!important;">
                                                         <h4 class="hours-worked">
                                                         Total Hours worked: 
-                                                            {{ $totalHours }} hour{{ $totalHours != 1 ? 's' : '' }} 
-                                                            @if ($remainingMinutes > 0)
-                                                                {{ $remainingMinutes }} minute{{ $remainingMinutes != 1 ? 's' : '' }}
-                                                            @endif
+                                                        {{ $totalHours }} hr{{ $totalHours != 1 ? 's' : '' }} 
+                                                        @if ($remainingMinutes > 0)
+                                                            {{ $remainingMinutes }} min{{ $remainingMinutes != 1 ? 's' : '' }}
+                                                        @endif
                                                         </h4>
                                                     </div>
                                                     <hr>
@@ -261,16 +261,17 @@
                                                                         </div>
                                                                             
 
-                                                                            <div class="time-details">
-                                                                                <div class="d-flex align-items-center card-time-detail-info mt-3">
-                                                                                    <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/end-time-icon.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
-                                                                                    <h3 class="time-sub-head">Start Time: {{ $record->check_in_time }}</h3>
-                                                                                </div>
-                                                                                <div class="d-flex align-items-center card-time-detail-info mt-2">
-                                                                                    <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/start-time-icon.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
-                                                                                    <h3>End Time: {{ $record->check_out_time ?? 'Not checked out' }}</h3>
-                                                                                </div>
+                                                                        <div class="time-details">
+                                                                            <div class="d-flex align-items-center card-time-detail-info mt-3">
+                                                                                <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/end-time-icon.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
+                                                                                <h3 class="time-sub-head">Start Time: {{ \Carbon\Carbon::parse($record->check_in_time)->format('H:i') }}</h3>
                                                                             </div>
+                                                                            <div class="d-flex align-items-center card-time-detail-info mt-2">
+                                                                                <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/start-time-icon.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
+                                                                                <h3>End Time: {{ $record->check_out_time ? \Carbon\Carbon::parse($record->check_out_time)->format('H:i') : 'Not checked out' }}</h3>
+                                                                            </div>
+                                                                        </div>
+
 
                                                                             <div class="d-flex card-time-detail-info mt-2">
                                                                                 <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/total-work-hours.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
@@ -307,8 +308,8 @@
                                                                                 <div class="modal-body">
                                                                                     @if($record->attendanceBreaks->isNotEmpty())
                                                                                         @foreach($record->attendanceBreaks as $break)
-                                                                                            <p><strong>Break Start-End:</strong> {{ \Carbon\Carbon::parse($break->start_break)->format('h:i A') }} -
-                                                                                            {{ \Carbon\Carbon::parse($break->end_break)->format('h:i A') }}</p>
+                                                                                            <p><strong>Break Start-End:</strong> {{ \Carbon\Carbon::parse($break->start_break)->format('H:i') }} -
+                                                                                            {{ \Carbon\Carbon::parse($break->end_break)->format('H:i') }}</p>
                                                                                         @endforeach
                                                                                     @else
                                                                                         <p>No breaks recorded.</p>

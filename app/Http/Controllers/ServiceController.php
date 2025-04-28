@@ -24,7 +24,7 @@ class ServiceController extends Controller
             ->paginate(config("contant.paginatePerPage"));
 
         $title = "Service Management";
-        $all_services = Service::where('status', 1)->with('subCategories')->get();
+        $all_services = Service::where('status', 1)->with('subCategories')->orderby('name','asc')->get();
 
         return view("pages.master.services", compact("title", 'services', 'search', 'all_services'));
     }

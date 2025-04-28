@@ -269,6 +269,14 @@ Responsive
 @media(max-width:767px) {
     .profile-name{display: none;}
     .dash-card{width: 100%;}
+    .services-page-section{margin-left: 0px !important;}
+    .attendance-records-head{display: block !important;}
+    .Search-filter{margin-top: 20px;}
+    .attendance-records-section{margin-left:0px;}
+    .profile-page-section{padding: 1rem 0 0 0px !important;}
+
+
+    }
     
 }
 @media(max-width:557px) {
@@ -294,3 +302,5 @@ Responsive
     margin: 0px;
     transform: translate3d(0px, 42.4px, 0px);
 }
+
+.iq-light-logo img{height: 80px;}

@@ -291,7 +291,7 @@ class AdminController extends Controller
             }
             return Excel::download(new ReportExport($users),  'employees_' . date("d-m-Y", time()) . '.xlsx');
         }
-        $users =      $users->orderBy("id", "desc")->paginate(config("contant.paginatePerPage"));
+        $users =      $users->orderby('name','asc')->paginate(config("contant.paginatePerPage"));
 
         foreach ($users as $user) {
             $month = request("month", date("m"));
@@ -304,52 +304,56 @@ class AdminController extends Controller
     }
     function getTotalWorkingHours($userId, $month, $year)
     {
+        // Fetch attendance records where job_id exists (is not null)
         $attendanceRecords = Attendance::where('user_id', $userId)
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
+            ->whereNotNull('job_id') // Only records with job_id
             ->get()
-            ->keyBy('date'); // Store by date for quick lookup
-
-        $holidays = Holiday::whereMonth('date', $month)
-            ->whereYear('date', $year)
-            ->pluck('date')
-            ->toArray();
-
+            ->keyBy('date'); // Keyed by date for fast lookup
+    
         $totalWorkingHours = 0;
         $startDate = Carbon::createFromDate($year, $month, 1);
         $endDate = $startDate->copy()->endOfMonth();
-
-        for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+    
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             $formattedDate = $date->format('Y-m-d');
-
+    
             if (isset($attendanceRecords[$formattedDate])) {
                 $record = $attendanceRecords[$formattedDate];
-
+    
                 $checkInTime = !empty($record->check_in_time) ? strtotime($record->check_in_time) : null;
                 $checkOutTime = !empty($record->check_out_time) ? strtotime($record->check_out_time) : null;
-
+    
                 if (!is_null($checkInTime) && !is_null($checkOutTime)) {
-                    $workedHours = ($checkOutTime - $checkInTime) / 3600; // Convert to hours
-
-                    // Fetch total break time for the user on the given date
-                    $totalBreakSeconds = AttendanceBreak::where('user_id', $record->user_id)
+                    // Calculate worked hours between check-in and check-out
+                    $workedHours = ($checkOutTime - $checkInTime) / 3600; // seconds to hours
+    
+                    // Fetch total break seconds
+                    $breaks = AttendanceBreak::where('user_id', $record->user_id)
                         ->where('date', $record->date)
                         ->whereNotNull('start_break')
                         ->whereNotNull('end_break')
-                        ->get()
-                        ->sum(fn($break) => strtotime($break->end_break) - strtotime($break->start_break));
-
-                    // Subtract break time from worked hours
+                        ->get();
+    
+                    $totalBreakSeconds = 0;
+                    foreach ($breaks as $break) {
+                        $totalBreakSeconds += strtotime($break->end_break) - strtotime($break->start_break);
+                    }
+    
+                    // Calculate net worked hours after subtracting breaks
                     $netWorkedHours = $workedHours - ($totalBreakSeconds / 3600);
-
-                    // Ensure non-negative working hours
+    
+                    // Add to total working hours (ensure no negative hours)
                     $totalWorkingHours += max($netWorkedHours, 0);
                 }
             }
         }
-
-        return number_format($totalWorkingHours, 1); // Return formatted total hours
+    
+        // Return total working hours rounded to 1 decimal
+        return number_format($totalWorkingHours, 1);
     }
+
     public function settings()
     {
         $title = 'Settings';

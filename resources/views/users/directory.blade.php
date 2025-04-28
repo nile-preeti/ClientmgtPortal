@@ -367,9 +367,9 @@
                 <div class="services-tabs">
                     <ul class="nav nav-tabs" role="tablist">
 
-                    <li><a href="#AssignedServices" data-bs-toggle="tab" aria-selected="true" role="tab" class="active" tabindex="-1"><i class="las la-eye-slash"></i> Assigned</a>
+                    <li><a href="#AssignedServices" data-bs-toggle="tab" aria-selected="true" role="tab" class="active" tabindex="-1">Assigned</a>
                     </li>
-                    <li><a href="#UnAssignedServices" data-bs-toggle="tab" aria-selected="false" role="tab" class="" tabindex="-1"><i class="las la-eye-slash"></i> Completed</a>
+                    <li><a href="#UnAssignedServices" data-bs-toggle="tab" aria-selected="false" role="tab" class="" tabindex="-1"> Completed</a>
                     </li>
                     
                     <button class="btn btn-md" style="border: 1px solid #064086; border-radius: 30px; background: #064086;" id="refreshFilters">
@@ -620,10 +620,12 @@
 <script>
 $(document).ready(function () {
     // Initialize Owl Carousel
-    $('#Ongoingcalender').owlCarousel({
+    let owl = $('#Ongoingcalender');
+    owl.owlCarousel({
         loop: false,
         margin: 10,
         nav: true,
+        dots: false,
         responsive: {
             0: { items: 2 },
             600: { items: 4 },
@@ -631,20 +633,27 @@ $(document).ready(function () {
         }
     });
 
-    let owl = $('#Ongoingcalender');
-    owl.owlCarousel({
-        items: 5,
-        margin: 10,
-        loop: false,
-        nav: true,
-        dots: false,
-    });
-
-    // Scroll to selected date on load
+    // Scroll to the selected date or today's date on load
     let selectedIndex = $('#selectedCalendarItem').closest('.owl-item').index();
+    
+    // If a date is selected, scroll to it
     if (selectedIndex >= 0) {
         owl.trigger('to.owl.carousel', [selectedIndex, 300]);
+    } else {
+        // Otherwise, scroll to today's date (if available)
+        let today = new Date();
+        let todayFormatted = today.getFullYear() + '-' +
+            String(today.getMonth() + 1).padStart(2, '0') + '-' +
+            String(today.getDate()).padStart(2, '0');
+        
+        let todayItem = $('.Ongoing-calender-item[data-date="' + todayFormatted + '"]').closest('.item');
+        selectedIndex = todayItem.index();
+        
+        if (selectedIndex >= 0) {
+            owl.trigger('to.owl.carousel', [selectedIndex, 300]);
+        }
     }
+
     // Combined click handler for date selection
     $(document).on('click', '.selectable-date', function () {
         let selectedDate = $(this).data('date');

@@ -33,7 +33,7 @@ class UserController extends Controller
                 return $query->where("status", request("status"));
             })
 
-            ->orderBy("id", "desc")->paginate(config("contant.paginatePerPage"));
+            ->orderBy("name", "asc")->paginate(config("contant.paginatePerPage"));
 
         $title = "Employee Management";
 
@@ -43,7 +43,7 @@ class UserController extends Controller
     public function create(Request $request)
     {
         $title = "Create Employee";
-        $back_url = route('users.index');
+        $back_url = route('userss.index');
         $services = Service::with('subCategories')->get();
         return view("pages.users.create", compact('services', 'title','back_url'));
     }
@@ -179,53 +179,61 @@ class UserController extends Controller
     }
     // user end routes
     public function userAttendance(Request $request, $id)
-    { // Store status filter separately
-        $user = User::where('id', $id)->first();// Store by date for quick lookup
+{
+    $user = User::where('id', $id)->first();
+    $title = "Employee Attendance Records";
+    $back_url = route('userss.index');
 
-        // dd($attendanceRecords);
-        $title = "Employee Attendance Records";
-        $back_url = route('users.index');
+    // Get month and year from request, fallback to current
+    $month = $request->input('month', now()->month);
+    $year = $request->input('year', now()->year);
 
-        // Get month and year from request, fallback to current
-        $month = $request->input('month', now()->month);
-        $year = $request->input('year', now()->year);
+    // Fetch attendance records with relations
+    $attendanceRecords = Attendance::with(['attendanceBreaks', 'jobSchedule.service'])
+        ->where('user_id', $user->id)
+        ->whereMonth('date', $month)
+        ->whereYear('date', $year)
+        ->whereNotNull('job_id') // ✅ Only include records with a job assigned
+        ->orderBy('date', 'desc')
+        ->get();
 
-        $attendanceRecords = Attendance::with(['attendanceBreaks', 'jobSchedule.service'])
-            ->where('user_id', $user->id)
-            ->whereMonth('date', $month)
-            ->whereYear('date', $year)
-            ->orderBy('date', 'desc')
-            ->get();
+    $totalMinutes = 0;
 
-        $totalMinutes = 0;
-        foreach ($attendanceRecords as $record) {
-            if ($record->check_in_time && $record->check_out_time) {
-                $in = \Carbon\Carbon::parse($record->check_in_time);
-                $out = \Carbon\Carbon::parse($record->check_out_time);
-                $duration = $out->diffInMinutes($in);
+    foreach ($attendanceRecords as $record) {
+        if ($record->check_in_time && $record->check_out_time) {
+            $in = \Carbon\Carbon::parse($record->check_in_time);
+            $out = \Carbon\Carbon::parse($record->check_out_time);
 
-                $breakMinutes = $record->attendanceBreaks->sum(function ($break) {
+            $duration = $out->diffInMinutes($in);
+
+            // ✅ Only count valid breaks
+            $breakMinutes = $record->attendanceBreaks->sum(function ($break) {
+                if ($break->start_break && $break->end_break) {
                     return \Carbon\Carbon::parse($break->end_break)->diffInMinutes(\Carbon\Carbon::parse($break->start_break));
-                });
+                }
+                return 0;
+            });
 
-                $totalMinutes += ($duration - $breakMinutes);
-            }
+            // ✅ Ensure no negative working time
+            $netWorkedMinutes = max($duration - $breakMinutes, 0);
+
+            $totalMinutes += $netWorkedMinutes;
         }
-
-        $totalHours = floor($totalMinutes / 60);
-        $remainingMinutes = $totalMinutes % 60;
-        
-
-
-        return view("pages.users.attendance", compact(
-            "attendanceRecords",
-            "totalHours",
-            "remainingMinutes",
-            "title",
-            'user',
-            'back_url',
-        ));
     }
+
+    $totalHours = floor($totalMinutes / 60);
+    $remainingMinutes = $totalMinutes % 60;
+
+    return view("pages.users.attendance", compact(
+        "attendanceRecords",
+        "totalHours",
+        "remainingMinutes",
+        "title",
+        'user',
+        'back_url',
+    ));
+}
+
     public function attendance(Request $request)
     {
         $user = Auth::user();
@@ -937,7 +945,8 @@ class UserController extends Controller
             }
         ])
         ->where('status', 2)
-        ->where('user_id', $authUserId);
+        ->where('user_id', $authUserId)
+        ->orderby('id','desc');
 
         // Apply exact date match if selected
         if (!empty($parsedDate)) {

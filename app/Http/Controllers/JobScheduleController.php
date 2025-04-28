@@ -43,8 +43,8 @@ class JobScheduleController extends Controller
     {
         $title = "Schedule Job";
         $back_url = route('job_schedules.index');
-        $users = User::where("role_id", 2)->get();
-        $customers = Customer::all();
+        $users = User::where("role_id", 2)->orderBy("name", "asc")->get();
+        $customers = Customer::orderBy("name", "asc")->get();
         $states=State::where("country_id",233)->get();
         $services=Service::all();
         return view("pages.job_schedules.create", compact('title','services','states', 'users', 'customers','back_url'));
@@ -58,8 +58,8 @@ class JobScheduleController extends Controller
         if (!$job_schedule) {
             return back()->with("error", 'Schedule does not exists');
         }
-        $users = User::where("role_id", 2)->get();
-        $customers = Customer::all();
+        $users = User::where("role_id", 2)->orderBy("name", "asc")->get();
+        $customers = Customer::orderBy("name", "asc")->get();
         $states=State::where("country_id",233)->get();
         $services=Service::all();
         return view("pages.job_schedules.create", compact('job_schedule','states','services', 'users', 'customers', 'title','back_url'));
