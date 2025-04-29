@@ -27,21 +27,18 @@ class ReportExport implements FromCollection, WithHeadings
     {
         // Fetch data from the database
 
-
-        $modifiedData = $this->users->map(function ($item, $_i) {
-
-
+        $modifiedData = $this->users->map(function ($item, $_i) use (&$counter) {
+            // Initialize counter if it is not set
+            $counter = $counter ?? 1;
+            
             return [
-                "ID" => $item->id,
-                "Name" => $item->name  ?? 'N/A',
+                // dd($item->name),
+                "S.No." => $counter++, // Increment the counter for each row
+                "Name" => $item->name ?? 'N/A',
                 "Email" => $item->email ?? 'N/A',
-                "Phone" => $item->phone ?? 'N/A',
-                "Status" => $item->status ?"Active": 'Inactive',
+                "Phone" => $item->phone ?? 'N/A', // Clean phone number
+                "Status" => $item->status ? "Active" : 'Inactive',
                 "Working Hours" => $item->working_hours ?? 'N/A',
-
-
-
-
             ];
         });
 
@@ -51,7 +48,7 @@ class ReportExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            "ID",
+            "S.No.",
             "Name",
             "Email",
             "Phone",

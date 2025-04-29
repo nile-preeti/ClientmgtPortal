@@ -92,8 +92,22 @@
                                     </div>
 
                                     <div class="col-md-2 account-status mt-2">
+                                        @php
+                                        $currentDateTime = now();
+                                        $jobEndDateTime = \Carbon\Carbon::parse($item->end_date . ' ' . $item->end_time);
+                                    if ($item->status == 2) {
+                                        $statusLabel = 'Completed';
+                                        $badgeClass = 'iq-bg-success';
+                                    } elseif ($currentDateTime->greaterThan($jobEndDateTime) && in_array($item->status, [1])) {
+                                        $statusLabel = 'Pending';
+                                        $badgeClass = 'iq-bg-warning';
+                                    } else {
+                                        $statusLabel = $item->status ? 'Active' : 'Inactive';
+                                        $badgeClass = 'iq-bg-primary';
+                                    }
+                                       @endphp 
                                         <h6 class="mb-2">Status</h6>
-                                        <span class="badge dark-icon-light iq-bg-primary">{{ $item->status ? 'Active' : 'Inactive' }}</span>
+                                        <span class="badge dark-icon-light iq-bg-primary {{ $badgeClass }}">{{ $statusLabel }}</span>
                                     </div>
                                     <div class="col-md-3 account-status mt-2">
                                         <h6 class="mb-2">Action</h6>
@@ -116,7 +130,7 @@
                         </div>
                     </div>
                     @empty
-                                <div class="row align-items-center"> <>
+                                <div class="row align-items-center">
                                     <p>No records found</p>
                                 </div>
                             @endforelse

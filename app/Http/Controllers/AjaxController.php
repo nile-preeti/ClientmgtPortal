@@ -103,7 +103,7 @@ class AjaxController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Check-in recorded successfully.',
+            'message' => 'Checked-in successfully.',
             'data' => [
                 'date' => $attendance->date,
                 'check_in_time' => date("H:i", strtotime($attendance->check_in_time)),
@@ -179,7 +179,7 @@ class AjaxController extends Controller
         $attendance->save();
         return response()->json([
             'status' => 'success',
-            'message' => 'Attendance updated successfully.',
+            'message' => 'Checked-out successfully.',
             'data' => [
                 'check_in_time' => $checkInTime->format('H:i'),
                 'check_out_time' => $checkOutTime->format('H:i'),

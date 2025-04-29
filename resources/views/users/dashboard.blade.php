@@ -111,6 +111,15 @@
     box-shadow: none;  /* Remove the shadow */
     border: 2px solid #b0b0b0 !important; /* Muted border color when disabled */
 } 
+
+a.start-checkin-btn[disabled] {
+        color: #b0b0b0 !important;
+        background: #d3d3d3 !important;
+        cursor: not-allowed !important;
+        box-shadow: none !important;
+        border: 2px solid #b0b0b0 !important;
+        pointer-events: none; /* This prevents any click events */
+    }
   .container-wrapper-main{margin-left: 270px;}
   </style>
 <body>
@@ -152,9 +161,11 @@
         <h4 class="text-dark mb-4 mt-5 pb-0 text-capitalize font-weight-bolder"> Welcome {{ auth()->user()->name }}</h4>
         <div class="services-tabs">
                 <ul class="nav nav-tabs" role="tablist">
-                  <li><a class="active" href="#OngoingServices" data-bs-toggle="tab" aria-selected="true" role="tab">Ongoing</a></li>
-                  <li><a href="#AssignedServices" data-bs-toggle="tab" aria-selected="false" role="tab" class="" tabindex="-1"> Assigned</a>
-                  </li>
+                <li>
+                  <a class="active" href="#AssignedServices" data-bs-toggle="tab" aria-selected="false" role="tab" class="" tabindex="-1"> Assigned</a>
+                </li>
+                  <li><a  href="#OngoingServices" data-bs-toggle="tab" aria-selected="true" role="tab">Ongoing</a></li>
+                  
                   <!-- <li><a href="#UnAssignedServices" data-bs-toggle="tab" aria-selected="false" role="tab" class="" tabindex="-1"><i class="las la-eye-slash"></i> Completed</a>
                   </li> -->
                   
@@ -193,7 +204,7 @@
               </form>
             </div>
               <div class="tasks-content-info tab-content">
-              <div class="tab-pane active show" id="OngoingServices" role="tabpanel">
+              <div class="tab-pane " id="OngoingServices" role="tabpanel">
                   <div class="ongoing-services-list">
                     @forelse($ongoingSchedules as $schedule)
                       @php $service = $schedule->service; @endphp
@@ -217,7 +228,7 @@
                                 <a 
                                     class="px-4 start-checkin-btn" 
                                     href="javascript:void(0);" 
-                                    data-id="{{ $schedule->id }}"
+                                    data-id="{{ $schedule->id }}"  @if($canMarkComplete) disabled @endif
                                 >
                                  {{ $todayAttendance->isNotEmpty() ? 'Break/End' : 'Start' }}
                                 </a>
@@ -313,7 +324,7 @@
                   </div>
                 </div>
 
-                <div class="tab-pane" id="AssignedServices" role="tabpanel">
+                <div class="tab-pane active show" id="AssignedServices" role="tabpanel">
                     <div class="ongoing-services-list">
                         @forelse($assignedSchedules as $job)
                         <div class="ongoing-services-item">

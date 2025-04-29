@@ -65,13 +65,12 @@
                             <tr>
                                 <th>Employee</th>
                                 <th>Service</th>
-
-
-                                <th>Start Date </th>
-                                <th>End Date </th>
+                                <th>Sub Category</th>
+                                <th> Date </th>
                                 <th>From Time </th>
                                 <th>To Time </th>
                                 <th>Status</th>
+                                <th>Total Hours Worked</th>
                                 <th>Action &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
                             </tr>
                         </thead>
@@ -84,9 +83,10 @@
                                     <td>
                                         {{ $item->service->name ?? 'N/A' }}
                                     </td>
-                                    <td>{{ date('Y-m-d', strtotime($item->start_date)) }}
+                                    <td>
+                                        {{ $item->subCategory->sub_category ?? 'N/A' }}
                                     </td>
-                                    <td>{{ date('Y-m-d', strtotime($item->end_date)) }}
+                                    <td>{{ date('Y-m-d', strtotime($item->start_date)) }}
                                     </td>
 
 
@@ -96,10 +96,25 @@
                                     </td>
 
 
-                                    <td><span
-                                            class="badge dark-icon-light iq-bg-primary">{{ $item->status ? 'Active' : 'Inactive' }}</span>
+                                    <td>
+                                        @php
+                                        $currentDateTime = now();
+                                        $jobEndDateTime = \Carbon\Carbon::parse($item->end_date . ' ' . $item->end_time);
+                                    if ($item->status == 2) {
+                                        $statusLabel = 'Completed';
+                                        $badgeClass = 'iq-bg-success';
+                                    } elseif ($currentDateTime->greaterThan($jobEndDateTime) && in_array($item->status, [1])) {
+                                        $statusLabel = 'Pending';
+                                        $badgeClass = 'iq-bg-warning';
+                                    } else {
+                                        $statusLabel = $item->status ? 'Active' : 'Inactive';
+                                        $badgeClass = 'iq-bg-primary';
+                                    }
+                                       @endphp 
+                                    <span
+                                            class="badge dark-icon-light {{ $badgeClass }}">{{ $statusLabel }}</span>
                                     </td>
-
+                                        <td> {{ $jobTotalHours[$item->id] ?? '0.00' }} hrs</td>
                                     <td>
                                         <div class="flex align-items-center list-user-action">
 

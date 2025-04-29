@@ -502,6 +502,19 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+
+                                            <div class="col-md-6 col-sm-6 col-lg-4">
+                                                <div class="service-shift-card">
+                                                    <div class="service-shift-card-image">
+                                                        <img src="https://nileprojects.in/client-portal/public/assets/images/ic-dollar-circle.svg">
+                                                    </div>
+                                                    <div class="service-shift-card-text">
+                                                        <h2>Total Hours Worked</h2>
+                                                        <p>{{ $job->total_hours ?? 0 }}hrs</p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="ongoing-services-item-foot">

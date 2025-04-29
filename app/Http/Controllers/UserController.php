@@ -221,7 +221,7 @@ class UserController extends Controller
         }
     }
 
-    $totalHours = floor($totalMinutes / 60);
+    $totalHours = $totalMinutes / 60;
     $remainingMinutes = $totalMinutes % 60;
 
     return view("pages.users.attendance", compact(
@@ -308,30 +308,42 @@ class UserController extends Controller
         // Get month and year from request, fallback to current
         $month = $request->input('month', now()->month);
         $year = $request->input('year', now()->year);
-
+    
+        // Fetch attendance records with relations
         $attendanceRecords = Attendance::with(['attendanceBreaks', 'jobSchedule.service'])
             ->where('user_id', $user->id)
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
+            ->whereNotNull('job_id') // ✅ Only include records with a job assigned
             ->orderBy('date', 'desc')
             ->get();
-
+    
         $totalMinutes = 0;
+    
         foreach ($attendanceRecords as $record) {
             if ($record->check_in_time && $record->check_out_time) {
                 $in = \Carbon\Carbon::parse($record->check_in_time);
                 $out = \Carbon\Carbon::parse($record->check_out_time);
+    
                 $duration = $out->diffInMinutes($in);
-
+    
+                // ✅ Only count valid breaks
                 $breakMinutes = $record->attendanceBreaks->sum(function ($break) {
-                    return \Carbon\Carbon::parse($break->end_break)->diffInMinutes(\Carbon\Carbon::parse($break->start_break));
+                    if ($break->start_break && $break->end_break) {
+                        return \Carbon\Carbon::parse($break->end_break)->diffInMinutes(\Carbon\Carbon::parse($break->start_break));
+                    }
+                    return 0;
                 });
-
-                $totalMinutes += ($duration - $breakMinutes);
+    
+                // ✅ Ensure no negative working time
+                $netWorkedMinutes = max($duration - $breakMinutes, 0);
+    
+                $totalMinutes += $netWorkedMinutes;
             }
         }
+    
+        $totalHours = $totalMinutes / 60;
 
-        $totalHours = floor($totalMinutes / 60);
         $remainingMinutes = $totalMinutes % 60;
 
         return view("users.attendance_records", [
@@ -1013,7 +1025,7 @@ class UserController extends Controller
     public function job_schedule($id)
     {
         $title ="Scheduled Jobs";
-        $back_url = route('users.index');
+        $back_url = route('userss.index');
         $job_schedules = JobSchedule::where("user_id", $id)->get();
         foreach ($job_schedules as $key => $value) {
             $charge = UserService::where("user_id", $value->user_id)->where("service_id", $value->service_id)->first();

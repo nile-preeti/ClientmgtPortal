@@ -117,10 +117,11 @@ class JobScheduleController extends Controller
 
     public function  destroy($id)
     {
-        $user = User::find($id);
+        // dd($id);
+        $user = JobSchedule::find($id);
         if ($user) {
             $user->delete();
-            return response()->json(['success' => true, 'message' => "User deleted successfully"]);
+            return response()->json(['success' => true, 'message' => "Job deleted successfully"]);
         }
         return response()->json(['success' => false, 'message' => "User does not exists"]);
     }

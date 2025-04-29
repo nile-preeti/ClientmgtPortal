@@ -55,7 +55,7 @@
                         <div class="iq-card-body">
                             <div class="d-flex d-flex align-items-center justify-content-between">
                                 <div>
-                                    <h6 class="over-title-text">Total jobs</h6>
+                                    <h6 class="over-title-text">Total Jobs</h6>
                                     <h2 class="over-title-value">{{ ($user_jobs) }}</h2>
                                 </div>
                                 <div class="iq-card-icon">
@@ -71,7 +71,7 @@
                         <div class="iq-card-body">
                             <div class="d-flex d-flex align-items-center justify-content-between">
                                 <div>
-                                    <h6 class="over-title-text">Total services</h6>
+                                    <h6 class="over-title-text">Total Services</h6>
                                     <h2 class="over-title-value">{{ ($services) }}</h2>
                                 </div>
                                 <div class="iq-card-icon">

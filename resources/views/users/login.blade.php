@@ -76,7 +76,7 @@
                             <div class="auth-content">
                                 <div class="auth-content-info text-center">
                                     <h4 class="text-black mb-2 font-weight-bold">Secure Access Portal</h4>
-                                    <p class="mb-5 text-dark">Unlock The Power Of Seamless And Protected Interaction With Your Intuitive Admin Panel.</p>
+                                    <p class="mb-5 text-dark">Unlock The Power Of Seamless And Protected Interaction With Your Intuitive User Panel.</p>
                                     <div class="auth-illustration">
                                         <img class="mt-2" src="https://nileprojects.in/client-portal/public/admin-login-img.svg" alt="" width="100%">
                                     </div>
@@ -99,11 +99,11 @@
                                     @csrf
                                     <div class="form-group">
                                         <label class="text-white" for="exampleInputEmail1"><i class="ri-profile-line"></i> &nbsp;Employee Id</label>
-                                        <input type="text" name="emp_id" class="form-control mb-0" id="exampleInputEmail1" placeholder="Enter emp id">
+                                        <input type="text" name="emp_id" class="form-control mb-0" id="exampleInputEmail1" placeholder="">
                                     </div>
                                     <div class="form-group">
                                         <label class="text-white" for="exampleInputPassword1"><i class="ri-lock-password-line"></i> &nbsp;Password</label>
-                                        <input type="password"  name="password" class="form-control mb-0" id="exampleInputPassword1" placeholder="Password">
+                                        <input type="password"  name="password" class="form-control mb-0" id="exampleInputPassword1" placeholder="">
                                     </div>
                                     <div class="d-inline-block w-100">
                                         <button type="submit" class="  btn-signin-1"> <i class="ri-login-circle-line font-weight-normal"></i> &nbsp;Sign in</button>

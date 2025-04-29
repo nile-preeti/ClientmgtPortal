@@ -7,6 +7,7 @@ use App\Models\JobSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Attendance;
 
 class CustomerController extends Controller
 {
@@ -86,13 +87,58 @@ class CustomerController extends Controller
     }
     public function show($id)
     {
-        $id =  decrypt($id);
+        $id = decrypt($id);
 
         $customer = Customer::find($id);
-        $job_schedules = JobSchedule::where("customer_id", $id)->get();
+        $job_schedules = JobSchedule::where("customer_id", $id)->with(['subCategory', 'user', 'service'])->get();
         $title = "Customer Details";
         $back_url = route('customers.index');
-        return view("pages.customers.details", compact("customer", 'job_schedules', 'title','back_url'));
+
+        // Get all job IDs
+        $jobIds = $job_schedules->pluck('id');
+
+        // Fetch all related attendances at once
+        $attendances = Attendance::with('attendanceBreaks')
+            ->whereIn('job_id', $jobIds)
+            ->get();
+
+        // Group attendances by job_id
+        $attendancesByJob = $attendances->groupBy('job_id');
+
+        // Initialize an array to store total hours per job
+        $jobTotalHours = [];
+
+        foreach ($attendancesByJob as $jobId => $records) {
+            $totalMinutes = 0;
+
+            foreach ($records as $record) {
+                if ($record->check_in_time && $record->check_out_time) {
+                    $in = \Carbon\Carbon::parse($record->check_in_time);
+                    $out = \Carbon\Carbon::parse($record->check_out_time);
+                    $duration = $out->diffInMinutes($in);
+
+                    $breakMinutes = $record->attendanceBreaks->sum(function ($break) {
+                        if ($break->start_break && $break->end_break) {
+                            return \Carbon\Carbon::parse($break->end_break)->diffInMinutes(\Carbon\Carbon::parse($break->start_break));
+                        }
+                        return 0;
+                    });
+
+                    $netWorkedMinutes = max($duration - $breakMinutes, 0);
+                    $totalMinutes += $netWorkedMinutes;
+                }
+            }
+
+            $jobTotalHours[$jobId] = round($totalMinutes / 60, 2); // e.g., 5.25 hours
+        }
+
+        return view("pages.customers.details", compact(
+            "customer",
+            'job_schedules',
+            'title',
+            'back_url',
+            'jobTotalHours' // pass the array to the view
+        ));
     }
     public function  destroy($id)
     {

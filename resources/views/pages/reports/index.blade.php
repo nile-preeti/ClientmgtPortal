@@ -90,7 +90,7 @@
                                         <div class="form-group">
                                             <a class="btnChangePassword" href="{{ route('reports') }}?export=true"><i
                                                     class="ri-download-line"></i>
-                                                &nbsp; Download Report</a>
+                                                &nbsp; Report</a>
                                         </div>
                                     </div>
 

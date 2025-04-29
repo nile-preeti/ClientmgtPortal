@@ -342,10 +342,7 @@
                                             <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/working-hour.png" alt="image" class="img-fluid me-2" style="width: 25px; height: auto;border-radius: 0!important;">
                                             <h4 class="hours-worked">
                                             Total Hours worked: 
-                                                {{ $totalHours }} hr{{ $totalHours != 1 ? 's' : '' }} 
-                                                @if ($remainingMinutes > 0)
-                                                    {{ $remainingMinutes }} min{{ $remainingMinutes != 1 ? 's' : '' }}
-                                                @endif
+                                            {{ number_format($totalHours, 2) }} hr{{ $totalHours != 1 ? 's' : '' }}
                                             </h4>
                                         </div>
                                         <hr>
@@ -382,7 +379,7 @@
 
                                                                 <div class="d-flex card-time-detail-info mt-2">
                                                                     <img src="https://nileprojects.in/clearchoice-janitorial/public/assets/admin-images/total-work-hours.png" alt="image" class="img-fluid me-2" style="width: 22px; height: auto;border-radius: 0!important;">
-                                                                    <h3>Total Hours Worked on Day:
+                                                                    <h3>Total Working Hours:
                                                                         @if($record->check_out_time)
                                                                         @php
                                                                             $start = \Carbon\Carbon::parse($record->check_in_time);

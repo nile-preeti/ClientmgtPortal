@@ -283,7 +283,7 @@ class AdminController extends Controller
 
         if (request()->has("export")) {
 
-            $users =  $users->get();
+            $users =  $users->orderby('name','asc')->get();
             foreach ($users as $user) {
                 $month = request("month", date("m"));
                 $year = request("year", date("Y"));

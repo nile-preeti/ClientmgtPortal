@@ -57,7 +57,7 @@
                                             @if (isset($job_schedule)) value="{{ $job_schedule->customer->phone }}" @endif>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="full_address">Full Address*</label>
                                         <input type="text" id="full_address" class="form-control"
