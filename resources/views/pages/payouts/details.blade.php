@@ -202,11 +202,11 @@
                     <ul class="pagination justify-content-end mb-0">
                       @if ($paginatedData->onFirstPage())
                       <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Prev</a>
                       </li>
                       @else
                       <li class="page-item">
-                        <a class="page-link" href="{{ $paginatedData->previousPageUrl() }}">Previous</a>
+                        <a class="page-link" href="{{ $paginatedData->previousPageUrl() }}">Prev</a>
                       </li>
                       @endif
 

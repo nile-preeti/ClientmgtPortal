@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ReportExport;
+use App\Exports\CustomerExport;
 use App\Models\Admin;
 use App\Models\Attendance;
 use App\Models\AttendanceBreak;
@@ -271,88 +272,358 @@ class AdminController extends Controller
 
     public function reports(Request $request)
     {
+    
+        $title = "Reports";
+        $users =  $users = User::where("role_id", 2)->where('status',1)->count();
+        $customer = Customer::where('status',1)->count();
+        return view("pages.reports.index", compact("title",'users','customer'));
+    }
+
+
+    public function Employeereports(Request $request)
+    {
         $search = $request->search;
-        $users = User::when(request()->filled("search"), function ($query) {
-            $keyword = trim(request("search"));
-            return $query->where("name", "LIKE", "%$keyword%")->orWhere("designation", "LIKE", "%$keyword%")->orWhere("email", "LIKE", "%$keyword%")->orWhere("phone", "LIKE", "%$keyword%");
-        })
+        $month = $request->input("month", date("m"));
+        $year = $request->input("year", date("Y"));
+    
+        $users = User::withCount([
+            'jobSchedules as services_count' => function ($query) use ($month, $year) {
+                $query->where('status', 2)
+                      ->whereMonth('start_date', $month)
+                      ->whereYear('start_date', $year);
+            }
+        ])
+            ->when($request->filled("search"), function ($query) use ($search) {
+                $keyword = trim($search);
+                return $query->where(function ($q) use ($keyword) {
+                    $q->where("name", "LIKE", "%$keyword%")
+                      ->orWhere("designation", "LIKE", "%$keyword%")
+                      ->orWhere("email", "LIKE", "%$keyword%")
+                      ->orWhere("phone", "LIKE", "%$keyword%");
+                });
+            })
             ->where("role_id", 2)
-            ->when(request()->filled("status"), function ($query) {
-                return $query->where("status", request("status"));
+            ->where("status", 1)
+            ->when($request->filled("status"), function ($query) use ($request) {
+                return $query->where("status", $request->status);
             });
-
-        if (request()->has("export")) {
-
-            $users =  $users->orderby('name','asc')->get();
+    
+        // Handle export
+        if ($request->has("export")) {
+            $users = $users->orderBy('name', 'asc')->get();
             foreach ($users as $user) {
-                $month = request("month", date("m"));
-                $year = request("year", date("Y"));
                 $user->working_hours = $this->getTotalWorkingHours($user->id, $month, $year);
             }
-            return Excel::download(new ReportExport($users),  'employees_' . date("d-m-Y", time()) . '.xlsx');
+    
+            return Excel::download(new ReportExport($users, $month, $year), 'employees_report_' . date("d-m-Y") . '.xlsx');
         }
-        $users =      $users->orderby('name','asc')->paginate(config("contant.paginatePerPage"));
-
+    
+        // Pagination
+        $users = $users->orderBy('name', 'asc')->paginate(config("contant.paginatePerPage"));
+    
+        // Append working hours for each user
         foreach ($users as $user) {
-            $month = request("month", date("m"));
-            $year = request("year", date("Y"));
             $user->working_hours = $this->getTotalWorkingHours($user->id, $month, $year);
         }
-        $title = "Reports ";
-
-        return view("pages.reports.index", compact("title", 'users', 'search'));
+    
+        $title = "Employee Reports";
+        $back_url = route('reports');
+    
+        return view("pages.reports.reports_by_employee", compact("title", "users", "search",'back_url'));
     }
+
+
+
+
+    public function Customerreports(Request $request)
+    {
+        $search = $request->search;
+        $month = $request->input("month", date("m"));
+        $year = $request->input("year", date("Y"));
+
+        $users = Customer::withCount([
+            'jobSchedules as services_count' => function ($query) use ($month, $year) {
+                $query->where('status', 2)
+                      ->whereMonth('start_date', $month)
+                      ->whereYear('start_date', $year);
+            }
+        ])
+            ->when($request->filled("search"), function ($query) use ($search) {
+                $keyword = trim($search);
+                return $query->where(function ($q) use ($keyword) {
+                    $q->where("name", "LIKE", "%$keyword%")
+                    ->orWhere("email", "LIKE", "%$keyword%")
+                    ->orWhere("phone", "LIKE", "%$keyword%");
+                });
+            })
+            ->where("status", 1)
+            ->when($request->filled("status"), function ($query) use ($request) {
+                return $query->where("status", $request->status);
+            });
+
+        // Handle export
+        if ($request->has("export")) {
+            $users = $users->orderBy('name', 'asc')->get();
+            foreach ($users as $customer) {
+                $customer->working_hours = $this->getTotalWorkingHours($customer->id, $month, $year);
+            }
+
+            return Excel::download(new CustomerExport($users, $month, $year), 'customers_report_' . date("d-m-Y") . '.xlsx');
+        }
+
+        // Pagination
+        $users = $users->orderBy('name', 'asc')->paginate(config("contant.paginatePerPage"));
+
+        // Append working hours for each customer
+        foreach ($users as $customer) {
+            $customer->working_hours = $this->getTotalWorkingHours($customer->id, $month, $year);
+        }
+        // dd($users);
+        $title = "Customer Reports";
+        $back_url = route('reports');
+
+        return view("pages.reports.reports_by_customer", compact("title", "users", "search", 'back_url'));
+    }
+
+
     function getTotalWorkingHours($userId, $month, $year)
     {
-        // Fetch attendance records where job_id exists (is not null)
-        $attendanceRecords = Attendance::where('user_id', $userId)
+        // Step 1: Get job IDs with status = 2 (completed)
+        $jobIdsWithStatus2 = JobSchedule::where('status', 2)->where('user_id',$userId)->pluck('id')->toArray();
+
+        // Step 2: Fetch attendance records with breaks using eager loading
+        $attendanceRecords = Attendance::with('attendanceBreaks') // 'breaks' relationship defined in model
+            ->where('user_id', $userId)
             ->whereMonth('date', $month)
             ->whereYear('date', $year)
-            ->whereNotNull('job_id') // Only records with job_id
+            ->whereIn('job_id', $jobIdsWithStatus2)
+            ->whereNotNull('job_id')
             ->get()
-            ->keyBy('date'); // Keyed by date for fast lookup
-    
+            ->keyBy('id');
+
+        // Step 3: Loop and calculate working hours
         $totalWorkingHours = 0;
-        $startDate = Carbon::createFromDate($year, $month, 1);
-        $endDate = $startDate->copy()->endOfMonth();
-    
-        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
-            $formattedDate = $date->format('Y-m-d');
-    
-            if (isset($attendanceRecords[$formattedDate])) {
-                $record = $attendanceRecords[$formattedDate];
-    
-                $checkInTime = !empty($record->check_in_time) ? strtotime($record->check_in_time) : null;
-                $checkOutTime = !empty($record->check_out_time) ? strtotime($record->check_out_time) : null;
-    
-                if (!is_null($checkInTime) && !is_null($checkOutTime)) {
-                    // Calculate worked hours between check-in and check-out
-                    $workedHours = ($checkOutTime - $checkInTime) / 3600; // seconds to hours
-    
-                    // Fetch total break seconds
-                    $breaks = AttendanceBreak::where('user_id', $record->user_id)
-                        ->where('date', $record->date)
-                        ->whereNotNull('start_break')
-                        ->whereNotNull('end_break')
-                        ->get();
-    
-                    $totalBreakSeconds = 0;
-                    foreach ($breaks as $break) {
+
+        foreach ($attendanceRecords as $record) {
+            $checkInTime = !empty($record->check_in_time) ? strtotime($record->check_in_time) : null;
+            $checkOutTime = !empty($record->check_out_time) ? strtotime($record->check_out_time) : null;
+
+            if (!is_null($checkInTime) && !is_null($checkOutTime)) {
+                $workedHours = ($checkOutTime - $checkInTime) / 3600; // in hours
+
+                // Calculate total break time
+                $totalBreakSeconds = 0;
+                foreach ($record->attendanceBreaks as $break) {
+                    if (!empty($break->start_break) && !empty($break->end_break)) {
                         $totalBreakSeconds += strtotime($break->end_break) - strtotime($break->start_break);
                     }
-    
-                    // Calculate net worked hours after subtracting breaks
-                    $netWorkedHours = $workedHours - ($totalBreakSeconds / 3600);
-    
-                    // Add to total working hours (ensure no negative hours)
-                    $totalWorkingHours += max($netWorkedHours, 0);
                 }
+
+                // Subtract break time from worked time
+                $netWorkedHours = $workedHours - ($totalBreakSeconds / 3600);
+                $totalWorkingHours += max($netWorkedHours, 0); // avoid negative values
             }
         }
-    
-        // Return total working hours rounded to 1 decimal
-        return number_format($totalWorkingHours, 1);
+
+        // Return total working hours, rounded to 2 decimal places
+        return number_format($totalWorkingHours, 2);
     }
+
+
+
+    public function getServiceDetails(Request $request)
+    {
+        $userId = $request->user_id;
+        $month = $request->input("month", date("m"));
+       // dd($month);
+        $year = $request->input("year", date("Y"));
+
+        // Fetch services with associated service and subCategory
+        $services = JobSchedule::with(['service', 'subCategory'])
+            ->where('user_id', $userId)
+            ->where('status', 2)
+            ->orderby('id', 'desc') // assuming 2 is a valid status
+            ->get();
+
+        // Loop through services and calculate working hours for each service
+        foreach ($services as $s) {
+            $s->working_hours = $this->getTotalWorkingHoursPerService($userId, $s->id, $month, $year); // Pass job_id for each service
+        }
+
+        // Build raw HTML string
+        if ($services->isEmpty()) {
+            $html = '<p class="text-muted">No service data available.</p>';
+        } else {
+            $html = '<table class="table table-bordered">';
+            $html .= '<thead><tr><th>Service Name</th><th>Sub Category</th><th>Working Hours</th></tr></thead><tbody>';
+
+            foreach ($services as $service) {
+                $html .= '<tr>';
+                $html .= '<td>' . ($service->service->name ?? 'N/A') . '</td>';
+                $html .= '<td>' . ($service->subCategory->sub_category ?? 'N/A') . '</td>';
+                $html .= '<td>' . ($service->working_hours ? $service->working_hours . ' hrs' : 'N/A') . '</td>';
+                $html .= '</tr>';
+            }
+
+            $html .= '</tbody></table>';
+        }
+
+        return response()->json(['html' => $html]);
+    }
+
+    public function getTotalWorkingHoursPerService($userId, $jobId, $month, $year)
+    {
+        // Get attendance records for the specific job ID
+        $attendanceRecords = Attendance::with('attendanceBreaks')
+            ->where('user_id', $userId)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->where('job_id', $jobId) // Now using job_id to filter attendance records
+            ->get();
+        //dd($attendanceRecords);
+        $totalWorkingHours = 0;
+
+        // Calculate working hours for each attendance record
+        foreach ($attendanceRecords as $record) {
+            if ($record->check_in_time && $record->check_out_time) {
+                $checkIn = strtotime($record->check_in_time);
+                $checkOut = strtotime($record->check_out_time);
+
+                $workedSeconds = $checkOut - $checkIn;
+                $breakSeconds = 0;
+
+                foreach ($record->attendanceBreaks as $break) {
+                    if ($break->start_break && $break->end_break) {
+                        $breakSeconds += strtotime($break->end_break) - strtotime($break->start_break);
+                    }
+                }
+
+                $netSeconds = max(0, $workedSeconds - $breakSeconds);
+                $totalWorkingHours += $netSeconds / 3600; // Convert to hours
+               
+            }
+        }
+
+        return number_format($totalWorkingHours, 2); // Round to 2 decimal places
+    }
+
+
+
+
+    public function getWeeklyWorkingHours($userId, Request $request)
+    {
+        $month = $request->get('month');
+        $year = $request->get('year');
+
+        // Get only job_ids with status = 2
+        $jobIds = JobSchedule::where('status', 2)->where('user_id',$userId)->pluck('id')->toArray();
+
+        // Fetch attendance with breaks, only for matching jobs
+        $records = Attendance::with('attendanceBreaks')
+            ->where('user_id', $userId)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->whereIn('job_id', $jobIds)
+            ->get();
+
+        // Prepare weekly data
+        $weeklyHours = [];
+
+        foreach ($records as $record) {
+            $date = Carbon::parse($record->date);
+            $weekIndex = $date->copy()->startOfWeek(Carbon::SUNDAY)->diffInWeeks($date->copy()->startOfMonth());
+
+            $checkIn = strtotime($record->check_in_time);
+            $checkOut = strtotime($record->check_out_time);
+
+            if ($checkIn && $checkOut) {
+                $workedHours = ($checkOut - $checkIn) / 3600;
+
+                $breakSeconds = 0;
+                foreach ($record->attendanceBreaks as $break) {
+                    if ($break->start_break && $break->end_break) {
+                        $breakSeconds += strtotime($break->end_break) - strtotime($break->start_break);
+                    }
+                }
+
+                $netHours = max($workedHours - ($breakSeconds / 3600), 0);
+
+                if (!isset($weeklyHours[$weekIndex])) {
+                    $weeklyHours[$weekIndex] = 0;
+                }
+
+                $weeklyHours[$weekIndex] += $netHours;
+            }
+        }
+
+        // Handle empty weekly hours case
+        if (empty($weeklyHours)) {
+            return response()->json([0.00, 0.00, 0.00, 0.00, 0.00]);
+        }
+
+        // Format to 2 decimals
+        $maxWeek = max(array_keys($weeklyHours));
+        $weeklyHoursFormatted = [];
+        
+        for ($i = 0; $i <= $maxWeek; $i++) {
+            $weeklyHoursFormatted[$i] = isset($weeklyHours[$i]) ? round($weeklyHours[$i], 2) : 0.00;
+        }
+
+        // Ensure we always return 5 weeks (0-4)
+        while (count($weeklyHoursFormatted) < 5) {
+            $weeklyHoursFormatted[] = 0.00;
+        }
+
+        return response()->json(array_slice($weeklyHoursFormatted, 0, 5));
+    }
+
+
+
+
+    public function getServiceDetailsCustomer(Request $request)
+    {
+        $customerId = $request->user_id; // still coming from JS as user_id
+        $month = $request->input("month", date("m"));
+        $year = $request->input("year", date("Y"));
+
+        // Fetch services with associated service and subCategory based on customer_id
+        $services = JobSchedule::with(['service', 'subCategory', 'user']) // added 'user'
+                    ->where('customer_id', $customerId)
+                    ->where('status', 2)
+                    ->orderBy('id', 'desc')
+                    ->get();
+
+        // Loop through services and calculate working hours
+        foreach ($services as $s) {
+            $s->working_hours = $this->getTotalWorkingHoursPerService($s->user_id, $s->id, $month, $year);
+        }
+
+        // Build HTML response
+        if ($services->isEmpty()) {
+            $html = '<p class="text-muted">No service data available.</p>';
+        } else {
+            $html = '<table class="table table-bordered">';
+            $html .= '<thead><tr><th>Service Name</th><th>Employee Name</th><th>Sub Category</th><th>Working Hours</th></tr></thead><tbody>';
+
+            foreach ($services as $service) {
+                $html .= '<tr>';
+                $html .= '<td>' . ($service->service->name ?? 'N/A') . '</td>';
+                $html .= '<td>' . ($service->user->name ?? 'N/A') . '</td>';
+                $html .= '<td>' . ($service->subCategory->sub_category ?? 'N/A') . '</td>';
+                $html .= '<td>' . ($service->working_hours ? $service->working_hours . ' hrs' : 'N/A') . '</td>';
+                $html .= '</tr>';
+            }
+
+            $html .= '</tbody></table>';
+        }
+
+        return response()->json(['html' => $html]);
+    }
+
+
+
+
+    
 
     public function settings()
     {

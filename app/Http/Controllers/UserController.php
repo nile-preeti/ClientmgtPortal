@@ -50,7 +50,7 @@ class UserController extends Controller
     public function edit(Request $request, $id)
     {
         $title = "Edit Employee";
-        $back_url = route('users.index');
+        $back_url = route('userss.index');
         $user = User::find($id);
         if (!$user) {
             return back()->with("error", 'User does not exists');
@@ -164,7 +164,7 @@ class UserController extends Controller
             'success' => true,
             'message' => "User Updated Successfully",
             'redirect' => true,
-            'route' => route('users.index') // Returning route for frontend redirection
+            'route' => route('userss.index') // Returning route for frontend redirection
         ]);
     }
 

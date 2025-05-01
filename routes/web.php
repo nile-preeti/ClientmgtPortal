@@ -62,6 +62,8 @@ Route::group(['middleware' => 'admin'], function () {
 
     
     Route::get("reports", [AdminController::class, 'reports'])->name("reports");
+    Route::get("employee-reports", [AdminController::class, 'Employeereports'])->name("employee.reports");
+    Route::get("customer-reports", [AdminController::class, 'Customerreports'])->name("customer.reports");
     Route::get("settings", [AdminController::class, 'settings'])->name("settings");
     Route::post("settings", [AdminController::class, 'settings_store'])->name("settings.store");
 
@@ -73,6 +75,11 @@ Route::group(['middleware' => 'admin'], function () {
 
     //holidays
     Route::resource("holidayss", HolidayController::class);
+    Route::get('/user/service-details', [AdminController::class, 'getServiceDetails'])->name('user.service.details');
+    Route::get('/admin/weekly-working-hours/{userId}', [AdminController::class, 'getWeeklyWorkingHours'])->name('admin.weekly.working.hours');
+
+
+    Route::get('/customer/service-details', [AdminController::class, 'getServiceDetailsCustomer'])->name('customer.service.details');
 
     Route::get("logout", [AdminController::class, 'logout'])->name("logout");
 });

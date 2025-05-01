@@ -173,7 +173,7 @@ button:disabled {
 .btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
 a.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
 .user-profile {height: 140px;border-radius: 24px;}
-.btnUpdate {color: #fff;    white-space: nowrap; background: #0069ac; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
+.btnUpdate {color: #fff;    white-space: nowrap; background: var(--iq-primary); box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
 .btnCancel {color: #fff;   white-space: nowrap; background: #c93126; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); display: inline-block; text-align: center; border-radius: 5px; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; }
 .dropdown-menu .dropdown-item.active, .dropdown-item:active {background-color: #064086 !important;}
 
@@ -183,8 +183,8 @@ a.btnChangePassword {color: #fff;    width: 100%; white-space: nowrap; backgroun
 
 .Ongoing-calender-item h3 {color: #4F5168; text-align: center; font-size: 13px; font-style: normal; font-weight: 400; line-height: 20px; margin: 0; padding: 0; }
 .Ongoing-calender-item h2 {color: #064086; text-align: center; font-size: 18px; font-style: normal; font-weight: 700; line-height: 20px; margin: 0; padding: 0; }
-.services-tabs ul li a.active {color: #fff; border-radius: 50px; background:  #064086; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); }
-.services-tabs ul li a {font-weight: 700; font-size: 14px; text-align: center; padding: 10px 15px; color: var(--gray); display: inline-block; width: 100%; border-bottom: none; border-radius: 50px; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); }
+.services-tabs ul li a.active {color: #fff; border-radius: 10px; background:  #064086; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); }
+.services-tabs ul li a {font-weight: 700; font-size: 14px; text-align: center; padding: 10px 15px; color: var(--gray); display: inline-block; width: 100%; border-bottom: none; border-radius: 10px; background: #FFF; box-shadow: 0px 8px 13px 0px rgba(35, 53, 111, 0.12); }
 
 .services-tabs ul li {flex: auto; }
 .services-tabs ul {display: flex; position: relative; border: none; gap: 10px; }
@@ -250,6 +250,12 @@ Responsive
    
 }
 @media(max-width:1299px) {
+    .profile-page-section{padding: 1rem 0 0 0px !important;}
+    .attendance-records-section{margin-left:0px;}
+    .services-page-section{margin-left: 0px !important;}
+
+
+
     
 }
 @media (min-width:992px) and (max-width:1199px) {
@@ -269,11 +275,8 @@ Responsive
 @media(max-width:767px) {
     .profile-name{display: none;}
     .dash-card{width: 100%;}
-    .services-page-section{margin-left: 0px !important;}
     .attendance-records-head{display: block !important;}
     .Search-filter{margin-top: 20px;}
-    .attendance-records-section{margin-left:0px;}
-    .profile-page-section{padding: 1rem 0 0 0px !important;}
 
 
     }

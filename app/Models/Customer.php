@@ -12,4 +12,9 @@ class Customer extends Model
     public function state(){
         return $this->belongsTo(State::class);
     }
+
+    public function jobSchedules()
+    {
+        return $this->hasMany(JobSchedule::class, 'customer_id', 'id');
+    }
 }

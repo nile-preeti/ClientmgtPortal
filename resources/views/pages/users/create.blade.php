@@ -59,108 +59,116 @@
                             @endif
 
                             <div class="client-form-card">
-                                <h2>Create Employee</h2>
+                                
                                 <div class="row">
+                                     <div class="col-md-2">
+                                        <div class="user-profile-card-sec">
+                                            
+                                            <label class="" for="">Profile Image</label>
+                                            <div class="profile-img-edit">
+                                                 
+                                            @if(isset($user))
+                                           
+                                                <img  src="{{ $user->image ? asset('uploads/images/' . $user->image) : 'https://nileprojects.in/client-portal/public/avatar-1.png' }}"  class="rounded-circle profile-pic img-fluid rounded mr-2" alt="user"/>
+                                            @else 
+                                                <img src="https://nileprojects.in/client-portal/public/avatar-1.png" class="rounded-circle profile-pic img-fluid rounded mr-2" alt="user">
+                                            @endif
+                                                <div class="p-image">
+                                                  <i class="ri-pencil-line upload-button"></i>
+                                                  <input class="file-upload" type="file" name="image" accept=".png,.jpeg,.jpg,.svg"/>
+                                               </div>
+                                             </div>
 
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="name">Name*</label>
-                                            <input type="text" name="name"
-                                                @if (isset($user)) value="{{ $user->name }}" @endif
-                                                class="form-control" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="name">Email*</label>
-                                            <input type="email" name="email"
-                                                @if (isset($user)) value="{{ $user->email }}" @endif
-                                                class="form-control" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="name">Emp ID*</label>
-                                            <input type="number" min="0" name="emp_id"
-                                                @if (isset($user)) value="{{ $user->emp_id }}" @endif
-                                                class="form-control" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="name">Phone Number*</label>
-                                            <input type="text" placeholder="(678) 878-9909"
-                                                @if (isset($user)) value="{{ $user->phone }}" @endif
-                                                data-inputmask="'mask': '(999) 999-9999'" required name="phone"
-                                                class="form-control">
-                                        </div>
-                                    </div>
-                                    
-
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="name">Status</label>
-                                            <select class="form-control" name="status">
-                                                <option value="1" @selected(isset($user) && $user->status == 1)>Active </option>
-                                                <option value="0" @selected(isset($user) && $user->status == 0)>Inactive </option>
-                                            </select>
+                                            <!-- <input type="hidden" name="image" id="create_image" class="form-control"> -->
+                                            <!-- <div class="form-group">
+                                                <div id="myDropzone" class="dropzone dz-box"></div>
+                                            </div> -->
                                         </div>
                                     </div>
 
-                                    @if (isset($user))
+                                    <div class="col-md-10">
+
+                                        <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                 <label for="name">&nbsp;</label>
-                                                <div>
-                                                    <button type="button" class="btnReset"
-                                                        onclick="$('#password').toggle()">Reset
-                                                        Password</button>
-                                                </div>
-                                                <div>
-                                                    <input type="text" name="password" class="form-control" required
-                                                        id="password" style="display: none">
-
-                                                </div>
+                                                <label for="name">Name*</label>
+                                                <input type="text" name="name"
+                                                    @if (isset($user)) value="{{ $user->name }}" @endif
+                                                    class="form-control" required>
                                             </div>
                                         </div>
-                                    @else
+
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label for="name">Password*</label>
-                                                <input type="text" name="password" class="form-control" required>
+                                                <label for="name">Email*</label>
+                                                <input type="email" name="email"
+                                                    @if (isset($user)) value="{{ $user->email }}" @endif
+                                                    class="form-control" required>
                                             </div>
                                         </div>
-                                    @endif
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="name">Emp ID*</label>
+                                                <input type="number" min="0" name="emp_id"
+                                                    @if (isset($user)) value="{{ $user->emp_id }}" @endif
+                                                    class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="name">Phone Number*</label>
+                                                <input type="text" placeholder="(678) 878-9909"
+                                                    @if (isset($user)) value="{{ $user->phone }}" @endif
+                                                    data-inputmask="'mask': '(999) 999-9999'" required name="phone"
+                                                    class="form-control">
+                                            </div>
+                                        </div>
+                                        
 
-                                    <div class="col-md-4">
-                                        <label for="">Profile Image</label>
-                                        <div class="profile-img-edit">
-                                        @if(isset($user))
-                                            <img 
-                                                src="{{ $user->image ? asset('uploads/images/' . $user->image) : 'https://nileprojects.in/client-portal/public/avatar-1.png' }}" 
-                                                class="rounded-circle profile-pic img-fluid rounded mr-2" 
-                                                alt="user"
-                                            />
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="name">Status</label>
+                                                <select class="form-control" name="status">
+                                                    <option value="1" @selected(isset($user) && $user->status == 1)>Active </option>
+                                                    <option value="0" @selected(isset($user) && $user->status == 0)>Inactive </option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        @if (isset($user))
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                     <label for="name">&nbsp;</label>
+                                                    <div>
+                                                        <button  type="button" class="btnReset"
+                                                            onclick="$('#password').toggle()">Reset
+                                                            Password</button>
+                                                    </div>
+                                                    <div>
+                                                        <input type="text" name="password" class="form-control" required
+                                                            id="password" style="display: none">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="name">Password*</label>
+                                                    <input type="text" name="password" class="form-control" required>
+                                                </div>
+                                            </div>
                                         @endif
-                                            <div class="p-image">
-                                              <i class="ri-pencil-line upload-button"></i>
-                                              <input class="file-upload" type="file" name="image" accept=".png,.jpeg,.jpg,.svg"/>
-                                           </div>
-                                         </div>
-
-                                        <!-- <input type="hidden" name="image" id="create_image" class="form-control"> -->
-                                        <!-- <div class="form-group">
-                                            <div id="myDropzone" class="dropzone dz-box"></div>
-                                        </div> -->
+                                        </div>
                                     </div>
+                                   
                                 </div>
                             </div>
 
                             <div class="client-form-item">
                                 <div class="client-form-item-head">
                                     <h4>Services</h4>
-                                    <button type="button" class="btnAdd" id="addService"><i class="ri-add-circle-line"></i> Add</button>
+                                    <button type="button" class="btnAdd" id="addService"><i class="ri-add-circle-line"></i> </button>
                                 </div>
 
                                 @if (isset($user))
@@ -217,7 +225,7 @@
                                                     <div class="form-group">
                                                         <button type="button" class="btnremove" 
                                                             onclick="$('#old_service_{{ $item->id }}').remove()"> 
-                                                            <i class="ri-delete-bin-line"></i> Remove
+                                                            <i class="ri-delete-bin-line"></i> 
                                                         </button>
                                                     </div>
                                                 </div>
@@ -278,7 +286,7 @@
             </div>
             <div class="col-md-2">
                 <div class="form-group">
-                    <button type="button" class="btnremove removeService"> <i class="ri-delete-bin-line"></i> Remove</button>
+                    <button type="button" class="btnremove removeService"> <i class="ri-delete-bin-line"></i> </button>
                 </div>
             </div>
         `;

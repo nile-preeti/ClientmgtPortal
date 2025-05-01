@@ -5,13 +5,13 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="iq-card">
+                    <div class="">
                         <!-- <div class="iq-card-header d-flex justify-content-between">
                                   <div class="iq-header-title">
                                      <h4 class="card-title">User List</h4>
                                   </div>
                                </div> -->
-                        <div class="iq-card-body">
+                        <div class="">
                             <div class="search-filter-info">
                                 <div class="row justify-content-between">
                                     <div class="col-sm-12 col-md-5">
@@ -24,14 +24,14 @@
                                                             placeholder="Search..." aria-controls="user-list-table"
                                                             value="{{ $search }}">
                                                     </div>
-                                                    <button type="submit" class="" style="border: none; background: none; cursor: pointer;">
-                                                                <i class="fa fa-search" style="color:#3d3e3e;font-size:16px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);padding: 10px 0px;text-align: center;border-radius: 5px;width: 45px;height:44px;  justify-content: center; display: flex; align-items: center;"></i>
+                                                    <button type="submit" class="" style="border: none;  cursor: pointer;">
+                                                                <i class="fa fa-search" style="color:#fff; background: #3d3e3e; font-size:16px;border: 1px solid #3d3e3e;box-shadow:0px 8px 13px 0px rgba(35, 53, 111, 0.12);padding: 10px 0px;text-align: center;border-radius: 5px;width: 45px;height:44px;  justify-content: center; display: flex; align-items: center;"></i>
                                                             </button>
                                                 </form>
                                             </div>
                                             <div class="btn-reload"
                                                 onclick="window.location.href = window.location.origin + window.location.pathname;">
-                                                <img src="{{ asset('reset.png') }}" height="15" alt="">
+                                                <img src="{{ asset('ic-reset.svg') }}" height="20" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -57,7 +57,82 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+                                <!-- <div class="table-responsive d-none">
+                                    <table id="user-list-table"
+                                        class="table table-striped table-hover table-borderless mt-0" role="grid"
+                                        aria-describedby="user-list-page-info">
+                                        <thead>
+                                            <tr>
+                                                <th> Name</th>
+                                                <th>Email</th>
+                                                {{-- <th>Designation</th> --}}
+                                                <th>Phone No.</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($users as $item)
+                                                <tr>
+                                                    <td class="d-flex align-items-center"><img
+                                                            class="avatar-30 rounded mr-2"
+                                                            src="{{ $item->image ? asset("uploads/images/$item->image") : asset('avatar-1.png') }}"
+                                                            alt="profile"> {{ $item->name }}</td>
+
+                                                    <td>{{ $item->email }}</td>
+                                                    {{-- <td>{{ $item->designation ?? 'N/A' }}</td> --}}
+                                                    <td>{{ $item->phone ?? 'N/A' }}</td>
+                                                    <td><span
+                                                            class="badge dark-icon-light iq-bg-primary">{{ $item->status ? 'Active' : 'Inactive' }}</span>
+                                                    </td>
+
+                                                    <td>
+                                                        <div class="flex align-items-center list-user-action">
+                                                            {{-- <a  data-toggle="modal"
+                                                                data-name="{{ $item->name ?? '' }}"
+                                                                data-status="{{ $item->status ?? '' }}"
+                                                                data-email="{{ $item->email ?? '' }}"
+                                                                data-designation="{{ $item->designation }}"
+                                                                data-phone="{{ $item->phone }}"
+                                                                data-image="{{ $item->image ? asset("uploads/images/$item->image") : null }}"
+                                                                data-url="{{ route('userss.update', $item->id) }}"
+                                                                onclick="showData(this)" data-target="#EditModel"
+                                                                style="cursor: pointer"><i class="ri-pencil-fill"></i></a> --}}
+
+                                                            {{-- edit button --}}
+                                                            <a href="{{ route('userss.edit', $item->id) }}"
+                                                                class="btnedit"><i class="ri-pencil-fill"></i></a>
+                                                            {{-- delete  button --}}
+                                                            <a class="btndelete" data-id="{{ $item->id }}"
+                                                                style="cursor: pointer"
+                                                                data-url="{{ route('userss.destroy', $item->id) }}"
+                                                                onclick="deletePublic(this)"><i
+                                                                    class="ri-delete-bin-7-line"></i></a>
+                                                            <a class="btnview" data-id="{{ $item->id }}"
+                                                                style="cursor: pointer"
+                                                                href="{{ route('user.job_schedule', $item->id) }}"><i
+                                                                    class="ri-briefcase-line"></i></a>
+                                                            <a class="btnview" data-id="{{ $item->id }}"
+                                                                style="cursor: pointer"
+                                                                href="{{ route('userAttendance', $item->id) }}"><i
+                                                                    class="ri-calendar-event-fill"></i></a>
+
+
+                                                        </div>
+
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" align="center">No records found</td>
+                                                </tr>
+                                            @endforelse
+
+
+
+                                        </tbody>
+                                    </table>
+                                </div> -->
                             </div>
                             
                         </div>
@@ -78,7 +153,7 @@
                                             </div>
                                             <div class="name-info ml-3">
                                                 <p>{{ $item->name }}</p>
-                                                <h6 class="mt-2"></h6>
+                                                <h6 class=""></h6>
                                             </div>
                                         </div>
                                     </div>
@@ -92,11 +167,12 @@
                                     </div>
                                     <div class="col-md-1 account-status">
                                         <h6>Status</h6>
-                                        <p class="mt-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-circle-fill me-2" viewBox="0 0 16 16"><circle cx="6" cy="6" r="6"></circle></svg>{{ $item->status ? 'Active' : 'Inactive' }}</p>
+                                        <span class="badge dark-icon-light {{ $item->status ? 'iq-bg-primary' : 'bg-danger' }} ">{{ $item->status ? 'Active' : 'Inactive' }}</span>
+                                        <!-- <p class="mt-2"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-circle-fill me-2" viewBox="0 0 16 16"><circle cx="6" cy="6" r="6"></circle></svg></p> -->
                                     </div>
                                     <div class="col-md-3 account-status">
-                                        <h6>Action</h6>
-                                        <div class="mt-2 flex align-items-center list-user-action">
+                                        <h6 class="mb-2">Action</h6>
+                                        <div class=" flex align-items-center list-user-action">
                                             <a href="{{ route('userss.edit', $item->id) }}" class="btnedit"><i class="ri-pencil-fill"></i></a>
 
                                             <a class="btndelete" data-id="{{ $item->id }}" style="cursor: pointer" data-url="{{ route('userss.destroy', $item->id) }}" onclick="deletePublic(this)"><i class="ri-delete-bin-7-line"></i></a>
@@ -118,7 +194,7 @@
                         </div>
                     </div>
                     @empty
-                        <div class="row align-items-center"> <>
+                        <div class="row align-items-center">
                             <p>No records found</p>
                         </div>
                     @endforelse
@@ -129,18 +205,18 @@
                                 <div id="user-list-page-info" class="col-md-6">
                                     {{-- <span>Showing 1 to 5 of 5 entries</span> --}}
                                 </div>
-                                <div class="col-md-6">
-                                    <nav aria-label="Page navigation example">
+                                <div class="col-md-6 mb-3">
+                                    <nav aria-label="Page navigation example ">
                                         <ul class="pagination justify-content-end mb-0">
                                             @if ($users->onFirstPage())
                                                 <li class="page-item disabled">
                                                     <a class="page-link" href="#" tabindex="-1"
-                                                        aria-disabled="true">Previous</a>
+                                                        aria-disabled="true">Prev</a>
                                                 </li>
                                             @else
                                                 <li class="page-item">
                                                     <a class="page-link"
-                                                        href="{{ $users->previousPageUrl() }}">Previous</a>
+                                                        href="{{ $users->previousPageUrl() }}">Prev</a>
                                                 </li>
                                             @endif
 

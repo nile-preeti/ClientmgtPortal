@@ -104,12 +104,12 @@
                                             @if ($data->onFirstPage())
                                                 <li class="page-item disabled">
                                                     <a class="page-link" href="#" tabindex="-1"
-                                                        aria-disabled="true">Previous</a>
+                                                        aria-disabled="true">Prev</a>
                                                 </li>
                                             @else
                                                 <li class="page-item">
                                                     <a class="page-link"
-                                                        href="{{ $data->previousPageUrl() }}">Previous</a>
+                                                        href="{{ $data->previousPageUrl() }}">Prev</a>
                                                 </li>
                                             @endif
 

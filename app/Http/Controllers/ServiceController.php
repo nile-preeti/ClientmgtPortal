@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Service;
 use App\Models\ServiceSubCategory;
 use Illuminate\Http\Request;
+use App\Models\JobSchedule;
 
 class ServiceController extends Controller
 {
@@ -78,15 +79,35 @@ class ServiceController extends Controller
     }
 
 
-    public function  destroy($id)
+    public function destroy($id)
     {
-        $user = Service::find($id);
-        if ($user) {
-            $user->delete();
-            return response()->json(['success' => true, 'message' => "Service deleted successfully"]);
+        $service = Service::find($id);
+
+        if (!$service) {
+            return response()->json([
+                'success' => false,
+                'message' => "Service does not exist"
+            ]);
         }
-        return response()->json(['success' => false, 'message' => "Service does not exists"]);
+
+        // Check if service is used in JobSchedule
+        $isUsed = JobSchedule::where('service_id', $id)->exists();
+
+        if ($isUsed) {
+            return response()->json([
+                'success' => false,
+                'message' => "Service is already in use and cannot be deleted"
+            ]);
+        }
+
+        $service->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Service deleted successfully"
+        ]);
     }
+
 
 
 

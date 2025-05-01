@@ -82,7 +82,7 @@
                                                         <td>{{ $item->name  }}</td> <!-- Show service name only once -->
                                                         <td>{{ $subcategory->sub_category }}</td>
                                                         <td>
-                                                            <span class="badge dark-icon-light iq-bg-primary">
+                                                            <span class="badge dark-icon-light {{ $item->status ? 'iq-bg-primary' : 'bg-danger' }}">
                                                                 {{ $item->status ? 'Active' : 'Inactive' }}
                                                             </span>
                                                         </td>
@@ -116,7 +116,7 @@
                                                     <td>{{ $item->name }}</td>
                                                     <td>N/A</td>
                                                     <td>
-                                                        <span class="badge dark-icon-light iq-bg-primary">
+                                                        <span class="badge dark-icon-light {{ $item->status ? 'iq-bg-primary' : 'bg-danger' }}">
                                                             {{ $item->status ? 'Active' : 'Inactive' }}
                                                         </span>
                                                     </td>
@@ -164,12 +164,12 @@
                                             @if ($services->onFirstPage())
                                                 <li class="page-item disabled">
                                                     <a class="page-link" href="#" tabindex="-1"
-                                                        aria-disabled="true">Previous</a>
+                                                        aria-disabled="true">Prev</a>
                                                 </li>
                                             @else
                                                 <li class="page-item">
                                                     <a class="page-link"
-                                                        href="{{ $services->previousPageUrl() }}">Previous</a>
+                                                        href="{{ $services->previousPageUrl() }}">Prev</a>
                                                 </li>
                                             @endif
 

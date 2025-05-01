@@ -130,7 +130,7 @@
                                                     <td>{{ $item->phone ?? 'N/A' }}</td>
                                                     <td>{{ $item->full_address ?? 'N/A' }}</td>
                                                     <td><span
-                                                            class="badge dark-icon-light iq-bg-primary">{{ $item->status ? 'Active' : 'Inactive' }}</span>
+                                                            class="badge dark-icon-light {{ $item->status ? 'iq-bg-primary' : 'bg-danger' }}">{{ $item->status ? 'Active' : 'Inactive' }}</span>
                                                     </td>
 
                                                     <td>

@@ -48,4 +48,9 @@ class User extends Authenticatable
     public function services(){
         return $this->hasMany(UserService::class);
     }
+
+    public function jobSchedules()
+    {
+        return $this->hasMany(JobSchedule::class, 'user_id');
+    }
 }
