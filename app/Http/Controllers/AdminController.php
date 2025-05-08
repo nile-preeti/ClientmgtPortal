@@ -333,6 +333,61 @@ class AdminController extends Controller
     }
 
 
+    public function monthlyreports(Request $request)
+    {
+        $search = $request->search;
+        $month = $request->input("month", date("m"));
+        $year = $request->input("year", date("Y"));
+    
+        $users = User::withCount([
+            'jobSchedules as services_count' => function ($query) use ($month, $year) {
+                $query->where('status', 2)
+                      ->whereMonth('start_date', $month)
+                      ->whereYear('start_date', $year);
+            }
+        ])
+            ->when($request->filled("search"), function ($query) use ($search) {
+                $keyword = trim($search);
+                return $query->where(function ($q) use ($keyword) {
+                    $q->where("name", "LIKE", "%$keyword%")
+                      ->orWhere("designation", "LIKE", "%$keyword%")
+                      ->orWhere("email", "LIKE", "%$keyword%")
+                      ->orWhere("phone", "LIKE", "%$keyword%");
+                });
+            })
+            ->where("role_id", 2)
+            ->where("status", 1)
+            ->when($request->filled("status"), function ($query) use ($request) {
+                return $query->where("status", $request->status);
+            });
+    
+        // Handle export
+        if ($request->has("export")) {
+            $users = $users->orderBy('name', 'asc')->get();
+            foreach ($users as $user) {
+                $user->working_hours = $this->getTotalWorkingHours($user->id, $month, $year);
+            }
+    
+            return Excel::download(new ReportExport($users, $month, $year), 'employees_report_' . date("d-m-Y") . '.xlsx');
+        }
+    
+        // Pagination
+        $users = $users->orderBy('name', 'asc')->paginate(config("contant.paginatePerPage"));
+    
+        // Append working hours for each user
+        foreach ($users as $user) {
+            $user->working_hours = $this->getTotalWorkingHours($user->id, $month, $year);
+        }
+    
+        $title = "Employee Reports";
+        $back_url = route('reports');
+    
+        return view("pages.reports.reports_by_employee", compact("title", "users", "search",'back_url'));
+    }
+
+
+
+    
 
 
     public function Customerreports(Request $request)
@@ -365,7 +420,7 @@ class AdminController extends Controller
         if ($request->has("export")) {
             $users = $users->orderBy('name', 'asc')->get();
             foreach ($users as $customer) {
-                $customer->working_hours = $this->getTotalWorkingHours($customer->id, $month, $year);
+                $customer->working_hours = $this->getTotalWorkingHoursCustomer($customer->id, $month, $year);
             }
 
             return Excel::download(new CustomerExport($users, $month, $year), 'customers_report_' . date("d-m-Y") . '.xlsx');
@@ -376,7 +431,7 @@ class AdminController extends Controller
 
         // Append working hours for each customer
         foreach ($users as $customer) {
-            $customer->working_hours = $this->getTotalWorkingHours($customer->id, $month, $year);
+            $customer->working_hours = $this->getTotalWorkingHoursCustomer($customer->id, $month, $year);
         }
         // dd($users);
         $title = "Customer Reports";
@@ -431,6 +486,51 @@ class AdminController extends Controller
 
 
 
+
+    function getTotalWorkingHoursCustomer($userId, $month, $year)
+    {
+        // Step 1: Get job IDs with status = 2 (completed)
+        $jobIdsWithStatus2 = JobSchedule::where('status', 2)->where('customer_id',$userId)->pluck('id')->toArray();
+
+        // Step 2: Fetch attendance records with breaks using eager loading
+        $attendanceRecords = Attendance::with('attendanceBreaks') // 'breaks' relationship defined in model
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->whereIn('job_id', $jobIdsWithStatus2)
+            ->whereNotNull('job_id')
+            ->get()
+            ->keyBy('id');
+
+        // Step 3: Loop and calculate working hours
+        $totalWorkingHours = 0;
+
+        foreach ($attendanceRecords as $record) {
+            $checkInTime = !empty($record->check_in_time) ? strtotime($record->check_in_time) : null;
+            $checkOutTime = !empty($record->check_out_time) ? strtotime($record->check_out_time) : null;
+
+            if (!is_null($checkInTime) && !is_null($checkOutTime)) {
+                $workedHours = ($checkOutTime - $checkInTime) / 3600; // in hours
+
+                // Calculate total break time
+                $totalBreakSeconds = 0;
+                foreach ($record->attendanceBreaks as $break) {
+                    if (!empty($break->start_break) && !empty($break->end_break)) {
+                        $totalBreakSeconds += strtotime($break->end_break) - strtotime($break->start_break);
+                    }
+                }
+
+                // Subtract break time from worked time
+                $netWorkedHours = $workedHours - ($totalBreakSeconds / 3600);
+                $totalWorkingHours += max($netWorkedHours, 0); // avoid negative values
+            }
+        }
+
+        // Return total working hours, rounded to 2 decimal places
+        return number_format($totalWorkingHours, 2);
+    }
+
+
+
     public function getServiceDetails(Request $request)
     {
         $userId = $request->user_id;
@@ -439,7 +539,7 @@ class AdminController extends Controller
         $year = $request->input("year", date("Y"));
 
         // Fetch services with associated service and subCategory
-        $services = JobSchedule::with(['service', 'subCategory'])
+        $services = JobSchedule::with(['service', 'subCategory','customer'])
             ->where('user_id', $userId)
             ->where('status', 2)
             ->orderby('id', 'desc') // assuming 2 is a valid status
@@ -455,11 +555,12 @@ class AdminController extends Controller
             $html = '<p class="text-muted">No service data available.</p>';
         } else {
             $html = '<table class="table table-bordered">';
-            $html .= '<thead><tr><th>Service Name</th><th>Sub Category</th><th>Working Hours</th></tr></thead><tbody>';
+            $html .= '<thead><tr><th>Service Name</th><th>Customer Name</th><th>Sub Category</th><th>Working Hours</th></tr></thead><tbody>';
 
             foreach ($services as $service) {
                 $html .= '<tr>';
                 $html .= '<td>' . ($service->service->name ?? 'N/A') . '</td>';
+                $html .= '<td>' . ($service->customer->name ?? 'N/A') . '</td>';
                 $html .= '<td>' . ($service->subCategory->sub_category ?? 'N/A') . '</td>';
                 $html .= '<td>' . ($service->working_hours ? $service->working_hours . ' hrs' : 'N/A') . '</td>';
                 $html .= '</tr>';
@@ -587,7 +688,7 @@ class AdminController extends Controller
         $year = $request->input("year", date("Y"));
 
         // Fetch services with associated service and subCategory based on customer_id
-        $services = JobSchedule::with(['service', 'subCategory', 'user']) // added 'user'
+        $services = JobSchedule::with(['service', 'subCategory', 'user',]) // added 'user'
                     ->where('customer_id', $customerId)
                     ->where('status', 2)
                     ->orderBy('id', 'desc')

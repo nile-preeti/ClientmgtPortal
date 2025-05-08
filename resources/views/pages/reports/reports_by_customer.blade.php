@@ -107,6 +107,7 @@
                                                 <th>City</th>
                                                 <th>Status</th>
                                                 <th>Total Services</th>
+                                                <th>Total Working Hours</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -135,7 +136,9 @@
                                                         </a>
                                                     @endif
                                                     </td>
-                                                   
+                                                    <td>
+                                                        {{ $item->working_hours }} hrs
+                                                    </td>
                                                 </tr>
                                             @empty
                                                 <tr>

@@ -30,7 +30,7 @@ class ReportExport implements FromCollection, WithHeadings, WithStyles, WithEven
         //dd($this->month);
         foreach ($this->users as $user) {
             // Get services for the user
-            $services = \App\Models\JobSchedule::with(['service', 'subCategory'])
+            $services = \App\Models\JobSchedule::with(['service', 'subCategory','customer'])
                 ->where('user_id', $user->id)
                 ->where('status', 2)
                 ->whereMonth('start_date', $this->month)
@@ -43,6 +43,7 @@ class ReportExport implements FromCollection, WithHeadings, WithStyles, WithEven
                 $hours = $this->getTotalWorkingHoursPerService($user->id, $service->id, $this->month, $this->year);
                 $serviceDetails[] = 
                     ($service->service->name ?? 'N/A') . ' - ' . 
+                    ($service->customer->name ?? 'N/A').' - '.
                     ($service->subCategory->sub_category ?? 'N/A') . ' - ' . 
                     $hours . ' hrs';
             }
@@ -82,7 +83,7 @@ class ReportExport implements FromCollection, WithHeadings, WithStyles, WithEven
             'Name',
             'Email',
             'Phone',
-            'Services (Name - Category - Hours)',
+            'Services (Name - Customer Name - Category - Hours)',
             'Total Working Hours',
             'Week 1 Hours',
             'Week 2 Hours',

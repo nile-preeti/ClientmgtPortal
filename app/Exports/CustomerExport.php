@@ -68,6 +68,7 @@ class CustomerExport implements FromCollection, WithHeadings, WithStyles, WithEv
                 'Full Address' => $user->full_address,
                 'City' => $user->city,
                 'Services' => $servicesText,
+                'Total Working Hours' => $user->working_hours .' hrs',
             ];
         }
 
@@ -83,6 +84,7 @@ class CustomerExport implements FromCollection, WithHeadings, WithStyles, WithEv
             'Full Address',
             'City',
             'Services (Name - Category - Employee Name - Hours)',
+            'Total Working Hours',
         ];
     }
 
